@@ -1,7 +1,6 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-
+import connectDB from './configs/database.js';
 import authRoutes from './routes/authRoutes.js';
 
 dotenv.config();
@@ -16,20 +15,9 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 
 // Connect to MongoDB
-mongoose
-    .connect(process.env.MONGO_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useCreateIndex: true,
-    })
-    .then(() => {
-        console.log('Connected to MongoDB');
-    })
-    .catch((error) => {
-        console.log(error.message);
-    });
+connectDB();
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

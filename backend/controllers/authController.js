@@ -4,7 +4,7 @@ import User from '../models/userModel.js';
 // Register a user
 export const register = async (req, res) => {
     const { name, email, password } = req.body;
-
+    
     try {
         const user = await User.create({
             name,
