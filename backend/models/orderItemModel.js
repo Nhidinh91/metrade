@@ -1,19 +1,14 @@
 import mongoose from "mongoose";
 
-
 const orderDetailSchema = new mongoose.Schema(
   {
-    id: {
-      type: Schema.Types.ObjectId,
-      auto: true,
-    },
     order_id: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Order", // Reference to the Order model
       required: true,
     },
     product_id: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Product", // Reference to the Product model
       required: true,
     },
@@ -37,9 +32,9 @@ const orderDetailSchema = new mongoose.Schema(
       min: 0, // Ensures the price is not negative
     },
     pickup_point: {
-        type: String,
-        enum: ["Myllypuro", "Karamalmi", "Myyrmäki"],
-        trim: true,
+      type: String,
+      enum: ["Myllypuro", "Karamalmi", "Myyrmäki"],
+      trim: true,
     },
     sub_total: {
       type: Number,
@@ -59,4 +54,4 @@ const orderDetailSchema = new mongoose.Schema(
 
 const OrderDetail = mongoose.model("OrderDetail", orderDetailSchema);
 
-module.exports = OrderDetail;
+export default OrderDetail;

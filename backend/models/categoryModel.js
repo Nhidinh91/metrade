@@ -2,10 +2,6 @@ import mongoose from "mongoose";
 
 const categorySchema = new mongoose.Schema(
   {
-    id: {
-      type: Schema.Types.ObjectId,
-      auto: true,
-    },
     name: {
       type: String,
       required: true,
@@ -16,19 +12,19 @@ const categorySchema = new mongoose.Schema(
       trim: true,
     },
     parent_id: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Category", // Reference to the parent category
       default: null,
     },
     ancestors: [
       {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Category", // References to all ancestor categories
       },
     ],
     children: [
       {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Category", // References to direct child categories
       },
     ],
@@ -45,6 +41,7 @@ const categorySchema = new mongoose.Schema(
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" }, // Automatically add created_at and updated_at
   }
 );
+
 const Category = mongoose.model("Category", categorySchema);
 
 export default Category;
