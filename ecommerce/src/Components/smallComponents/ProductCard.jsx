@@ -1,21 +1,33 @@
-import { products } from "../dummyData";
 import { Card, Button } from "react-bootstrap";
 import coin from "../images/star.png";
-import img from "../images/hero.png";
+import clock from "../images/clock.png";
+import locImg from "../images/location.png";
 import style from "./styles/ProductCard.module.css";
 
-const ProductCard = () => {  
-
+const ProductCard = ({ name, image, pickup_point, price, created_at }) => {
+  //calculate days since creation
+  const daysSinceCreation = Math.floor(
+    (Date.now() - new Date(created_at)) / (1000 * 60 * 60 * 24)
+  );
   return (
     <Card className={style.productCard}>
-      <Card.Img variant="top" src={img} className="productImg" />
+      <Card.Img variant="top" src={image} className="productImg" />
       <Card.Body>
-        <Card.Title className="fw-bold" style={{ color: "#173b45" }}>Card Title</Card.Title>
+        <Card.Title className="fw-bold" style={{ color: "#173b45" }}>
+          {name}
+        </Card.Title>
         <div className="d-flex align-items-center">
           <img src={coin} alt="coin" style={{ width: "20px" }} />
-          <Card.Text>Price</Card.Text>
+          <Card.Text>{price}</Card.Text>
         </div>
-        <Card.Text>PickUp</Card.Text>
+        <div className="d-flex align-items-center">
+          <img src={clock} alt="clock" style={{ width: "20px" }} />
+          <Card.Text>{daysSinceCreation} days ago</Card.Text>
+        </div>
+        <div className="d-flex align-items-center">
+          <img src={locImg} alt="location" style={{ width: "20px" }} />
+          <Card.Text>{pickup_point}</Card.Text>
+        </div>
         <div className="d-flex justify-content-end">
           <Button variant="primary" hidden>
             Edit
