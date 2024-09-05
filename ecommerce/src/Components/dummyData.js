@@ -1,4 +1,14 @@
 
+
+export const pageLinks = [
+  { id: 1, href: "", text: "Apparel" },
+  { id: 2, href: "", text: "Books" },
+  { id: 3, href: "", text: "Electronics" },
+  { id: 4, href: "", text: "Decor" },
+  { id: 5, href: "", text: "Sport" },
+  { id: 6, href: "", text: "Entertainment & Services" },
+];
+
 export const products = [
   {
     _id: 1,
