@@ -1,4 +1,4 @@
-import { pageLinks } from "../dummyData";
+import { pageLinks } from "../dummyData.js";
 import PageLink from "./PageLink.jsx";
 
 const PageLinks = ({ parentClass, itemClass }) => {
