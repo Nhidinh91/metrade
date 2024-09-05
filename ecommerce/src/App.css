@@ -114,7 +114,7 @@ p {
 }
 .btn:hover {
   color: var(--clr-cream);
-  background: var(--clr-nude);
+  background: var(--clr-green);
 }
 /* section */
 .section {
