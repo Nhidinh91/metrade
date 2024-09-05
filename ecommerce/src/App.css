@@ -157,6 +157,7 @@ Navbar
     position: fixed;
     top: 0;
     left: 0;
+    background-color: var(--clr-nude);
 }
 
 .nav-upper {
@@ -199,5 +200,17 @@ Navbar
   display: flex;
   gap: 10px;
   margin: 5%;;
+}
+
+.nav-lower {
+  align-self: center;
+}
+
+.nav-lower-links {
+  display: flex;
+  padding: 1rem 2rem;
+  gap: 8rem;
+  color: var(--clr---navy);
+  cursor: pointer;
 }
 
