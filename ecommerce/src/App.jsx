@@ -7,7 +7,7 @@ import Navbar from "./Components/pageComponents/Navbar.jsx";
 function App() {
   return (
     <>
-    <h1>Heluuu</h1>
+    <Hero />
     </>
   );
 }
