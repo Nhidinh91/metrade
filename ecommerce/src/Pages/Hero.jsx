@@ -9,11 +9,11 @@ import style from "../Styles/Hero.module.css";
 const Hero = () => {
   return (
     <Container fluid className={`${style.hero} px-5`}>
-      <Row className="flex-row-reverse align-items-center">
-        <Col lg={4} md={3}className="justify-content-end align-items-end">
+      <Row className="flex-row-reverse">
+        <Col lg={5} xl={4} className="d-flex align-items-end">
           <img src={heroImg} alt="hero img" />
         </Col>
-        <Col md={9} lg={8} className="text-center ">
+        <Col lg={7} xl={8} className="text-center ">
           <Container>
             <h1 className="fw-bold">TRADE SMARTER, TOGETHER</h1>
             <h2 className="lead">Secure and Easy Transaction</h2>
