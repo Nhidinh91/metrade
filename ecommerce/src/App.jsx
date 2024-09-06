@@ -5,14 +5,16 @@ import Hero from "./Pages/Hero.jsx";
 import Navbar from "./Pages/Navbar.jsx";
 import Footer from "./Pages/Footer.jsx";
 import Newsfeed from "./Pages/Newsfeed.jsx";
+import AboutContact from "./Pages/AboutContact.jsx";
 
 
 function App() {
   return (
     <>
     <Navbar/>
-    <Hero/>
-    <Newsfeed/>
+    <AboutContact/>
+    {/* <Hero/> */}
+    {/* <Newsfeed/> */}
     <Footer/>
     </>
   );

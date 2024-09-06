@@ -170,7 +170,7 @@ p {
   letter-spacing: var(--spacing);
   display: inline-block;
   transition: var(--transition);
-  font-size: 1rem;
+  font-size: 1.5rem;
   border: 2px solid var(--clr-navy);
   border-radius: 4rem;
   cursor: pointer;

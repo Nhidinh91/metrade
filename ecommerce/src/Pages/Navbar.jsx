@@ -1,5 +1,5 @@
 import React from "react";
-import logo2 from "../assets/logo-2.png";
+import logo2 from "../assets/logo-2-removebg.png";
 import PageLinks from "../Components/PageLinks";
 
 const Navbar = () => {
