@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import connectDB from "./configs/database.js";
 import authRoutes from "./routes/authRoutes.js";
 
+import { logger } from "./middlewares/logger.js";
+
 dotenv.config();
 
 const app = express();
@@ -10,7 +12,7 @@ const app = express();
 // Middleware
 // A middleware function in Express.js that is used to parse incoming JSON payloads in HTTP requests
 app.use(express.json());
-
+app.use(logger);
 // Routes
 app.use("/api/auth", authRoutes);
 app.get("/", (req, res) => {

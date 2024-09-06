@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["active", "deactive", "banned"],
-      default: "user",
+      default: "active",
     },
     validationToken: {
       type: String,
