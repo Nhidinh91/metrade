@@ -1,8 +1,8 @@
 import { Card, Button } from "react-bootstrap";
-import coin from "../images/star.png";
-import clock from "../images/clock.png";
-import locImg from "../images/location.png";
-import style from "./styles/ProductCard.module.css";
+import coin from "../assets/star.png";
+import clock from "../assets/clock.png";
+import locImg from "../assets/location.png";
+import style from "../Styles/ProductCard.module.css";
 
 const ProductCard = ({ name, image, pickup_point, price, created_at }) => {
   //calculate days since creation

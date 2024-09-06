@@ -21,9 +21,9 @@ const Footer = () => {
             <Col className='footer-lower text-center py-3'>
                 <Col>
                     <a href='https://www.facebook.com' target='_blank' rel='noreferrer'><i className="fa-brands fa-facebook-f"/></a>
-                    <a href='https://www.instagram.com' target='_blank' rel='noreferrer'><i class="fa-brands fa-instagram"></i></a>
-                    <a href='https://www.twitter.com' target='_blank' rel='noreferrer'><i class="fa-brands fa-twitter"></i></a>
-                    <a href='https://www.linkedin.com' target='_blank' rel='noreferrer'><i class="fa-brands fa-linkedin"></i></a>
+                    <a href='https://www.instagram.com' target='_blank' rel='noreferrer'><i className="fa-brands fa-instagram"></i></a>
+                    <a href='https://www.twitter.com' target='_blank' rel='noreferrer'><i className="fa-brands fa-twitter"></i></a>
+                    <a href='https://www.linkedin.com' target='_blank' rel='noreferrer'><i className="fa-brands fa-linkedin"></i></a>
                 </Col> 
                 <Col>
                     <p>&copy; Metrade 2024. All rights reserved.</p>   

@@ -1,7 +1,7 @@
 import { products } from "../dummyData";
-import ProductCard from "../smallComponents/ProductCard";
+import ProductCard from "../Components/ProductCard";
 import { Container, Row, Col, Button } from "react-bootstrap";
-import style from "./styles/Newsfeed.module.css";
+import style from "../Styles/Newsfeed.module.css";
 import { useState } from "react";
 
 const Newsfeed = () => {

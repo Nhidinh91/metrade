@@ -1,6 +1,6 @@
 import React from "react";
-import logo2 from "../images/logo-2.png";
-import PageLinks from "../smallComponents/PageLinks.jsx";
+import logo2 from "../assets/logo-2.png";
+import PageLinks from "../Components/PageLinks";
 
 const Navbar = () => {
   return (
