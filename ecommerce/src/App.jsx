@@ -6,6 +6,7 @@ import Navbar from "./Pages/Navbar.jsx";
 import Footer from "./Pages/Footer.jsx";
 import Newsfeed from "./Pages/Newsfeed.jsx";
 import AboutContact from "./Pages/AboutContact.jsx";
+import SearchBar from "./Components/SearchBar.jsx";
 
 
 function App() {
@@ -16,6 +17,8 @@ function App() {
     {/* <Hero/> */}
     {/* <Newsfeed/> */}
     <Footer/>
+    <SearchBar />
+
     </>
   );
 }
