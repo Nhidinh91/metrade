@@ -1,6 +1,8 @@
 import User from "../models/userModel.js";
 import Cart from "../models/cartModel.js";
-import { emailCheck } from "../trung/mailVerification.js";
+import { emailCheck } from "../trung/mailValidation.js";
+import { hashPassword } from "../trung/passwordHashing.js";
+import { sendConfirmationEmailService } from "../trung/emailSender.js";
 
 export const register = async (req, res) => {
   try {
@@ -16,11 +18,18 @@ export const register = async (req, res) => {
       if (user) {
         throw new Error(`email ${email} is already used`);
       } else {
-        // if not exist, create a new user, and a new cart with new user id
-        const newUser = await User.create(req.body);
+        // if not exist, create a new user , and a new cart with new user id
+        const hashedPassword = await hashPassword(password);
+        const newUser = await User.create({
+          name,
+          email,
+          password: hashedPassword,
+        });
         const newCart = await Cart.create({ user_id: newUser.id });
+
+        sendConfirmationEmailService(email);
         // send confirmation email
-        console.log(newCart);
+        // console.log(newCart);
         res.status(201).json({
           status: "success",
           data: {

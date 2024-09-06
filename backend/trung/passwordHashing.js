@@ -1,6 +1,6 @@
-const bcrypt = require("bcrypt");
+import bcrypt from "bcrypt";
 
-SALT_SECRET = 10;
+const SALT_SECRET = 10;
 export const hashPassword = async (input) => {
   try {
     const salt = await bcrypt.genSalt(SALT_SECRET);
