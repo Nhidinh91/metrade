@@ -163,6 +163,20 @@ p {
   text-transform: capitalize;
 }
 
+.btn-empty {
+  background: none;
+  color: var(--clr-navy)  ;
+  padding: 3px 15px;
+  letter-spacing: var(--spacing);
+  display: inline-block;
+  transition: var(--transition);
+  font-size: 1rem;
+  border: 2px solid var(--clr-navy);
+  border-radius: 4rem;
+  cursor: pointer;
+  text-transform: capitalize;
+}
+
 /* section */
 .section {
   padding: 5rem 0;
@@ -292,4 +306,10 @@ Footer
 
 .footer {
   background: linear-gradient(0deg, #F37C25 0%,  #F49149 27%, #F5CAAB 83%,#FBF5F5 100%);
+  min-height: 400px;
+}
+
+.footer a {
+  color: var(--clr-navy);
+  font-size: 2rem;
 }
