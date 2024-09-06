@@ -305,11 +305,35 @@ Footer
 */
 
 .footer {
-  background: linear-gradient(0deg, #F37C25 0%,  #F49149 27%, #F5CAAB 83%,#FBF5F5 100%);
+  background: linear-gradient(0deg, #F37C25 0%, #F49149 27%, #F5CAAB 83%, #FBF5F5 100%);
   min-height: 400px;
+  padding-top: 6em;
+  font-family: "Montserrat", sans-serif;
+}
+
+.footer h1 {
+  font-weight: 700;
+  font-style: italic;
 }
 
 .footer a {
   color: var(--clr-navy);
   font-size: 2rem;
 }
+
+.footer p {
+  font-size: 1.5rem;
+}
+
+.footer-icons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 80px;
+  margin-bottom: 10px;
+}
+
+.footer-trademark p {
+  font-size: 1rem;
+}
+
