@@ -219,6 +219,8 @@ Navbar
     left: 0;
     background-color: var(--clr-nude);
     padding: 0;
+    position: sticky;
+    z-index: 1;
 }
 
 .nav-upper {
@@ -280,7 +282,7 @@ Navbar
   align-items: center;
   justify-content: center;
   height: 60px;
-  border: 2px solid var(--clr-navy);
+  /* border: 2px solid var(--clr-navy); */
 }
 
 .nav-lower-links {
