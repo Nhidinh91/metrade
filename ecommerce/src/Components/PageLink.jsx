@@ -1,10 +1,11 @@
-const PageLink = ({ link, itemClass }) => {
+import NavDropdown from 'react-bootstrap/NavDropdown';
+import style from '../Styles/PageLink.module.css';
+
+const PageLink = ({link, itemClass}) => {
   return (
-    <li key={link.id}>
-      <a href={link.href} className={itemClass}>
-        {link.text}
-      </a>
-    </li>
-  );
-};
+    <NavDropdown id={link.id} title={link.main_category} className={`${itemClass} ${style.navDropdownToggle}`}></NavDropdown>
+  )
+}
+
+
 export default PageLink;

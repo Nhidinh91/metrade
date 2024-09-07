@@ -285,19 +285,7 @@ Navbar
   /* border: 2px solid var(--clr-navy); */
 }
 
-.nav-lower-links {
-  display: flex;
-  align-items: center;
-  gap: 6rem;
-  cursor: pointer;
-}
 
-.nav-lower-link {
-  color: var(--clr-navy);
-  font-family: "Cambay", sans-serif;
-  font-weight: 700;
-  font-size: 23px;
-}
 
 
 /*

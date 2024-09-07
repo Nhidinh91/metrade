@@ -1,13 +1,15 @@
 
 
-export const pageLinks = [
-  { id: 1, href: "", text: "Apparel" },
-  { id: 2, href: "", text: "Books" },
-  { id: 3, href: "", text: "Electronics" },
-  { id: 4, href: "", text: "Decor" },
-  { id: 5, href: "", text: "Sport" },
-  { id: 6, href: "", text: "Entertainment & Services" },
+export const navLinks = [
+  { id: 1, href: "", main_category: "Apparel" },
+  { id: 2, href: "", main_category: "Books" },
+  { id: 3, href: "", main_category: "Electronics" },
+  { id: 4, href: "", main_category: "Decor" },
+  { id: 5, href: "", main_category: "Sport" },
+  { id: 6, href: "", main_category: "Entertainment & Services" },
 ];
+
+
 
 export const products = [
   {

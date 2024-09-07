@@ -5,8 +5,8 @@ const Footer = () => {
   return (
     <footer className='footer'>
         <Container fluid className=''>
-            <Row className='footer-upper justify-content-center'>
-                <Col md={{span: 6}} >
+            <Row className='footer-upper'>
+                <Col md={{span: 6, offset: 1}} >
                     <h1>Metrade</h1>
                     <p>Metrade is the exclusive marketplace for the Metropolia University community, designed to help students and staff buy, sell, and trade with ease. Join us in connecting the campus one trade at a time.</p>
                 </Col>

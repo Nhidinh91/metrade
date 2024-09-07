@@ -1,10 +1,12 @@
-import { pageLinks } from "../dummyData.js";
+import { navLinks } from "../dummyData.js";
 import PageLink from "./PageLink.jsx";
+import NavDropdown from 'react-bootstrap/NavDropdown';
+
 
 const PageLinks = ({ parentClass, itemClass }) => {
   return (
     <ul className={parentClass} id="nav-links">
-      {pageLinks.map((link) => {
+      {navLinks.map((link) => {
         return <PageLink key={link.id} link={link} itemClass={itemClass} />;
       })}
     </ul>
