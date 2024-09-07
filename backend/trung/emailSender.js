@@ -4,13 +4,12 @@ import jwt from "jsonwebtoken";
 
 dotenv.config();
 
-// process.env.MONGO_URI
 export const sendConfirmationEmailService = async (email) => {
   console.log("Start sending email");
   const transport = nodemailer.createTransport({
     service: "gmail",
-    // service: "gmail",
-    port: 587,
+    // service: "smtp.gmail.com",
+    port: 25, //25, 465
     secure: false, // true for 465, false for other ports
     auth: {
       user: process.env.EMAIL_USERNAME,
@@ -42,6 +41,5 @@ export const sendConfirmationEmailService = async (email) => {
       throw new Error("Unable to send email");
     }
     console.log("Email SENT Successfully");
-    // console.log(info);
   });
 };
