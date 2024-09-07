@@ -18,22 +18,22 @@ export const sendConfirmationEmailService = async (email) => {
   });
   const jwtToken = jwt.sign(
     {
-      data: email,
+      email,
     },
     process.env.JWT_SECRET,
     {
-      expiresIn: "2m",
+      expiresIn: process.env.JWT_EXPIRES_IN,
     }
   );
   // console.log(jwtToken);
   let mailConfigurations = await transport.sendMail({
-    from: `Non Replay <${process.env.EMAIL_USERNAME}`,
+    from: `Metrade <${process.env.EMAIL_USERNAME}`,
     to: `${email}`,
     subject: "Email Verification",
     text: `Hi! There, You have recently visited 
            our website and entered your email.
            Please follow the given link to verify your email
-           http://localhost:3000/verify/${jwtToken} 
+           http://localhost:3000/api/auth/verify/${jwtToken} 
            Thanks`,
   });
   transport.sendMail(mailConfigurations, (err, info) => {
@@ -41,6 +41,6 @@ export const sendConfirmationEmailService = async (email) => {
       throw new Error("Unable to send email");
     }
     console.log("Email SENT Successfully");
-    console.log(info);
+    // console.log(info);
   });
 };

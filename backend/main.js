@@ -15,11 +15,11 @@ app.use(express.json());
 app.use(logger);
 // Routes
 app.use("/api/auth", authRoutes);
-app.get("/", (req, res) => {
-  res.status(500).json({
-    message: "This is resposne",
-  });
-});
+// app.get("/", (req, res) => {
+//   res.status(500).json({
+//     message: "This is resposne",
+//   });
+// });
 // Connect to MongoDB
 connectDB();
 
