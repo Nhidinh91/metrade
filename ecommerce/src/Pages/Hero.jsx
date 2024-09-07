@@ -1,10 +1,10 @@
-import heroImg from "../images/heroNew.png";
-import icon1 from "../images/hero1.png";
-import icon2 from "../images/hero2.png";
-import icon3 from "../images/hero3.png";
-import icon4 from "../images/hero4.png";
+import heroImg from "../assets/heroNew.png";
+import icon1 from "../assets/hero1.png";
+import icon2 from "../assets/hero2.png";
+import icon3 from "../assets/hero3.png";
+import icon4 from "../assets/hero4.png";
 import {Container, Row, Col, Button} from "react-bootstrap";
-import style from "./styles/Hero.module.css";
+import style from "../Styles/Hero.module.css";
 
 const Hero = () => {
   return (

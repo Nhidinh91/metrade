@@ -1,6 +1,6 @@
 import React from "react";
-import logo2 from "../images/logo-2.png";
-import PageLinks from "../smallComponents/PageLinks.jsx";
+import logo2 from "../assets/logo-2.png";
+import PageLinks from "../Components/PageLinks";
 
 const Navbar = () => {
   return (
@@ -23,16 +23,22 @@ const Navbar = () => {
         </div>
 
         <div className="nav-buttons">
-          <button className="nav-sell-now">Sell Now</button>
-          <button className="nav-login">Login</button>
-          <a
-            href="https://www.amazon.com"
-            target="_blank"
-            rel="noreferrer"
-            className="nav-icon"
-          >
-            <i className="fa-solid fa-cart-shopping" />
-          </a>
+          <div className="nav-sell-now">
+            <button className="btn-navy">Sell Now</button>
+          </div>
+          <div className="nav-login">
+            <button className="btn-transparent">Login</button>
+          </div>
+          <div className="nav-cart">
+            <a
+              href="https://www.amazon.com"
+              target="_blank"
+              rel="noreferrer"
+              className="nav-icon"
+            >
+              <i className="fa-solid fa-cart-shopping" />
+            </a>
+          </div>
         </div>
       </div>
 

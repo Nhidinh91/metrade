@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
     isVerified: {
-      // Check verify email
+      // Check verify email before checkout
       type: Boolean,
       default: false,
     },
