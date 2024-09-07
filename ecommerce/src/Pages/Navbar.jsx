@@ -1,6 +1,6 @@
-import React from "react";
 import logo2 from "../assets/logo-2.png";
 import PageLinks from "../Components/PageLinks";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
@@ -27,7 +27,9 @@ const Navbar = () => {
             <button className="btn-navy">Sell Now</button>
           </div>
           <div className="nav-login">
-            <button className="btn-transparent">Login</button>
+            <Link to="/login" className="btn-transparent">
+              Login
+            </Link>
           </div>
           <div className="nav-cart">
             <a
