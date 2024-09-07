@@ -4,6 +4,8 @@ import { emailCheck } from "../trung/mailValidation.js";
 import { hashPassword } from "../trung/passwordHashing.js";
 import { sendConfirmationEmailService } from "../trung/emailSender.js";
 import { verifyUser } from "../trung/userVerfication.js";
+import { verifyJwtToken } from "../trung/jwtPromise.js";
+import { isValidJwtToken } from "../trung/jwtTokenDecode";
 
 import jwt from "jsonwebtoken";
 import { jwtDecode } from "jwt-decode";
@@ -31,7 +33,7 @@ export const register = async (req, res) => {
         });
         const newCart = await Cart.create({ user_id: newUser.id });
 
-        sendConfirmationEmailService(email);
+        await sendConfirmationEmailService(email);
         // send confirmation email
         // console.log(newCart);
         res.status(201).json({
@@ -53,31 +55,33 @@ export const register = async (req, res) => {
 
 export const verifyToken = async (req, res) => {
   try {
-    const { token } = req.params;
-    const email = jwtDecode(token).email;
-    // {
-    //   email: 'viettrung.doan@metropolia.fi',
-    //   iat: 1725664371,
-    //   exp: 1725664491
-    // }
-    console.log(decodedToken.email);
+    // const { token } = req.params;
+    const { token, email } = req.query;
+    // console.log(req.query);
+    const fakeEmail = "trung@gmail.com";
+    const decodedToken = jwtDecode(token);
+    // console.log(decodedToken);
+    const checkEmail = decodedToken.email;
+    // console.log(isValidJwtToken(token, email));
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-      if (err) {
-        throw new Error(
-          "Email verification failed, possibly the link is invalid or expired"
-        );
-      } else {
-        // const updateUser = await verifyUser(email);
-        res.status(200).json({
-          status: "success",
-          data: {
-            message: "Email verified successfully",
-            decoded,
-          },
-        });
-      }
-    });
+    // if (isValidJwtToken(token, fakeEmail)) {
+    if (isValidJwtToken(token, email)) {
+      const updatedUser = await verifyUser(email);
+      res.status(200).json({
+        status: "success",
+        data: {
+          message: "Email verified successfully",
+          updatedUser,
+        },
+      });
+    } else {
+      console.log("Invalid Request. Resending new Email");
+      await sendConfirmationEmailService(email);
+      throw new Error(
+        "Email verification failed, possibly the link is invalid or expired\nNew verification link is sent."
+      );
+    }
+
   } catch (err) {
     res.status(400).json({
       status: "fail",

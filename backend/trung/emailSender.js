@@ -6,6 +6,7 @@ dotenv.config();
 
 // process.env.MONGO_URI
 export const sendConfirmationEmailService = async (email) => {
+  console.log("Start sending email");
   const transport = nodemailer.createTransport({
     service: "gmail",
     // service: "gmail",
@@ -22,7 +23,7 @@ export const sendConfirmationEmailService = async (email) => {
     },
     process.env.JWT_SECRET,
     {
-      expiresIn: process.env.JWT_EXPIRES_IN,
+      expiresIn: process.env.JWT_VERIFICATION_EXPIRES_IN,
     }
   );
   // console.log(jwtToken);
@@ -33,7 +34,7 @@ export const sendConfirmationEmailService = async (email) => {
     text: `Hi! There, You have recently visited 
            our website and entered your email.
            Please follow the given link to verify your email
-           http://localhost:3000/api/auth/verify/${jwtToken} 
+           http://localhost:3000/api/auth/verify/?token=${jwtToken}&email=${email}\n 
            Thanks`,
   });
   transport.sendMail(mailConfigurations, (err, info) => {
