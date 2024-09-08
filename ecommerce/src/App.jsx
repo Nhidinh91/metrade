@@ -1,23 +1,22 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
-import Login from "./Pages/Login.jsx";
-import Main from "./Pages/Main.jsx";
-
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Main />,
-  },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-]);
+import Home from "./Pages/Home.jsx";
+import AboutContact from "./Pages/AboutContact.jsx";
+import SearchResults from "./Pages/SearchResult.jsx";
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} /> 
+        <Route path="/login" element={<Home />} />
+        <Route path="/signup" element={<Home />} />
+        <Route path="/about" element={<AboutContact />} />
+        <Route path="/search-results" element={<SearchResults />} />
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;
