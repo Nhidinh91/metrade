@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema(
       },
       update_at: {
         type: Date,
-        default: Date.now(), // must include this field, though the default field not work, but it helps when create tokenObject when sending Email
+        default: Date.now(), // must include this field, otherwise, when create new token, the token obj will not be added in db
       },
     },
     deleted_at: {
