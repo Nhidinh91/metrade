@@ -8,7 +8,6 @@ router.route("/register").post(register);
 // router.route("/verify").get(success).get(fail);
 router.route("/verify/").get(verifyToken);
 
-// router.post("/register", register);
 router.post("/login", login);
 
 export default router;

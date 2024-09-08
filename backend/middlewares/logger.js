@@ -1,4 +1,3 @@
-// middleware/logger.js
 
 // Custom middleware to log incoming requests
 export const logger = (req, res, next) => {

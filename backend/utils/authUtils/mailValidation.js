@@ -6,8 +6,8 @@ const isValidEmail = (inputEmail) => {
 };
 
 const isValidMetro = (inputMail) => {
-  const metroLenght = METROMAIL.length;
-  const inputMailEnding = inputMail.slice(-metroLenght);
+  const metroLength = METROMAIL.length;
+  const inputMailEnding = inputMail.slice(-metroLength);
   return inputMailEnding === METROMAIL;
 };
 

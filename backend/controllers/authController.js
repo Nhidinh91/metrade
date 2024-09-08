@@ -1,13 +1,9 @@
 import User from "../models/userModel.js";
 import Cart from "../models/cartModel.js";
-import { emailCheck } from "../trung/mailValidation.js";
-import { hashPassword } from "../trung/passwordHashing.js";
-import { sendConfirmationEmailService } from "../trung/emailSender.js";
-import { verifyUser } from "../trung/userVerfication.js";
-import { isValidJwtToken } from "../trung/jwtTokenDecode";
-
-
-import { jwtDecode } from "jwt-decode";
+import { emailCheck } from "../utils/authUtils/mailValidation.js";
+import { hashInput } from "../utils/authUtils/inputHashing.js";
+import { sendConfirmationEmailService } from "../utils/authUtils/emailSender.js";
+import { isValidVerifyToken } from "../utils/authUtils/tokenValidation.js";
 
 export const register = async (req, res) => {
   try {
@@ -17,19 +13,20 @@ export const register = async (req, res) => {
       throw new Error("Invalid Email Format, should be Metropolia Email");
     } else {
       //check if the user with email exist
-      const user = await User.findOne({ email });
+      const user = await User.findUserByEmail(email);
+
       if (user) {
         throw new Error(`email ${email} is already used`);
       } else {
         // if not exist, create a new user , and a new cart with new user id
-        const hashedPassword = await hashPassword(password);
+        const hashedPassword = await hashInput(password);
         const newUser = await User.create({
           name,
           email,
           password: hashedPassword,
         });
         const newCart = await Cart.create({ user_id: newUser.id });
-        
+
         // send confirmation email
         await sendConfirmationEmailService(email);
         // return response to FE
@@ -53,16 +50,24 @@ export const register = async (req, res) => {
 export const verifyToken = async (req, res) => {
   try {
     const { token, email } = req.query;
-    const decodedToken = jwtDecode(token);
-    const checkEmail = decodedToken.email;
-    
+    const user = await User.findUserByEmail(email);
+    const validToken = await isValidVerifyToken(token, user);
+
     // test if someone has the obtain the link user's email and change to attacker's email
     // const fakeEmail = "trung@gmail.com";
-    // if (isValidJwtToken(token, fakeEmail)) {
-    
-    // check token
-    if (isValidJwtToken(token, email)) {
-      const updatedUser = await verifyUser(email);
+    // if (isValidVerifyToken(token, fakeEmail)) {
+
+    // invalid token, resend new email with new token
+    // check if the user is already verified (in case user spaming verify email)
+
+    if (!user) {
+      throw new Error("Cannot found user. Please register!");
+      
+    } else if (user.isVerified) {
+      throw new Error("User is already verified");
+
+    } else if (validToken) {
+      const updatedUser = await User.verifyUser(email);
       res.status(200).json({
         status: "success",
         data: {
@@ -71,13 +76,11 @@ export const verifyToken = async (req, res) => {
         },
       });
     } else {
-      // invalid token, resend new email with new token
       await sendConfirmationEmailService(email);
       throw new Error(
         "Email verification failed, possibly the link is invalid or expired\nNew verification link is sent."
       );
     }
-
   } catch (err) {
     res.status(400).json({
       status: "fail",

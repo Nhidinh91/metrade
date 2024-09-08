@@ -38,9 +38,15 @@ const userSchema = new mongoose.Schema(
       enum: ["active", "deactive", "banned"],
       default: "active",
     },
-    validationToken: {
-      type: String,
-      default: "",
+
+    validation_token: {
+      value: {
+        type: String,
+      },
+      update_at: {
+        type: Date,
+        default: Date.now(), // must include this field, though the default field not work, but it helps when create tokenObject when sending Email
+      },
     },
     deleted_at: {
       type: Date,
@@ -51,6 +57,36 @@ const userSchema = new mongoose.Schema(
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" }, // Automatically add created_at and updated_at
   }
 );
+
+//statics
+userSchema.statics.verifyUser = async function (email) {
+  const updatedUser = await this.findOneAndUpdate(
+    { email },
+    { $set: { isVerified: true } },
+    { returnDocument: "after" }
+  );
+  return updatedUser;
+};
+
+userSchema.statics.saveTokenToUserWithEmail = async function (email, token) {
+  const tokenObject = {
+    value: token,
+    update_at: Date.now(),
+  };
+  const updatedUser = await this.findOneAndUpdate(
+    { email },
+    { $set: { validation_token: tokenObject } },
+    { returnDocument: "after" }
+  );
+  // return updatedUser;
+  return;
+};
+
+userSchema.statics.findUserByEmail = async function (email) {
+  const user = await this.findOne({ email });
+  return user;
+};
+//method
 
 const User = mongoose.model("User", userSchema);
 
