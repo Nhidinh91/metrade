@@ -11,7 +11,7 @@ const Footer = () => {
                     <p>Metrade is the exclusive marketplace for the Metropolia University community, designed to help students and staff buy, sell, and trade with ease. Join us in connecting the campus one trade at a time.</p>
                 </Col>
                 <Col md={{span: 3, offset: 1}} className="d-flex justify-content-center align-items-center">
-                    <Button className='btn-empty'>Contact Us</Button>
+                    <Button className='btn-empty' href="/about">Contact Us</Button>
                 </Col>
             </Row>
 

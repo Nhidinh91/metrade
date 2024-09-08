@@ -1,25 +1,21 @@
-import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
-import Hero from "./Pages/Hero.jsx";
-import Header from "./Pages/Header.jsx";
-import Footer from "./Pages/Footer.jsx";
-import Newsfeed from "./Pages/Newsfeed.jsx";
+import Home from "./Pages/Home.jsx";
 import AboutContact from "./Pages/AboutContact.jsx";
-import SearchBar from "./Components/SearchBar.jsx";
-
+import SearchResults from "./Pages/SearchResult.jsx";
 
 function App() {
   return (
-    <>
-    <Header/>
-    {/* <SearchBar /> */}
-    {/* <AboutContact/> */}
-    {/* <Hero/> */}
-    <Newsfeed/>
-    <Footer/>
-
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} /> 
+        <Route path="/login" element={<Home />} />
+        <Route path="/signup" element={<Home />} />
+        <Route path="/about" element={<AboutContact />} />
+        <Route path="/search-results" element={<SearchResults />} />
+      </Routes>
+    </Router>
   );
 }
 

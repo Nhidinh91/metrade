@@ -18,7 +18,7 @@ const Hero = () => {
             <h1 className="fw-bold">TRADE SMARTER, TOGETHER</h1>
             <h2 className="lead">Secure and Easy Transaction</h2>
           </Container>
-          <Button variant="primary" size="lg">
+          <Button variant="primary" size="lg" href="/login">
             Explore
           </Button>
           <Row className="justify-content-center p-5">
