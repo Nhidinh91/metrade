@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors'
 import dotenv from 'dotenv';
 import connectDB from './configs/database.js';
 import authRoutes from './routes/authRoutes.js';
@@ -6,6 +7,7 @@ import authRoutes from './routes/authRoutes.js';
 dotenv.config();
 
 const app = express();
+app.use(cors());
 
 // Middleware
 // A middleware function in Express.js that is used to parse incoming JSON payloads in HTTP requests

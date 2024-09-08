@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema(
   {
@@ -24,11 +25,11 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin", "seller"],
       default: "user",
     },
-    photoURL: {
+    photo_url: {
       type: String,
       default: "",
     },
-    isVerified: {
+    is_verified: {
       // Check verify email before checkout
       type: Boolean,
       default: false,
@@ -38,7 +39,7 @@ const userSchema = new mongoose.Schema(
       enum: ["active", "deactive", "banned"],
       default: "active",
     },
-    validationToken: {
+    validation_token: {
       type: String,
       default: "",
     },
@@ -52,6 +53,10 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-const User = mongoose.model("User", userSchema);
 
+userSchema.methods.comparePassword = async function (inputPassword) {
+  return await bcrypt.compare(inputPassword, this.password);
+};
+
+const User = mongoose.model("User", userSchema);
 export default User;
