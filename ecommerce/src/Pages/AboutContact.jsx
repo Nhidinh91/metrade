@@ -15,7 +15,7 @@ const AboutContact = () => {
         <Row className={`${style.sectionMetrade}`}>
           <Col>
             <Row>
-              <h2>About Metrade</h2>
+              <h2 className={`${style.aboutTitle}`}>About Metrade</h2>
               <p>
                 Welcome to Metrade, the exclusive marketplace designed
                 specifically for the Metropolia University community. Whether
@@ -25,7 +25,7 @@ const AboutContact = () => {
               </p>
             </Row>
             <Row>
-              <h2>Our Mission</h2>
+              <h2 className={`${style.aboutTitle}`}>Our Mission</h2>
               <p>
                 At Metrade, our mission is simple: to connect the Metropolia
                 community through a safe, convenient, and university-driven
@@ -45,7 +45,7 @@ const AboutContact = () => {
             <img src={aboutus1} alt="Jumping friends" />
           </Col>
           <Col>
-            <h2>What We Offer</h2>
+            <h2 className={`${style.aboutTitle}`}>What We Offer</h2>
             <p>
               <b>A Trusted Campus Marketplace:</b> Metrade is designed
               exclusively for Metropolia University students, staff, and
@@ -77,7 +77,7 @@ const AboutContact = () => {
         <Row className={`${style.sectionContact}`}>
           <Col>
             <Row>
-              <h2>Our Team</h2>
+              <h2 className={`${style.aboutTitle}`}>Our Team</h2>
               <p>
                 Metrade is run by a{" "}
                 <b>passionate team of Metropolia University students</b>{" "}
@@ -87,7 +87,7 @@ const AboutContact = () => {
               </p>
             </Row>
             <Row>
-              <h2>Contact Us</h2>
+              <h2 className={`${style.aboutTitle}`}>Contact Us</h2>
               <p>
                 We&apos;re here to help! Whether you have a question about a
                 product, need assistance with your account, or want to provide
@@ -126,7 +126,7 @@ const AboutContact = () => {
         </Row>
 
         <Row className={`${style.sectionMovement}`}>
-          <h2>Join the Metrade Movement</h2>
+          <h2 className={`${style.aboutTitle}`}>Join the Metrade Movement</h2>
           <p>
             We&apos;re more than just a marketplace – we&apos;re a growing
             community of students and staff who believe in the power of

@@ -1,16 +1,15 @@
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
+import dotenv from "dotenv";
 import morgan from "morgan";
-
 import connectDB from "./configs/database.js";
 import authRoutes from "./routes/authRoutes.js";
-
 import { logger } from "./middlewares/logger.js";
 
 dotenv.config();
 
 const app = express();
+app.use(cors());
 
 // Middleware
 // display request to terminal
