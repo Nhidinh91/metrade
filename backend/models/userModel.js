@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
+import { createToken } from "./../utils/authUtils/tokenValidation.js";
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -43,10 +45,11 @@ const userSchema = new mongoose.Schema(
     validation_token: {
       value: {
         type: String,
+
       },
-      update_at: {
+      expired_at: {
         type: Date,
-        default: Date.now(), // must include this field, otherwise, when create new token, the token obj will not be added in db
+
       },
     },
     deleted_at: {
@@ -60,35 +63,18 @@ const userSchema = new mongoose.Schema(
 );
 
 //statics
-userSchema.statics.verifyUser = async function (email) {
-  const updatedUser = await this.findOneAndUpdate(
-    { email },
-    { $set: { isVerified: true } },
-    { returnDocument: "after" }
-  );
-  return updatedUser;
-};
 
-userSchema.statics.saveTokenToUserWithEmail = async function (email, token) {
-  const tokenObject = {
-    value: token,
-    update_at: Date.now(),
-  };
+//methods
+
+userSchema.methods.createAndUpdateToken = async function () {
+  const tokenObject = await createToken(this.email);
   const updatedUser = await this.findOneAndUpdate(
     { email },
     { $set: { validation_token: tokenObject } },
     { returnDocument: "after" }
   );
-  // return updatedUser;
-  return;
+  return updatedUser;
 };
-
-userSchema.statics.findUserByEmail = async function (email) {
-  const user = await this.findOne({ email });
-  return user;
-};
-//method
-
 
 userSchema.methods.comparePassword = async function (inputPassword) {
   return await bcrypt.compare(inputPassword, this.password);

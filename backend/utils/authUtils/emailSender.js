@@ -25,7 +25,7 @@ const convertToFullDateTimeStr = (expStr) => {
   return num > 1 ? `${num_str} ${time_str}s` : `${num_str} ${time_str}`;
 };
 
-export const sendConfirmationEmailService = async (email) => {
+export const sendConfirmationEmailService = async (email, token) => {
   console.log("Start sending email");
   const exp_time_str = process.env.VERIFICATION_EXPIRES_IN;
   const transport = nodemailer.createTransport({
@@ -39,8 +39,6 @@ export const sendConfirmationEmailService = async (email) => {
     },
   });
 
-  const verifyToken = await hashInput(email);
-  await User.saveTokenToUserWithEmail(email, verifyToken);
   const timeStr = convertToFullDateTimeStr(exp_time_str);
 
   let mailConfigurations = await transport.sendMail({
@@ -50,7 +48,7 @@ export const sendConfirmationEmailService = async (email) => {
     text: `Hi! There, You have recently visited 
            our website and entered your email.
            Please follow the given link to verify your email
-           http://localhost:3000/api/auth/verify/?token=${verifyToken}&email=${email}\n.
+           http://localhost:3000/api/auth/register/verify/?token=${token}&email=${email}\n.
            
            The link will expire after ${timeStr}
            Thanks`,

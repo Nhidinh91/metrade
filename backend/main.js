@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 import connectDB from "./configs/database.js";
 import authRoutes from "./routes/authRoutes.js";
-import { logger } from "./middlewares/logger.js";
+
 
 dotenv.config();
 

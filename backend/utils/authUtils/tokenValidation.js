@@ -1,42 +1,47 @@
-import { checkHashedInput } from "./inputHashing.js";
+import { hashInput } from "./inputHashing.js";
+import dotenv from "dotenv";
 
-const isSameHash = (token, user) => {
-  const hashedToken = user.validation_token.value;
-  return token === hashedToken;
+dotenv.config();
+
+const getExpectDuration = () => {
+  return Number(process.env.VERIFICATION_EXPIRES_IN.slice(0, -1));
 };
 
-const isSameInput = async (token, user) => {
-  try {
-    const result = await checkHashedInput(user.email, token);
-    return result;
-  } catch (err) {
-    throw new Error("cannot check password");
-  }
+export const createToken = async (email) => {
+  const token = await hashInput(email);
+  const currentTime = Math.round(Date.now() / 1000);
+  const expired_at = currentTime + getExpectDuration();
+  const tokenObject = {
+    value: token,
+    expired_at: expired_at,
+  };
+  return tokenObject;
+};
+
+const isSameHash = (token, user) => {
+  const stored_token = user.validation_token.value;
+  return token === stored_token;
 };
 
 const convertToUNIXTimeStamp = (timeStr) => {
   const time = new Date(timeStr);
-  return Math.floor(time.getTime() / 1000);
+  return time.getTime();
 };
 
-const isValidTime = (user, expectedDuration) => {
-  const tokenCreatedAtStr = user.validation_token.update_at;
-  const convertedTime = convertToUNIXTimeStamp(tokenCreatedAtStr);
+const isValidTime = (user) => {
+  const tokenExpireTime = user.validation_token.expired_at;
+  const convertedExpireTime = convertToUNIXTimeStamp(tokenExpireTime);
   const currentTime = Math.round(Date.now() / 1000);
-  return currentTime - convertedTime < expectedDuration;
+
+  return currentTime < convertedExpireTime;
 };
 
 export const isValidVerifyToken = async (token, user) => {
   try {
-    const expectedDuration = Number(
-      process.env.VERIFICATION_EXPIRES_IN.slice(0, -1)
-    );
+    const validTime = isValidTime(user);
+    const sameToken = isSameHash(token, user);
 
-    const sameInput = await isSameInput(token, user);
-    const validTime = isValidTime(user, expectedDuration);
-    const sameHash = isSameHash(token, user);
-
-    if (sameInput && validTime && sameHash) {
+    if (sameToken && validTime) {
       return true;
     } else {
       return false;

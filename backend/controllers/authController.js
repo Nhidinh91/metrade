@@ -3,34 +3,39 @@ import Cart from "../models/cartModel.js";
 import { emailCheck } from "../utils/authUtils/mailValidation.js";
 import { hashInput } from "../utils/authUtils/inputHashing.js";
 import { sendConfirmationEmailService } from "../utils/authUtils/emailSender.js";
-import { isValidVerifyToken } from "../utils/authUtils/tokenValidation.js";
+import {
+  createToken,
+  isValidVerifyToken,
+} from "../utils/authUtils/tokenValidation.js";
 import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
   try {
     //email and password
     const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      throw new Error(`Missing information`);
+    }
     if (!emailCheck(email)) {
-      throw new Error("Invalid Email Format, should be Metropolia Email");
+      throw new Error(`wrong email format`);
     } else {
       //check if the user with email exist
-      const user = await User.findUserByEmail(email);
-
+      const user = await User.findOne({ email });
       if (user) {
         throw new Error(`email ${email} is already used`);
       } else {
         // if not exist, create a new user , and a new cart with new user id
         const hashedPassword = await hashInput(password);
+        const validation_token = await createToken(email);
         const newUser = await User.create({
           name,
           email,
           password: hashedPassword,
-          //{token}
+          validation_token,
         });
         const newCart = await Cart.create({ user_id: newUser.id });
-
         // send confirmation email
-        await sendConfirmationEmailService(email);
+        await sendConfirmationEmailService(email, validation_token.value);
         // return response to FE
         res.status(201).json({
           status: "success",
@@ -49,27 +54,32 @@ export const register = async (req, res) => {
   }
 };
 
-export const verifyToken = async (req, res) => {
+export const checkVerify = async (req, res) => {
   try {
     const { token, email } = req.query;
-    const user = await User.findUserByEmail(email);
+    const user = await User.findOne({ email });
     const validToken = await isValidVerifyToken(token, user);
-
-    // test if someone has the obtain the link user's email and change to attacker's email
-    // const fakeEmail = "trung@gmail.com";
-    // if (isValidVerifyToken(token, fakeEmail)) {
-
-    // invalid token, resend new email with new token
-    // check if the user is already verified (in case user spaming verify email)
-
     if (!user) {
-      throw new Error("Cannot found user. Please register!");
-      
-    } else if (user.isVerified) {
+      res.status(404).json({
+        status: "fail",
+        message: "an account with this email does not exist",
+      });
+    } else if (user.is_verified) {
       throw new Error("User is already verified");
-
     } else if (validToken) {
-      const updatedUser = await User.verifyUser(email);
+      const updatedUser = await User.findOneAndUpdate(
+        { email },
+        {
+          $set: {
+            is_verified: true,
+            validation_token: {
+              value: "",
+              expired_at: user.validation_token.expired_at,
+            },
+          },
+        },
+        { returnDocument: "after" }
+      );
       res.status(200).json({
         status: "success",
         data: {
@@ -78,15 +88,64 @@ export const verifyToken = async (req, res) => {
         },
       });
     } else {
-      await sendConfirmationEmailService(email);
       throw new Error(
-        "Email verification failed, possibly the link is invalid or expired\nNew verification link is sent."
+        "Email verification failed, possibly the link is invalid or expired\nPlease request new verification link."
       );
     }
   } catch (err) {
     res.status(400).json({
       status: "fail",
       message: err.message,
+    });
+  }
+};
+
+export const resendEmail = async (req, res) => {
+  const { email } = req.body;
+  try {
+    //check contain email in res
+    if (!email) {
+      throw new Error(`Missing information`);
+    }
+    // check email format
+    else if (!emailCheck(email)) {
+      throw new Error(`wrong email format`);
+    } else {
+      //check if the user with email exist
+      const user = await User.findOne({ email });
+      if (!user) {
+        res.status(404).json({
+          status: "fail",
+          message:
+            "an account with this email does not exist. Please register!",
+        });
+        //create token and update user to db and send email
+      } else if (user.is_verified) {
+        res.status(400).json({
+          status: "fail",
+          message: "user is already verified",
+        });
+      } else {
+        const validation_token = await createToken(email);
+        const updatedUser = await User.findOneAndUpdate(
+          { email },
+          {
+            $set: { validation_token },
+          },
+          { returnDocument: "true" }
+        );
+        sendConfirmationEmailService(email, validation_token.value);
+        res.status(201).json({
+          status: "success",
+          data: updatedUser,
+        });
+      }
+    }
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message:
+        "Cannot send resend email. Please wait a for 10 minutes and try again",
     });
   }
 };
