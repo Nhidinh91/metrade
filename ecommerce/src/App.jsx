@@ -5,6 +5,7 @@ import Home from "./Pages/Home.jsx";
 import Login from "./Pages/Login.jsx";
 import AboutContact from "./Pages/AboutContact.jsx";
 import SearchResults from "./Pages/SearchResult.jsx";
+import ProductListing from "./Pages/ProductListing.jsx";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/signup" element={<Home />} />
         <Route path="/about" element={<AboutContact />} />
         <Route path="/search-results" element={<SearchResults />} />
+        <Route path="/category" element={<ProductListing />} />
       </Routes>
     </Router>
   );
