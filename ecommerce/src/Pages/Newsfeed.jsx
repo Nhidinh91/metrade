@@ -17,7 +17,7 @@ const Newsfeed = () => {
       <Container>
         <Row sm={2} md={3} lg={4} className="g-4">
           {products.slice(0, visibleProducts).map((product) => (
-            <Col key={product.id}>
+            <Col key={product._id}>
               <ProductCard {...product} />
             </Col>
           ))}
