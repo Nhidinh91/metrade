@@ -1,28 +1,34 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Form, Button, Alert } from "react-bootstrap";
+import { Form, Button, Alert, Spinner } from "react-bootstrap";
 import "../../src/Styles/Login.css";
 import Logo from "../../src/assets/logo.png";
+import { useAuthContext } from '../hooks/useAuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { signIn } = useAuthContext();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
+    setLoading(true);
 
     // Form validation
     if (!email || !password) {
       setError("Email and password are required");
+      setLoading(false);
       return;
     }
 
     // Password validation
     if (password.length < 8) {
       setError("Password must be at least 8 characters");
+      setLoading(false);
       return;
     }
 
@@ -30,6 +36,7 @@ const Login = () => {
     const emailRegex = /^[a-zA-Z0-9._-]+@metropolia.fi$/;
     if (!emailRegex.test(email)) {
       setError("Invalid email address");
+      setLoading(false);
       return;
     }
 
@@ -46,15 +53,17 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("token", data.token);
-        // Redirect to home with query parameter ?is_from_login=true
-        navigate('/');
+        signIn(data.user);
+
+        navigate("/");
       } else {
         setError(data.message || "Login failed. Please try again.");
       }
     } catch (error) {
       console.error("Error during login:", error);
       setError("Something went wrong. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,7 +103,7 @@ const Login = () => {
           </Form.Group>
 
           <Button variant="primary" type="submit" className="signin-button">
-            Sign in
+            {loading ? <Spinner animation="border" size="sm" /> : "Sign in"}
           </Button>
         </Form>
 
