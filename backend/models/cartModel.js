@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const cartSchema = new mongoose.Schema(
   {
+    id: {
+      type: mongoose.Schema.Types.ObjectId,
+      auto: true,
+    },
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // Reference to the User model
