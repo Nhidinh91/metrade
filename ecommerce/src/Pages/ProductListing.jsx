@@ -1,9 +1,7 @@
 import { Container, Row, Col } from 'react-bootstrap';
 import { products } from '../dummyData';
 import { useSearchParams } from 'react-router-dom';
-import Footer from './Footer';
 import ProductCard from '../Components/ProductCard';  
-import Header from './Header';
 
 
 const ProductListing = ({ }) => {
@@ -14,7 +12,6 @@ const ProductListing = ({ }) => {
   
   return (
     <>
-      <Header></Header>
       <Container>
         {filteredProducts.length > 0 ? (
           <Row sm={2} md={3} lg={4} className="g-4">
@@ -28,7 +25,6 @@ const ProductListing = ({ }) => {
           <p>No products found</p>
         )}
       </Container>
-      <Footer></Footer>
     </>
   );
 };

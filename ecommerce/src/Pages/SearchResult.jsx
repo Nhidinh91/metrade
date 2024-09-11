@@ -3,8 +3,6 @@ import { useState, useEffect } from "react";
 import { products } from "../dummyData";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import ProductCard from "../Components/ProductCard";
-import Header from "./Header";
-import Footer from "./Footer";
 import style from "../Styles/Newsfeed.module.css"; //Same styling as Newsfeed
 
 const SearchResults = () => {
@@ -32,7 +30,6 @@ const SearchResults = () => {
 
   return (
     <>
-      <Header />
       <Container fluid className={style.newfeed}>
         <Container>
           <h1 className="fw-bold">Search Results for "{query}"</h1>
@@ -63,7 +60,6 @@ const SearchResults = () => {
           )}
         </Container>
       </Container>
-      <Footer />
     </>
   );
 };

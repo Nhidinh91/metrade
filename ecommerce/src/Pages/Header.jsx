@@ -11,7 +11,7 @@ const Header = () => {
       <Navbar sticky="top" className={style.navBar}>
         <Row className={`${style.navUpper} w-100`}>
           <Container className="d-flex align-items-center justify-content-around">
-            <Navbar.Brand href="/#home"><img src={logo2} alt="" height="100"/></Navbar.Brand>
+            <Navbar.Brand href="/"><img src={logo2} alt="" height="100"/></Navbar.Brand>
             <SearchBar />
             <Button className={`${style.btnSellNow}`}>Sell Now</Button>
             <Nav.Link className={`${style.btnLogin}`} href="/login">Login</Nav.Link>
