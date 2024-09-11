@@ -10,6 +10,7 @@ import PurchaseHistory from "./Pages/PurchaseHistory.jsx";
 import Profile from "./Pages/Profile.jsx";
 import { AuthProvider } from "./contexts/AuthContext";
 import SignUp from "./Pages/SignUp.jsx";
+import Resend from "./Pages/VerifyFail.jsx";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/resend" element={<Resend />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/about" element={<AboutContact />} />
           <Route path="/search-results" element={<SearchResults />} />
