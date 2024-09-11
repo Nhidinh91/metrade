@@ -60,11 +60,6 @@ const productSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
-
-    keywords: {
-      type: [String], // Array of keywords associated with the product
-      default: [], // Default to an empty array
-    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" }, // Automatically add created_at and updated_at
