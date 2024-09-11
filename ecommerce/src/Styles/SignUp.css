@@ -32,6 +32,7 @@
   width: 100%;
   height: 60vh;
   padding: 45px 48px 45px 48px;
+  box-shadow:0 0 10px rgba(0, 0, 0, 0.1) ;
 }
 
 .signup-title {
@@ -96,7 +97,7 @@
 }
 .signup-submit button {
   width: 60%;
-  /* height: ; */
+  
   /* background-color: #04aa6d; Green */
   border: none;
   color: white;
@@ -105,6 +106,7 @@
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
+  padding: 10px;
   border-radius: 25px;
   background: radial-gradient(circle, #43ca36, #3f9c36);
 }
