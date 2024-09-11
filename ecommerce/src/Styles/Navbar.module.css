@@ -12,6 +12,7 @@
     border: none;
     width: 700px;
 }
+
 .btnSellNow{
     background-color: #173b45;
     color: #fbf5f5;
@@ -45,3 +46,15 @@
     font-size: 23px;
 }
 
+.navUpper .navContainer {
+    display: flex;
+    align-items: center;
+    padding: 0 2.5rem;
+    gap: 1.5rem;
+}
+
+.navUpper .rightContainer {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
