@@ -32,10 +32,6 @@ const categorySchema = new mongoose.Schema(
       type: Boolean,
       default: true, // Indicates whether the category is active
     },
-    keywords: {
-      type: [String], // Array of keywords associated with the category
-      default: [], // Default to an empty array
-    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" }, // Automatically add created_at and updated_at

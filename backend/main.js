@@ -1,21 +1,26 @@
 import express from 'express';
+import cors from 'cors'
 import dotenv from 'dotenv';
 import connectDB from './configs/database.js';
+import jwtAuthenticate from './middleware/jwtAuthenticate.js';
 import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 dotenv.config();
 
 const app = express();
 
+// Connect to MongoDB
+connectDB();
+
 // Middleware
-// A middleware function in Express.js that is used to parse incoming JSON payloads in HTTP requests
+app.use(cors());
 app.use(express.json());
+app.use('/api/user', jwtAuthenticate);
 
 // Routes
 app.use('/api/auth', authRoutes);
-
-// Connect to MongoDB
-connectDB();
+app.use('/api/user', userRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
