@@ -1,3 +1,4 @@
+import querystring from "querystring";
 import User from "../models/userModel.js";
 import Cart from "../models/cartModel.js";
 import { emailCheck } from "../utils/authUtils/mailValidation.js";
@@ -9,10 +10,15 @@ import {
 } from "../utils/authUtils/tokenValidation.js";
 import jwt from "jsonwebtoken";
 
+const FE_GATE = 5173;
+const FE_URL = `http://localhost:${FE_GATE}`;
+
 export const register = async (req, res) => {
   try {
     //email and password
     const { name, email, password } = req.body;
+    console.log(req.body);
+
     if (!name || !email || !password) {
       throw new Error(`Missing information`);
     }
@@ -58,15 +64,30 @@ export const checkVerify = async (req, res) => {
   try {
     const { token, email } = req.query;
     const user = await User.findOne({ email });
-    const validToken = await isValidVerifyToken(token, user);
     if (!user) {
-      res.status(404).json({
+      console.log("no user exist");
+      // return to fe-url/signup
+      // return res.redirect(FE_URL + "/signup");
+      const qsObj = {
         status: "fail",
-        message: "an account with this email does not exist",
-      });
-    } else if (user.is_verified) {
-      throw new Error("User is already verified");
-    } else if (validToken) {
+        message: "user does not exist",
+      };
+      console.log(qsObj);
+      const qs = querystring.stringify(qsObj);
+      console.log(qs);
+      return res.redirect(FE_URL + `/verify-fail?${qs}`);
+      // res.status(404).json({
+      //   status: "fail",
+      //   message: "an account with this email does not exist",
+      // });
+    }
+    if (user.is_verified) {
+      return res.redirect(FE_URL + `/verify-success`);
+      // throw new Error("User is already verified");
+    }
+
+    const validToken = await isValidVerifyToken(token, user);
+    if (validToken) {
       const updatedUser = await User.findOneAndUpdate(
         { email },
         {
@@ -80,17 +101,26 @@ export const checkVerify = async (req, res) => {
         },
         { returnDocument: "after" }
       );
-      res.status(200).json({
-        status: "success",
-        data: {
-          message: "Email verified successfully",
-          updatedUser,
-        },
-      });
+      //if valid token redirect to home page
+      return res.redirect(FE_URL + "/verify-success");
+      // res.status(200).json({
+      //   status: "success",
+      //   data: {
+      //     message: "Email verified successfully",
+      //     updatedUser,
+      //   },
+      // });
     } else {
-      throw new Error(
-        "Email verification failed, possibly the link is invalid or expired\nPlease request new verification link."
-      );
+      const qsObj = {
+        status: "fail",
+        email,
+        message: "Invalid Token",
+      };
+      const qs = querystring.stringify(qsObj);
+      return res.redirect(FE_URL + `/verify-fail?${qs}`);
+      // throw new Error(
+      //   "Email verification failed, possibly the link is invalid or expired\nPlease request new verification link."
+      // );
     }
   } catch (err) {
     res.status(400).json({
@@ -165,7 +195,9 @@ export const login = async (req, res) => {
 
     // If invalid email or password
     if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({ success: false, message: "Invalid email or password" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
     }
     // If email and password are correct, send res with token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
