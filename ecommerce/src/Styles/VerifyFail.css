@@ -69,9 +69,9 @@
   height: 10%;
 }
 
-.verify-button button,
-.verify-success button,
-.confirm-send button {
+.verify-button >button,
+.verify-success >button,
+.confirm-send >button {
   width: 50%;
   padding: 1rem 2rem;
   border: none;
@@ -85,12 +85,12 @@
 
   font-weight: bold;
 }
-.verify-button button {
+.verify-button> button {
   background: #3f9c36;
 }
 
-.verify-success button,
-.confirm-send button {
+.verify-success> button,
+.confirm-send >button {
   background: #f37c25;
 }
 

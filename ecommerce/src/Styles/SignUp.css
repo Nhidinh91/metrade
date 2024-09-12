@@ -72,6 +72,7 @@
 }
 .signup-item input,
 .signup-item input:after {
+  width: 100%;
   border-style: none;
   border-bottom: 2px solid black;
   font-weight: bold;
