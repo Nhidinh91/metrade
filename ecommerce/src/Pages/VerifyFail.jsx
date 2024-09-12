@@ -10,16 +10,31 @@ const checkValidEmail = (string) => {
   return emailRegex.test(string);
 };
 
+const containString = (string, checkString) => {
+  return string.toLowerCase().trim().includes(checkString);
+};
+
 const containNotExist = (string) => {
-  return string.toLowerCase().trim().includes("does not exist");
+  return containString(string, "does not exist");
 };
 
 const containVerified = (string) => {
-  return string.toLowerCase().trim().includes("already verified");
+  return containString(string, "already verified");
+  // return string.toLowerCase().trim().includes("already verified");
 };
-// const containFail = (string) => {
-//   return string.toLowerCase().trim().includes("fail");
-// };
+
+const containToken = (string) => {
+  return containString(string, "token");
+  // return string.toLowerCase().trim().includes("token");
+};
+
+const getMessageQr = (queryParams) => {
+  let messageQr = queryParams.get("message");
+  if (messageQr === null || containToken(messageQr)) {
+    messageQr = "";
+  }
+  return messageQr;
+};
 
 const EMAIL_ERROR = "not valid email";
 const NO_EMAIL_ERROR = "missing email";
@@ -29,20 +44,16 @@ const VerifyFail = () => {
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const emailQr = queryParams.get("email");
-  const messageQr = queryParams.get("message") || "";
-  // const statusQr = queryParams.get("status");
-  console.log(queryParams.get("message"));
-  // console.log(queryParams.get("mes"))
-  // console.log("emailQr", emailQr);
+  const messageQr = getMessageQr(queryParams);
+
   const [email, setEmail] = useState(emailQr);
   const [validEmail, setValidEmail] = useState(emailQr !== null);
-  const [error, setError] = useState(messageQr || "");
+  // const [error, setError] = useState(messageQr || "");
+  const [error, setError] = useState(messageQr);
   const [needRegister, setNeedRegister] = useState(
     containNotExist(messageQr) || false
   );
   const [needLogin, setNeedLogin] = useState(false);
-  // console.log("email", email);
-  // console.log("valid", needRegister);
 
   const emailObj = { email };
 
@@ -61,13 +72,12 @@ const VerifyFail = () => {
       setNeedRegister(false);
       console.log("checking email", checkValidEmail(email));
       console.log("valid email", validEmail);
-      //having this check so that I do not need to setEmail('') after submit form
-      // if (checkValidEmail(email) === false && validEmail === false) {
+
       if (validEmail === false) {
         if (!email) {
           setError(NO_EMAIL_ERROR);
         }
-        // console.log(email);
+
         setError(EMAIL_ERROR);
       } else {
         console.log("sending link");
@@ -83,10 +93,6 @@ const VerifyFail = () => {
         );
         const data = await response.json();
         if (!response.ok) {
-          console.log(data);
-          // setEmail((e) => "");
-          // setValidEmail((ve) => false);
-          // setNeedRegister((nr) => false);
           throw new Error(data.message || "Something went wrong");
         } else {
           console.log("data: ", data);

@@ -30,6 +30,7 @@
   align-items: center;
 }
 .verify-fail-content p {
+  color: #183942ad;
   width: 80%;
   text-align: center;
   font-size: 1rem;
@@ -42,7 +43,7 @@
 .alert p {
   margin: auto;
   /* padding-left: 0; */
-  text-align: start;
+  text-align: center;
   text-transform: capitalize;
 }
 .verify-fail-content input,
@@ -59,13 +60,18 @@
   outline: none; /* Remove default outline */
 }
 
-.verify-button {
+.verify-button,
+.confirm-send,
+.verify-success {
   padding-top: 2rem;
   text-align: center;
   width: 100%;
   height: 10%;
 }
-.verify-button button {
+
+.verify-button button,
+.verify-success button,
+.confirm-send button {
   width: 50%;
   padding: 1rem 2rem;
   border: none;
@@ -76,12 +82,24 @@
   font-size: 16px;
   /* padding: 10px; */
   border-radius: 40px;
-  background: #3f9c36;
+
   font-weight: bold;
+}
+.verify-button button {
+  background: #3f9c36;
+}
+
+.verify-success button,
+.confirm-send button {
+  background: #f37c25;
 }
 
 @media screen and (max-width: 480px) {
   .verify-fail-container {
+    width: 90%;
+  }
+  .verify-fail-content input,
+  .verify-fail-content input:after {
     width: 80%;
   }
 }
