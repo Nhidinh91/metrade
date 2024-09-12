@@ -6,7 +6,6 @@ import jwtAuthenticate from './middleware/jwtAuthenticate.js';
 import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import productRoutes from './routes/productRoutes.js';
 
 
 dotenv.config();
