@@ -77,6 +77,15 @@ const SignUp = () => {
     return check;
   };
 
+  const handleTogglePassword = () => {
+    if (passwordType === "password") {
+      setPasswordType((pt) => "text");
+    }
+    if (passwordType === "text") {
+      setPasswordType((pt) => "password");
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const isValid = isvalidForm();
@@ -174,6 +183,19 @@ const SignUp = () => {
                 onChange={handlePassword}
                 value={password}
               />
+              {passwordType === "password" ? (
+                <i
+                  className="fa-solid fa-eye"
+                  id="show-password"
+                  onClick={handleTogglePassword}
+                ></i>
+              ) : (
+                <i
+                  className="fa-solid fa-eye-slash"
+                  onClick={handleTogglePassword}
+                ></i>
+              )}
+              {/* {passwordType} */}
               {/* <span>
                 <img
                   src={Eye2}
