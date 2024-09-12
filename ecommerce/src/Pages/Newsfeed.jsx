@@ -1,14 +1,33 @@
-import { products } from "../dummyData";
 import ProductCard from "../Components/ProductCard";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import style from "../Styles/Newsfeed.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Newsfeed = () => {
-  const [visibleProducts, setVisibleProducts] = useState(8);
+  const [products, setProducts] = useState([]); //state to hold products fetch from backend
+  const [visibleProducts, setVisibleProducts] = useState(8); //state to keep track of displaying products
   const loadMoreProducts = () => {
     setVisibleProducts(visibleProducts + 8);
   };
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/product/newsfeed", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error.message);
+      }
+    };
+    fetchProducts();
+  });
+
   return (
     <Container fluid className={style.newfeed}>
       <Container>
