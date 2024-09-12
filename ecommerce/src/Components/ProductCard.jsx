@@ -11,21 +11,33 @@ const ProductCard = ({ name, image, pickup_point, price, created_at }) => {
   );
   return (
     <Card className={style.productCard}>
-      <Card.Img variant="top" src={image} className="productImg" />
+      <Card.Img variant="top" src={image} className={style.productImg} alt={name} />
       <Card.Body>
         <Card.Title className="fw-bold" style={{ color: "#173b45" }}>
           {name}
         </Card.Title>
         <div className="d-flex align-items-center">
-          <img src={coin} alt="coin" style={{ width: "20px" }} />
+          <img
+            src={coin}
+            alt="coin"
+            style={{ width: "20px", height: "20px" }}
+          />
           <Card.Text>{price}</Card.Text>
         </div>
         <div className="d-flex align-items-center">
-          <img src={clock} alt="clock" style={{ width: "20px" }} />
+          <img
+            src={clock}
+            alt="clock"
+            style={{ width: "20px", height: "20px" }}
+          />
           <Card.Text>{daysSinceCreation} days ago</Card.Text>
         </div>
         <div className="d-flex align-items-center">
-          <img src={locImg} alt="location" style={{ width: "20px" }} />
+          <img
+            src={locImg}
+            alt="location"
+            style={{ width: "20px", height: "20px" }}
+          />
           <Card.Text>{pickup_point}</Card.Text>
         </div>
         <div className="d-flex justify-content-end">
