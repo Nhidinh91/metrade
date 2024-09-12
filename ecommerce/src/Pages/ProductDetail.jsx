@@ -4,6 +4,7 @@ import locImg from "../assets/location.png";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Loading from "../Components/Loading";
+import "../Styles/ProductDetail.css";
 
 const ProductDetail = () => {
   // Get the 'id' parameter from the URL
@@ -26,103 +27,114 @@ const ProductDetail = () => {
     };
     fetchProduct();
   }, [id]); // 'id' is used as a dependency to refetch if the id changes
-
   const daysCreation = (dayCreated) => {
-    Math.floor((Date.now() - new Date(dayCreated)) / (1000 * 60 * 60 * 24));
+    return Math.floor(
+      (Date.now() - new Date(dayCreated)) / (1000 * 60 * 60 * 24)
+    );
   };
 
   // If the product data is still being fetched, display a Bootstrap spinner
   return (
-    <div>
+    <>
       {/* Conditionally render either the spinner or the product details */}
       {!product ? (
         <Loading />
       ) : (
-        <div>
-          <section className="card-info">
-            <div>
-              <p>Category Breadcrum</p>
-            </div>
-            <h2 className="product-name">{product.name}</h2>
-            <div className="product-price">
-              {product.price}
-              <img src={coin} alt="coin" />
-            </div>
-            <div className="days-from-creation">
-              {daysCreation(product.created_at)}
-              <img src={clock} alt="clock" />
-            </div>
-            <div className="location">
-              {product.pickup_point}
-              <img src={locImg} alt="location" />
-            </div>
-            <p className="description">{product.description}</p>
-            <div>
-              <div className="quantity-container">
-                <span
-                  className="quantity-btn"
-                  onClick={() => setQuantity(quantity - 1)}
-                >
-                  -
-                </span>
-                <span>{quantity}</span>
-                <span
-                  className="quantity-btn"
-                  onClick={() => setQuantity(quantity + 1)}
-                >
-                  +
-                </span>
+        <div className="product-detail-page">
+          <div className="go-back-button">
+            <i className="fa-solid fa-arrow-left"></i>Back to Home
+          </div>
+          <div className="product-detail-container">
+            <section className="product-info-container">
+              <div>
+                <p>Category Breadcrum</p>
               </div>
-              <button
-                className="add-card-btn"
-                type="button"
-                name="add-to-cart-button"
-              >
-                Add to Cart
-              </button>
-            </div>
-          </section>
-          <section className="photos-container">
-            <div className="big-photo">
-              <img src={product.photos[bigPhotoIndex]}></img>
-            </div>
-            <div className="small-photos">
-              <span
-                className="previous-button"
-                onClick={() =>
-                  setBigPhotoIndex(bigPhotoIndex <= 0 ? 0 : bigPhotoIndex - 1)
-                }
-              >
-                {"<"}
-              </span>
-              {product.photos.map((photo, index) => {
-                <img
-                  src={photo}
-                  key={index}
-                  alt={`Photo ${index + 1}`}
-                  style={{
-                    border:
-                      index === bigPhotoIndex ? "1px solid orange" : "none",
-                  }}
-                />;
-              })}
-              <span
-                className="next-button"
-                onClick={() =>
-                  setBigPhotoIndex(
-                    bigPhotoIndex >= product.photos.length - 1
-                      ? product.photos.length - 1
-                      : bigPhotoIndex + 1
-                  )
-                }
-              >
-                {">"}
-              </span>
-            </div>
-          </section>
+              <h2 className="product-name">{product.name}</h2>
+              <div className="product-price">
+                <span>{product.price}</span>
+                <img src={coin} alt="coin" />
+              </div>
+              <div className="days-from-creation">
+                <img src={clock} alt="clock" />
+                <div>{daysCreation(product.created_at)} days</div>
+              </div>
+              <div className="location">
+                <img src={locImg} alt="location" />
+                <div>{product.pickup_point}</div>
+              </div>
+              <p className="product-description">{product.description}</p>
+              <div className="add-product-container">
+                <div className="quantity-container">
+                  <div
+                    className="quantity-btn"
+                    onClick={() => setQuantity(quantity - 1)}
+                  >
+                    <i className="fa-solid fa-minus"></i>
+                  </div>
+                  <span className="quantity-number">{quantity}</span>
+                  <div
+                    className="quantity-btn"
+                    onClick={() => setQuantity(quantity + 1)}
+                  >
+                    <i className="fa-solid fa-plus"></i>
+                  </div>
+                </div>
+                <button
+                  className="add-card-btn"
+                  type="button"
+                  name="add-to-cart-button"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </section>
+            <section className="photos-container">
+              <div className="big-photo">
+                <img src={product.photos[bigPhotoIndex]} />
+              </div>
+              <div className="small-photos-container">
+                <div className="change-photo-button left">
+                  <i
+                    className="fa-solid fa-chevron-left"
+                    onClick={() =>
+                      setBigPhotoIndex(
+                        bigPhotoIndex <= 0 ? 0 : bigPhotoIndex - 1
+                      )
+                    }
+                  ></i>
+                </div>
+                <div className="small-photos">
+                  {product.photos.map((photo, index) => (
+                    <img
+                      src={photo}
+                      key={index}
+                      alt={`Photo ${index + 1}`}
+                      className="small-photo"
+                      style={{
+                        border:
+                          index === bigPhotoIndex ? "1px solid orange" : "none",
+                      }}
+                    />
+                  ))}
+                </div>
+                <div className="change-photo-button right">
+                  <i
+                    className="fa-solid fa-chevron-right"
+                    onClick={() =>
+                      setBigPhotoIndex(
+                        bigPhotoIndex >= product.photos.length - 1
+                          ? product.photos.length - 1
+                          : bigPhotoIndex + 1
+                      )
+                    }
+                  ></i>
+                </div>
+              </div>
+            </section>
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

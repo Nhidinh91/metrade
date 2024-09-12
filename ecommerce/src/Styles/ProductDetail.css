@@ -1,0 +1,162 @@
+.product-detail-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.go-back-button {
+    display: flex;
+    gap: 1rem;
+    padding-bottom: 2rem;
+    padding-left: 19rem;
+    align-items: center;
+}
+
+.product-detail-container {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.product-info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.product-name {
+    font-size: 2.5rem;
+    padding-top: 2rem;
+    font-weight: 600;
+}
+
+.product-price {
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.25rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.product-price span {
+    font-weight: 700;
+}
+
+.product-price img {
+    width: 1.5rem;
+    height: 1.5rem;
+    gap: 0.25rem;
+}
+
+.days-from-creation {
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+}
+
+.days-from-creation img {
+    width: 1rem;
+    height: 1rem;
+}
+
+.location {
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+}
+
+.location img {
+  width: 1rem;
+  height: 1rem;
+}
+
+.product-description {
+    padding-top: 1.5rem;
+    padding-bottom: 1rem;
+    font-size: 0.9rem;
+
+}
+
+.add-product-container {
+    display: flex;
+    justify-content: flex-start;
+    gap: 2rem;
+}
+
+.quantity-container {
+    display: flex;
+    justify-content: center;
+    border: 1px solid;
+    border-radius: 0.25rem;
+    align-items: center;
+}
+
+.quantity-number {
+    padding-left: 1.4rem;
+    padding-right: 1.4rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.quantity-btn {
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+    font-size: 0.6rem;
+}
+
+.add-card-btn {
+    padding-left: 1.7rem;
+    padding-right: 1.7rem;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+    border-radius: 0.25rem;
+    background: var(--clr-orange);
+    color: white;
+    border: none;
+    font-size: 0.75rem;
+}
+
+.photos-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.big-photo {
+  width: 100%;
+}
+
+.big-photo img {
+  max-width: 25rem;
+}
+
+.small-photos-container {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+}
+
+.change-photo-button {
+  border: none;
+  position: absolute;
+  top: 40%;
+}
+
+.change-photo-button.left {
+  left: 0;
+}
+
+.change-photo-button.right {
+  right: 0;
+}
+
+.small-photos {
+  display: flex;
+  padding: 0 1rem;
+}
+
+.small-photos img {
+  max-width: 5rem;
+}
