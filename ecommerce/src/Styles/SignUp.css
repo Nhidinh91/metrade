@@ -125,7 +125,7 @@
 .fa-eye-slash {
   position: absolute;
   z-index: 999;
-  transform: translateY(50%);
+  transform: translateY(30%);
   right: 2%;
   cursor: pointer;
 }
