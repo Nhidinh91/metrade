@@ -3,8 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Alert } from "react-bootstrap";
 
 import Logo from "./../../src/assets/logo.png";
-import Eye1 from "./../../src/assets/eye.png";
-import Eye2 from "./../../src/assets/eye.jpg";
+
 import "../Styles/SignUp.css";
 
 const ERROR_NAME = "Missing Name";
@@ -195,21 +194,7 @@ const SignUp = () => {
                   onClick={handleTogglePassword}
                 ></i>
               )}
-              {/* {passwordType} */}
-              {/* <span>
-                <img
-                  src={Eye2}
-                  alt="eye"
-                  className="signup-eye"
-                  onClick={handleShowPassWord}
-                />
-              </span> */}
             </div>
-            {/* <i
-              className="fa fa-eye"
-              id="togglePassword"
-              style="cursor: pointer"
-            ></i> */}
           </div>
           <div className="signup-submit">
             <button type="submit" className="signup-btn">

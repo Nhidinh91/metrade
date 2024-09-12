@@ -96,11 +96,11 @@
   height: 10%;
 }
 .signup-submit button {
-  width: 70%;
+  width: 80%;
   padding: 1rem 2rem;
   border: none;
   color: white;
-  /* padding: 15px 32px; */
+
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -109,20 +109,7 @@
   border-radius: 25px;
   background: radial-gradient(circle, #43ca36, #3f9c36);
 }
-/* .signup-form {
-  display: flex;
-  flex-direction: column;
-  background-color: white;
-  border-radius: 10px;
-  box-sizing: border-box;
-  padding: 48px 48px 45px;
-} */
-/* 
-.password-container {
-  position: relative;
-  width: 300px;
-}
-*/
+
 .password-container > input[type="password"],
 .password-container > input[type="text"] {
   width: 100%;
@@ -142,19 +129,6 @@
   right: 2%;
   cursor: pointer;
 }
-/* .pass */
-/*
-.signup-eye {
-  position: absolute;
-  top: 40%;
-  right: 10px;
-  transform: translateY(-70%);
-  transform: translateX(40%);
-  width: 58px;
-  height: 17px;
-
-  cursor: pointer;
-} */
 
 .signin-text {
   /* align-self: self-end; */
