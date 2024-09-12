@@ -9,6 +9,7 @@ import SellingHistory from "./Pages/SellingHistory.jsx";
 import PurchaseHistory from "./Pages/PurchaseHistory.jsx";
 import Profile from "./Pages/Profile.jsx";
 import { AuthProvider } from "./contexts/AuthContext";
+import ProductDetail from "./Pages/ProductDetail.jsx"
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/selling-history" element={<SellingHistory />} />
           <Route path="/purchase-history" element={<PurchaseHistory />} />
+          <Route path="/product/detail/:id" element={<ProductDetail/>} />
         </Routes>
       </Router>
     </AuthProvider>
