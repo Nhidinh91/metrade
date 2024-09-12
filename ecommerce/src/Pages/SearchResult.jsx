@@ -1,6 +1,5 @@
 import { useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { products } from "../dummyData";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import ProductCard from "../Components/ProductCard";
 import style from "../Styles/Newsfeed.module.css"; //Same styling as Newsfeed
@@ -13,14 +12,24 @@ const SearchResults = () => {
 
   //Filter products based on the search query
   useEffect(() => {
-    if (query) {
-      const filteredProducts = products.filter((product) =>
-        product.keywords.some((keyword) =>
-          keyword.toLowerCase().includes(query.toLowerCase())
-        )
-      );
-      setSearchResults(filteredProducts);
-    }
+    const fetchSearchResults = async () => {
+      if (query) {
+        try {
+          const response = await fetch(
+            `http://localhost:3000/api/product/search?query=${query}`,{
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            }}
+          ); //fetch search results from backend
+          const data = await response.json();
+          setSearchResults(data);
+        } catch (error) {
+          console.error("Error fetching search results:", error.message);
+        }    
+      }}
+
+      fetchSearchResults();
   }, [query]);
 
   //Load more products when "Load more" button is clicked
