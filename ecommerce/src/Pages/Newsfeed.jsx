@@ -8,10 +8,7 @@ const Newsfeed = () => {
   const [products, setProducts] = useState([]); //state to hold products fetch from backend
   const [visibleProducts, setVisibleProducts] = useState(8); //state to keep track of displaying products
   const [loading, setLoading] = useState(true); //Loading state
-
-  const loadMoreProducts = () => {
-    setVisibleProducts(visibleProducts + 8);
-  };
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -29,15 +26,24 @@ const Newsfeed = () => {
         setProducts(data);
         setLoading(false); //set loading to false after fetching products successfully
       } catch (error) {
-        console.error("Error fetching products:", error.message);
+        setError("Error fetching products");
         setLoading(false); //set loading to false after fetching products unsuccessfully
       }
     };
     fetchProducts();
   }, []);
 
+  //Load more products when "Load more" button is clicked
+  const loadMoreProducts = () => {
+    setVisibleProducts(visibleProducts + 8);
+  };
+
   if (loading) {
     return <Loading message="Loading..." />; //show loading... while fetching data
+  }
+
+  if (error) {
+    return <h2>{error}</h2>; //show error message if failed to fetch search results
   }
 
   return (

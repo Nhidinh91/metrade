@@ -11,6 +11,7 @@ const SearchResults = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState(8); //Keep track of the number of products to display
   const [loading, setLoading] = useState(true); //Loading state
+  const [error, setError] = useState(null);
 
   //Filter products based on the search query
   useEffect(() => {
@@ -18,22 +19,25 @@ const SearchResults = () => {
       if (query) {
         try {
           const response = await fetch(
-            `http://localhost:3000/api/product/search?query=${query}`,{
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            }}
+            `http://localhost:3000/api/product/search?query=${query}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
           ); //fetch search results from backend
           const data = await response.json();
           setSearchResults(data);
           setLoading(false); //set loading to false after fetching search results successfully
         } catch (error) {
-          console.error("Error fetching search results:", error.message);
+          setError("Error fetching search results");
           setLoading(false); //set loading to false after fetching search results unsuccessfully
-        }    
-      }}
+        }
+      }
+    };
 
-      fetchSearchResults();
+    fetchSearchResults();
   }, [query]);
 
   //Load more products when "Load more" button is clicked
@@ -45,23 +49,31 @@ const SearchResults = () => {
     return <Loading message="Loading..." />; //show loading... while fetching data
   };
 
+  if (error) {
+    return <h2>{error}</h2>; //show error message if failed to fetch search results
+  }
+
   return (
     <>
       <Container fluid className={style.newfeed}>
         <Container>
-          <h2 >Search Results for "{query}"</h2>
+          <h2>Search Results for "{query}"</h2>
         </Container>
         <Container>
           {searchResults.length > 0 ? (
             <Row sm={2} md={3} lg={4} className="g-4">
               {searchResults.slice(0, visibleProducts).map((product) => (
-                <Col key={product.id}>
+                <Col key={product._id}>
                   <ProductCard {...product} />
                 </Col>
               ))}
             </Row>
           ) : (
-            <p>No products found matching "{query}".</p>
+            <>
+              <p>No products found matching "{query}".</p>
+              {/* Display empty container to fill out the screen */}
+              <Container style={{height: "200px"}}></Container>
+            </>
           )}
         </Container>
         <Container className="d-flex justify-content-center">
