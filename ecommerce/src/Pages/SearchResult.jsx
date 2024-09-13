@@ -11,7 +11,6 @@ const SearchResults = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState(8); //Keep track of the number of products to display
   const [loading, setLoading] = useState(true); //Loading state
-  const [error, setError] = useState(null);
 
   //Filter products based on the search query
   useEffect(() => {
@@ -31,7 +30,7 @@ const SearchResults = () => {
           setSearchResults(data);
           setLoading(false); //set loading to false after fetching search results successfully
         } catch (error) {
-          setError("Error fetching search results");
+          console.error("Error fetching search results:", error.message);
           setLoading(false); //set loading to false after fetching search results unsuccessfully
         }
       }
@@ -47,10 +46,6 @@ const SearchResults = () => {
 
   if (loading) {
     return <Loading message="Loading..." />; //show loading... while fetching data
-  };
-
-  if (error) {
-    return <h2>{error}</h2>; //show error message if failed to fetch search results
   }
 
   return (
@@ -72,7 +67,7 @@ const SearchResults = () => {
             <>
               <p>No products found matching "{query}".</p>
               {/* Display empty container to fill out the screen */}
-              <Container style={{height: "200px"}}></Container>
+              <Container style={{ height: "200px" }}></Container>
             </>
           )}
         </Container>

@@ -6,15 +6,20 @@ import Loading from "../Components/Loading";
 
 const Newsfeed = () => {
   const [products, setProducts] = useState([]); //state to hold products fetch from backend
-  const [visibleProducts, setVisibleProducts] = useState(8); //state to keep track of displaying products
   const [loading, setLoading] = useState(true); //Loading state
-  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1); //state to keep track of the current page
+  const [hasMore, setHasMore] = useState(true); //check if more products are available
+  const limit = 8; //limit of products to fetch per page
 
   useEffect(() => {
+    let isMounted = true; //track if the component is mounted
+
+    //Fetch products from backend
     const fetchProducts = async () => {
+      setLoading(true); //set loading when fetching new data
       try {
         const response = await fetch(
-          "http://localhost:3000/api/product/newsfeed", //fetch products from backend
+          `http://localhost:3000/api/product/newsfeed?page=${page}&limit=${limit}`,
           {
             method: "GET",
             headers: {
@@ -22,28 +27,40 @@ const Newsfeed = () => {
             },
           }
         );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
-        setProducts(data);
-        setLoading(false); //set loading to false after fetching products successfully
+
+        if (isMounted) {
+          setProducts((prevProducts) => {
+            const newProducts = [...prevProducts, ...data.products];
+            setHasMore(newProducts.length < data.totalProducts); //check if more products are available
+            return newProducts;
+          });
+          setLoading(false); //set loading to false after fetching products successfully
+        }
       } catch (error) {
-        setError("Error fetching products");
+        console.error(`Error fetching products: ${error.message}`);
         setLoading(false); //set loading to false after fetching products unsuccessfully
       }
     };
     fetchProducts();
-  }, []);
 
-  //Load more products when "Load more" button is clicked
+    return () => {
+      isMounted = false; //cleanup function to track if the component is unmounted
+    }
+  }, [page]);
+
+  // Load more products when "Load more" button is clicked
   const loadMoreProducts = () => {
-    setVisibleProducts(visibleProducts + 8);
+    setPage((prevPage) => prevPage + 1);
   };
 
   if (loading) {
     return <Loading message="Loading..." />; //show loading... while fetching data
-  }
-
-  if (error) {
-    return <h2>{error}</h2>; //show error message if failed to fetch search results
   }
 
   return (
@@ -53,7 +70,7 @@ const Newsfeed = () => {
       </Container>
       <Container>
         <Row sm={2} md={3} lg={4} className="g-4">
-          {products.slice(0, visibleProducts).map((product) => (
+          {products.map((product) => (
             <Col key={product._id}>
               <ProductCard {...product} />
             </Col>
@@ -61,7 +78,7 @@ const Newsfeed = () => {
         </Row>
       </Container>
       <Container className="d-flex justify-content-center">
-        {visibleProducts < products.length && (
+        {hasMore && (
           <Button variant="primary" className="mt-4" onClick={loadMoreProducts}>
             Load more...
           </Button>
