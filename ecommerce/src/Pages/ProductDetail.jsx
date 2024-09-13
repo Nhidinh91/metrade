@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Loading from "../Components/Loading";
 import "../Styles/ProductDetail.css";
+import { Breadcrumb } from "react-bootstrap";
 
 const ProductDetail = () => {
   // Get the 'id' parameter from the URL
@@ -18,7 +19,9 @@ const ProductDetail = () => {
     // Fetch the product data using the 'id'
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/product/${id}`);
+        const response = await fetch(
+          `http://localhost:3000/api/product/detail/${id}`
+        );
         const data = await response.json();
         setProduct(data.product);
       } catch (error) {
@@ -41,53 +44,76 @@ const ProductDetail = () => {
         <Loading />
       ) : (
         <div className="product-detail-page">
-          <div className="go-back-button">
-            <i className="fa-solid fa-arrow-left"></i>Back to Home
-          </div>
           <div className="product-detail-container">
-            <section className="product-info-container">
-              <div>
-                <p>Category Breadcrum</p>
+            <div>
+              <div className="go-back-button">
+                <i className="fa-solid fa-arrow-left"></i>Back to Home
               </div>
-              <h2 className="product-name">{product.name}</h2>
-              <div className="product-price">
-                <span>{product.price}</span>
-                <img src={coin} alt="coin" />
-              </div>
-              <div className="days-from-creation">
-                <img src={clock} alt="clock" />
-                <div>{daysCreation(product.created_at)} days</div>
-              </div>
-              <div className="location">
-                <img src={locImg} alt="location" />
-                <div>{product.pickup_point}</div>
-              </div>
-              <p className="product-description">{product.description}</p>
-              <div className="add-product-container">
-                <div className="quantity-container">
-                  <div
-                    className="quantity-btn"
-                    onClick={() => setQuantity(quantity - 1)}
-                  >
-                    <i className="fa-solid fa-minus"></i>
-                  </div>
-                  <span className="quantity-number">{quantity}</span>
-                  <div
-                    className="quantity-btn"
-                    onClick={() => setQuantity(quantity + 1)}
-                  >
-                    <i className="fa-solid fa-plus"></i>
-                  </div>
+              <section className="product-info-container">
+                <div>
+                  <Breadcrumb>
+                    {product.category_id.ancestors.map((ancestor) => (
+                      <Breadcrumb.Item
+                        key={ancestor._id}
+                        // linkAs={Link}
+                        // linkProps={{ to: `/category/${ancestor._id}` }}
+                      >
+                        {ancestor.name}
+                      </Breadcrumb.Item>
+                    ))}
+                    <Breadcrumb.Item active>
+                      {product.category_id.name}
+                    </Breadcrumb.Item>
+                  </Breadcrumb>
                 </div>
-                <button
-                  className="add-card-btn"
-                  type="button"
-                  name="add-to-cart-button"
-                >
-                  Add to Cart
-                </button>
-              </div>
-            </section>
+                <h2 className="product-name">{product.name}</h2>
+                <div className="product-price">
+                  <span>{product.price}</span>
+                  <img src={coin} alt="coin" />
+                </div>
+                <div className="days-from-creation">
+                  <img src={clock} alt="clock" />
+                  <div>{daysCreation(product.created_at)} days</div>
+                </div>
+                <div className="location">
+                  <img src={locImg} alt="location" />
+                  <div>{product.pickup_point}</div>
+                </div>
+                <p className="product-description">{product.description}</p>
+                <div className="add-product-container">
+                  <div className="quantity-container">
+                    <div
+                      className="quantity-btn"
+                      onClick={() =>
+                        setQuantity(quantity <= 0 ? 0 : quantity - 1)
+                      }
+                    >
+                      <i className="fa-solid fa-minus"></i>
+                    </div>
+                    <span className="quantity-number">{quantity}</span>
+                    <div
+                      className="quantity-btn"
+                      onClick={() =>
+                        setQuantity(
+                          quantity >= product.stock_quantity
+                            ? quantity
+                            : quantity + 1
+                        )
+                      }
+                    >
+                      <i className="fa-solid fa-plus"></i>
+                    </div>
+                  </div>
+                  <button
+                    className="add-card-btn"
+                    type="button"
+                    name="add-to-cart-button"
+                  >
+                    Add to Cart
+                  </button>
+                </div>
+              </section>
+            </div>
             <section className="photos-container">
               <div className="big-photo">
                 <img src={product.photos[bigPhotoIndex]} />
@@ -105,16 +131,28 @@ const ProductDetail = () => {
                 </div>
                 <div className="small-photos">
                   {product.photos.map((photo, index) => (
-                    <img
-                      src={photo}
+                    <button
+                      onClick={() => {
+                        setBigPhotoIndex(index);
+                      }}
+                      className="image-gallery-thumbnail"
                       key={index}
-                      alt={`Photo ${index + 1}`}
-                      className="small-photo"
                       style={{
                         border:
-                          index === bigPhotoIndex ? "1px solid orange" : "none",
+                          index === bigPhotoIndex
+                            ? "2.5px solid orange"
+                            : "none",
                       }}
-                    />
+                    >
+                      <span className="image-gallery-thumbnail-inner">
+                        <img
+                          src={photo}
+                          key={index}
+                          alt={`Photo ${index + 1}`}
+                          className="small-photo image-gallery-thumbnail-image"
+                        />
+                      </span>
+                    </button>
                   ))}
                 </div>
                 <div className="change-photo-button right">

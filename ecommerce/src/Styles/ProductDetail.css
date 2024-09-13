@@ -7,9 +7,11 @@
 .go-back-button {
     display: flex;
     gap: 1rem;
-    padding-bottom: 2rem;
-    padding-left: 19rem;
+    padding-top: 1.3rem;
+    padding-bottom: 1.8rem;
     align-items: center;
+    font-size: 0.75rem;
+    font-weight: 500;
 }
 
 .product-detail-container {
@@ -25,8 +27,7 @@
 }
 
 .product-name {
-    font-size: 2.5rem;
-    padding-top: 2rem;
+    font-size: 2rem;
     font-weight: 600;
 }
 
@@ -34,8 +35,8 @@
     display: flex;
     justify-content: flex-start;
     gap: 0.25rem;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
 }
 
 .product-price span {
@@ -73,8 +74,7 @@
 }
 
 .product-description {
-    padding-top: 1.5rem;
-    padding-bottom: 1rem;
+    padding-top: 1rem;
     font-size: 0.9rem;
 
 }
@@ -121,15 +121,20 @@
 .photos-container {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 1rem;
+  padding-top: 3rem;
 }
 
 .big-photo {
-  width: 100%;
+  width: 20rem;
+  height: 20rem;
 }
 
 .big-photo img {
-  max-width: 25rem;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
 }
 
 .small-photos-container {
@@ -157,6 +162,12 @@
   padding: 0 1rem;
 }
 
-.small-photos img {
-  max-width: 5rem;
+.small-photos .image-gallery-thumbnail {
+  width: 6.25rem;
+}
+
+.small-photos .image-gallery-thumbnail img {
+  width: 100%;
+  object-fit: contain;
+  aspect-ratio: 1;
 }

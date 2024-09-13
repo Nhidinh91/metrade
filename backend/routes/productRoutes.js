@@ -7,7 +7,7 @@ import {
 
 const router = express.Router();
 
-router.get("/:id", productDetail);
+router.get("/detail/:id", productDetail);
 
 router.get("/newsfeed", getAllProducts);
 router.get("/search", searchProducts);
