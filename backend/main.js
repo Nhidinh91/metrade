@@ -3,7 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv';
 import connectDB from './configs/database.js';
 import authRoutes from './routes/authRoutes.js';
-import productRoutes from './routes/productRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
 
 dotenv.config();
 
@@ -16,7 +16,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/product-categories', productRoutes)
+app.use('/api/categories', categoryRoutes)
 
 // Connect to MongoDB
 connectDB();

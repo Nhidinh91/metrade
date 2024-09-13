@@ -1,13 +1,12 @@
 import Product from "../models/productModel.js";
 import mongoose from "mongoose";
 
+
 export const getProductsByCategory = async (req, res) => {
   const chosenCategory = req.params.categoryId;
-  const objectId = new mongoose.Types.ObjectId(chosenCategory);
 
   try {
-    // const products = await Product.find({ name: name });
-    const products = await Product.find({ category_id: objectId });
+    const products = await Product.find({ category_id: chosenCategory });
 
     if (products.length > 0) {
       res.status(200).json(products);
