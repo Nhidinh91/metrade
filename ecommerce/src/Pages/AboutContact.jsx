@@ -4,13 +4,10 @@ import logo4 from '../assets/logo-4-removebg.png';
 import aboutus1 from '../assets/aboutus1.png';
 import aboutus2 from '../assets/aboutus2.png';
 import style from '../Styles/AboutContact.module.css';
-import Header from './Header';
-import Footer from './Footer';
 
 const AboutContact = () => {
   return (
     <>
-      <Header />
       <Container fluid className={`${style.aboutContact}`}>
         <Row className={`${style.sectionMetrade}`}>
           <Col>
@@ -140,7 +137,6 @@ const AboutContact = () => {
           <h4>Let&apos;s Trade Together. Let&apos;s Trade Smart</h4>
         </Row>
       </Container>
-      <Footer />
     </>
   );
 }

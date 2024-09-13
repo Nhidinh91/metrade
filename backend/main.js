@@ -1,11 +1,13 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
+import express from 'express';
+import cors from 'cors'
+import dotenv from 'dotenv';
 import morgan from "morgan";
-import connectDB from "./configs/database.js";
-import jwtAuthenticate from "./middleware/jwtAuthenticate.js";
-import authRoutes from "./routes/authRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
+import connectDB from './configs/database.js';
+import jwtAuthenticate from './middleware/jwtAuthenticate.js';
+import authRoutes from './routes/authRoutes.js';
+import productRoutes from './routes/productRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+
 
 dotenv.config();
 
@@ -23,8 +25,12 @@ app.use(express.json());
 app.use("/api/user", jwtAuthenticate);
 
 // Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/user", userRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/product', productRoutes);
+
+// Connect to MongoDB
+connectDB();
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

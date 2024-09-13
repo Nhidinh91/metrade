@@ -59,16 +59,16 @@ h4 {
   margin-bottom: 0.75rem;
 }
 h1 {
-  font-size: 3rem;
-}
-h2 {
   font-size: 2rem;
 }
+h2 {
+  font-size: 1.5rem;
+}
 h3 {
-  font-size: 1.25rem;
+  font-size: 0.75rem;
 }
 h4 {
-  font-size: 0.875rem;
+  font-size: 0.5rem;
 }
 p {
   margin-bottom: 1.25rem;
@@ -76,16 +76,16 @@ p {
 }
 @media screen and (min-width: 800px) {
   h1 {
-    font-size: 4rem;
+    font-size: 3rem;
   }
   h2 {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
   h3 {
-    font-size: 1.75rem;
+    font-size: 1rem;
   }
   h4 {
-    font-size: 1rem;
+    font-size: 0.75rem;
   }
   body {
     font-size: 1rem;
@@ -97,6 +97,7 @@ p {
     line-height: 1;
   }
 }
+
 /*  global classes */
 
 .btn {
