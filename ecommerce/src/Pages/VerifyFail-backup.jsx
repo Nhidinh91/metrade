@@ -39,12 +39,11 @@ const getMessageQr = (queryParams) => {
 const EMAIL_ERROR = "not valid email";
 const NO_EMAIL_ERROR = "missing email";
 
-const VerifyFail = ({ emailProp, message }) => {
+const VerifyFailBackup = () => {
   const location = useLocation(); // to get path info
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
-  // const emailQr = queryParams.get("email");
-  const emailQr = emailProp || "";
+  const emailQr = queryParams.get("email");
   const messageQr = getMessageQr(queryParams);
 
   const [email, setEmail] = useState(emailQr);
@@ -123,7 +122,7 @@ const VerifyFail = ({ emailProp, message }) => {
         <h2>Verification Failed!</h2>
         {error != "" && (
           <>
-            <Alert variant="danger" onClose={() => setError("")} dismissible className="sign-up-alert">
+            <Alert variant="danger" onClose={() => setError("")} dismissible>
               <p className="signup-error-item">
                 {error}{" "}
                 {needRegister && (
@@ -155,4 +154,4 @@ const VerifyFail = ({ emailProp, message }) => {
     </div>
   );
 };
-export default VerifyFail;
+export default VerifyFailBackup;

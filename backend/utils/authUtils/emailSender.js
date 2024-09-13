@@ -40,15 +40,25 @@ export const sendConfirmationEmailService = async (email, token) => {
   });
 
   const timeStr = convertToFullDateTimeStr(exp_time_str);
+  const BEURL = "http://localhost:3000/api/auth/register/verify";
+  const FEURL = "http://localhost:5173/verify";
 
   let mailConfigurations = await transport.sendMail({
-    from: `Metrade <${process.env.EMAIL_USERNAME}`,
+    from: `Metrade <${process.env.EMAIL_USERNAME}>`,
     to: `${email}`,
     subject: "Email Verification",
+    // text: `Hi! There, You have recently visited
+    //        our website and entered your email.
+    //        Please follow the given link to verify your email
+    //        http://localhost:3000/api/auth/register/verify/?token=${token}&email=${email}\n.
+
+    //        The link will expire after ${timeStr}
+    //        Thanks`,
     text: `Hi! There, You have recently visited 
            our website and entered your email.
            Please follow the given link to verify your email
-           http://localhost:3000/api/auth/register/verify/?token=${token}&email=${email}\n.
+           ${FEURL}?token=${token}&email=${email}\n.
+
            
            The link will expire after ${timeStr}
            Thanks`,

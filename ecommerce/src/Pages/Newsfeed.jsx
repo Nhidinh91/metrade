@@ -13,12 +13,15 @@ const Newsfeed = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/product/newsfeed", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          "http://localhost:3000/api/product/newsfeed",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         const data = await response.json();
         setProducts(data);
       } catch (error) {
@@ -26,7 +29,7 @@ const Newsfeed = () => {
       }
     };
     fetchProducts();
-  });
+  }, []);
 
   return (
     <Container fluid className={style.newfeed}>

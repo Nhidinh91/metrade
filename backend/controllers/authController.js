@@ -60,30 +60,28 @@ export const register = async (req, res) => {
   }
 };
 
-export const checkVerify = async (req, res) => {
+export const getCheckVerify = async (req, res) => {
   try {
     const { token, email } = req.query;
     const user = await User.findOne({ email });
     if (!user) {
-      console.log("no user exist");
-      // return to fe-url/signup
-      // return res.redirect(FE_URL + "/signup");
-      const qsObj = {
-        status: "fail",
-        message: "user does not exist",
-      };
-      console.log(qsObj);
-      const qs = querystring.stringify(qsObj);
-      console.log(qs);
-      return res.redirect(FE_URL + `/verify-fail?${qs}`);
-      // res.status(404).json({
+      // cach 1
+
+      // const qsObj = {
       //   status: "fail",
-      //   message: "an account with this email does not exist",
-      // });
+      //   message: "user does not exist",
+      // };
+      // const qs = querystring.stringify(qsObj);
+      // return res.redirect(FE_URL + `/verify-fail?${qs}`);
+
+      res.status(404).json({
+        status: "fail",
+        message: "an account with this email does not exist",
+      });
     }
     if (user.is_verified) {
-      return res.redirect(FE_URL + `/verify-success`);
-      // throw new Error("User is already verified");
+      // return res.redirect(FE_URL + `/verify-success`);
+      throw new Error("User is already verified");
     }
 
     const validToken = await isValidVerifyToken(token, user);
@@ -102,28 +100,110 @@ export const checkVerify = async (req, res) => {
         { returnDocument: "after" }
       );
       //if valid token redirect to home page
-      return res.redirect(FE_URL + "/verify-success");
-      // res.status(200).json({
-      //   status: "success",
-      //   data: {
-      //     message: "Email verified successfully",
-      //     updatedUser,
-      //   },
-      // });
+      // return res.redirect(FE_URL + "/verify-success");
+
+      res.status(200).json({
+        status: "success",
+        data: {
+          message: "Email verified successfully",
+          updatedUser,
+        },
+      });
     } else {
-      const qsObj = {
-        status: "fail",
-        email,
-        message: "Invalid Token",
-      };
-      const qs = querystring.stringify(qsObj);
-      return res.redirect(FE_URL + `/verify-fail?${qs}`);
-      // throw new Error(
-      //   "Email verification failed, possibly the link is invalid or expired\nPlease request new verification link."
-      // );
+      // const qsObj = {
+      //   status: "fail",
+      //   email,
+      //   message: "Invalid Token",
+      // };
+      // const qs = querystring.stringify(qsObj);
+      // return res.redirect(FE_URL + `/verify-fail?${qs}`);
+
+      throw new Error(
+        "Email verification failed, possibly the link is invalid or expired\nPlease request new verification link."
+      );
     }
   } catch (err) {
     res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+export const postCheckVerify = async (req, res) => {
+  try {
+    const { token, email } = req.body;
+    const user = await User.findOne({ email });
+    console.log(user);
+    if (!user) {
+      // cach 1
+
+      // const qsObj = {
+      //   status: "fail",
+      //   message: "user does not exist",
+      // };
+      // const qs = querystring.stringify(qsObj);
+      // return res.redirect(FE_URL + `/verify-fail?${qs}`);
+
+      return res.status(404).json({
+        status: "fail",
+        message: "an account with this email does not exist",
+      });
+    }
+    if (user.is_verified) {
+      // return res.redirect(FE_URL + `/verify-success`);
+      // throw new Error("User is already verified");
+      return res.status(400).json({
+        status: "fail",
+        message: "User is already verified",
+      });
+    }
+
+    const validToken = await isValidVerifyToken(token, user);
+    if (validToken) {
+      const updatedUser = await User.findOneAndUpdate(
+        { email },
+        {
+          $set: {
+            is_verified: true,
+            validation_token: {
+              value: "",
+              expired_at: user.validation_token.expired_at,
+            },
+          },
+        },
+        { returnDocument: "after" }
+      );
+      //   //if valid token redirect to home page
+      //   // return res.redirect(FE_URL + "/verify-success");
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          message: "Email verified successfully",
+          updatedUser,
+        },
+      });
+    } else {
+      // const qsObj = {
+      //   status: "fail",
+      //   email,
+      //   message: "Invalid Token",
+      // };
+      // const qs = querystring.stringify(qsObj);
+      // return res.redirect(FE_URL + `/verify-fail?${qs}`);
+
+      // throw new Error(
+      //   "Email verification failed, possibly the link is invalid or expired\nPlease request new verification link."
+      // );
+      return res.status(404).json({
+        status: "fail",
+        message:
+          "        Email verification failed, possibly the link is invalid or expired\nPlease request new verification link.",
+      });
+    }
+  } catch (err) {
+    return res.status(400).json({
       status: "fail",
       message: err.message,
     });
@@ -162,7 +242,7 @@ export const resendEmail = async (req, res) => {
           {
             $set: { validation_token },
           },
-          { returnDocument: "true" }
+          { returnDocument: "after" }
         );
         sendConfirmationEmailService(email, validation_token.value);
         res.status(201).json({

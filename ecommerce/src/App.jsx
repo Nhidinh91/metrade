@@ -16,7 +16,7 @@ import SignUp from "./Pages/SignUp.jsx";
 import VerifyFail from "./Pages/VerifyFail.jsx";
 import VerifySuccess from "./Pages/VerifySuccess.jsx";
 import ConfirmSent from "./Pages/ConfirmSent.jsx";
-
+import Verify from "./Pages/Verify.jsx"
 
 function App() {
   return (
@@ -24,18 +24,11 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
-<<<<<<< HEAD
           <Route path="/verify-fail" element={<VerifyFail />} />
           <Route path="/verify-success" element={<VerifySuccess />} />
           <Route path="/confirm-sent" element={<ConfirmSent />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/about" element={<AboutContact />} />
-          <Route path="/search-results" element={<SearchResults />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/selling-history" element={<SellingHistory />} />
-          <Route path="/purchase-history" element={<PurchaseHistory />} />
-=======
-          <Route path="/signup" element={<Home />} />
+          <Route path="/verify" element={<Verify />} />
           <Route path="/" element={<LayoutEcom />}>
             <Route index element={<Home />} />
             <Route path="about" element={<AboutContact />} />
@@ -46,11 +39,9 @@ function App() {
             <Route path="category" element={<ProductListing />} />
             <Route path="*" element={<NotFound />} />
           </Route>
->>>>>>> sprint1
         </Routes>
       </Router>
     </AuthProvider>
-
   );
 }
 
