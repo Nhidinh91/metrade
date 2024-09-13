@@ -2,10 +2,13 @@ import ProductCard from "../Components/ProductCard";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import style from "../Styles/Newsfeed.module.css";
 import { useState, useEffect } from "react";
+import Loading from "../Components/Loading";
 
 const Newsfeed = () => {
   const [products, setProducts] = useState([]); //state to hold products fetch from backend
   const [visibleProducts, setVisibleProducts] = useState(8); //state to keep track of displaying products
+  const [loading, setLoading] = useState(true); //Loading state
+
   const loadMoreProducts = () => {
     setVisibleProducts(visibleProducts + 8);
   };
@@ -13,20 +16,29 @@ const Newsfeed = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/product/newsfeed", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          "http://localhost:3000/api/product/newsfeed", //fetch products from backend
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         const data = await response.json();
         setProducts(data);
+        setLoading(false); //set loading to false after fetching products successfully
       } catch (error) {
         console.error("Error fetching products:", error.message);
+        setLoading(false); //set loading to false after fetching products unsuccessfully
       }
     };
     fetchProducts();
   }, []);
+
+  if (loading) {
+    return <Loading message="Loading..." />; //show loading... while fetching data
+  }
 
   return (
     <Container fluid className={style.newfeed}>

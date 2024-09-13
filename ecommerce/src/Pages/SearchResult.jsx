@@ -3,12 +3,14 @@ import { useState, useEffect } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import ProductCard from "../Components/ProductCard";
 import style from "../Styles/Newsfeed.module.css"; //Same styling as Newsfeed
+import Loading from "../Components/Loading";
 
 const SearchResults = () => {
   const location = useLocation();
   const query = new URLSearchParams(location.search).get("query"); //Extract search term from query parameter
   const [searchResults, setSearchResults] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState(8); //Keep track of the number of products to display
+  const [loading, setLoading] = useState(true); //Loading state
 
   //Filter products based on the search query
   useEffect(() => {
@@ -24,8 +26,10 @@ const SearchResults = () => {
           ); //fetch search results from backend
           const data = await response.json();
           setSearchResults(data);
+          setLoading(false); //set loading to false after fetching search results successfully
         } catch (error) {
           console.error("Error fetching search results:", error.message);
+          setLoading(false); //set loading to false after fetching search results unsuccessfully
         }    
       }}
 
@@ -35,6 +39,10 @@ const SearchResults = () => {
   //Load more products when "Load more" button is clicked
   const loadMoreProducts = () => {
     setVisibleProducts(visibleProducts + 8);
+  };
+
+  if (loading) {
+    return <Loading message="Loading..." />; //show loading... while fetching data
   };
 
   return (
