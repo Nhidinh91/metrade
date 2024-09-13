@@ -41,7 +41,7 @@ const SearchResults = () => {
     <>
       <Container fluid className={style.newfeed}>
         <Container>
-          <h1 className="fw-bold">Search Results for "{query}"</h1>
+          <h2 >Search Results for "{query}"</h2>
         </Container>
         <Container>
           {searchResults.length > 0 ? (

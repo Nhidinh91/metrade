@@ -26,7 +26,7 @@ const Newsfeed = () => {
       }
     };
     fetchProducts();
-  });
+  }, []);
 
   return (
     <Container fluid className={style.newfeed}>
