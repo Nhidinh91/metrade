@@ -55,6 +55,7 @@ const SignUp = () => {
       setValidPassword((vp) => true);
     } else {
       setValidPassword((vp) => false);
+      
     }
   };
 
