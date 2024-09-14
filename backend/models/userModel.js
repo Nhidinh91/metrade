@@ -5,7 +5,12 @@ import { createToken } from "./../utils/authUtils/tokenValidation.js";
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    first_name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    last_name: {
       type: String,
       required: true,
       trim: true,
@@ -49,11 +54,9 @@ const userSchema = new mongoose.Schema(
     validation_token: {
       value: {
         type: String,
-
       },
       expired_at: {
         type: Date,
-
       },
     },
     deleted_at: {

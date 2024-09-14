@@ -7,7 +7,7 @@
   margin: auto;
   font-family: Poppins;
   font-size: 1.2rem;
-  min-height: 100vh;
+  min-height: 80vh;
 }
 .verify-fail-icon {
   margin-top: 0;
@@ -36,19 +36,20 @@
   font-size: 1rem;
 }
 
-.alert {
-  width: 80%;
+.sign-up-alert {
+  width: 60%;
   text-align: start;
 }
-.alert p {
+.sign-up-alert p {
   margin: auto;
   /* padding-left: 0; */
+  width: 80%;
   text-align: center;
   text-transform: capitalize;
 }
 .verify-fail-content input,
 .verify-fail-content input:after {
-  width: 80%;
+  width: 70%;
   border-style: none;
   border-bottom: 2px solid black;
   font-weight: bold;
@@ -69,9 +70,9 @@
   height: 10%;
 }
 
-.verify-button >button,
-.verify-success >button,
-.confirm-send >button {
+.verify-button > button,
+.verify-success > button,
+.confirm-send > button {
   width: 50%;
   padding: 1rem 2rem;
   border: none;
@@ -85,12 +86,12 @@
 
   font-weight: bold;
 }
-.verify-button> button {
+.verify-button > button {
   background: #3f9c36;
 }
 
-.verify-success> button,
-.confirm-send >button {
+.verify-success > button,
+.confirm-send > button {
   background: #f37c25;
 }
 

@@ -7,8 +7,6 @@ dotenv.config();
 export const hashInput = async (input) => {
   try {
     const SALT_SECRET = Number(process.env.SALT_SECRET);
-    // console.log(typeof process.env.SALT_SECRET);
-    // const salt = await bcrypt.genSalt(process.env.SALT_SECRET);
     const salt = await bcrypt.genSalt(SALT_SECRET);
     const hash = await bcrypt.hash(input, salt);
     return hash;

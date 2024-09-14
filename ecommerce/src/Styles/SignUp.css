@@ -66,7 +66,7 @@
   height: 30%;
 }
 .signup-item > label {
-  padding-bottom: 10px;
+  padding-bottom: 0.6rem;
   color: #183942ad;
   font-weight: bold;
 }
@@ -105,7 +105,7 @@
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 16px;
+  font-size: 1rem;
   /* padding: 10px; */
   border-radius: 25px;
   background: radial-gradient(circle, #43ca36, #3f9c36);
@@ -126,7 +126,7 @@
 .fa-eye-slash {
   position: absolute;
   z-index: 999;
-  transform: translateY(30%);
+  transform: translateY(-150%);
   right: 2%;
   cursor: pointer;
 }
