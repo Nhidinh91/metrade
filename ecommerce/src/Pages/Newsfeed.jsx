@@ -9,6 +9,7 @@ const Newsfeed = () => {
   const [loading, setLoading] = useState(true); //Loading state
   const [page, setPage] = useState(1); //state to keep track of the current page
   const [hasMore, setHasMore] = useState(true); //check if more products are available
+  const [error, setError] = useState(null); //error state
   const limit = 8; //limit of products to fetch per page
 
   useEffect(() => {
@@ -28,10 +29,6 @@ const Newsfeed = () => {
           }
         );
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
         const data = await response.json();
 
         if (isMounted) {
@@ -40,11 +37,11 @@ const Newsfeed = () => {
             setHasMore(newProducts.length < data.totalProducts); //check if more products are available
             return newProducts;
           });
-          setLoading(false); //set loading to false after fetching products successfully
         }
       } catch (error) {
-        console.error(`Error fetching products: ${error.message}`);
-        setLoading(false); //set loading to false after fetching products unsuccessfully
+        setError(error.message);
+      } finally {
+        setLoading(false); //set loading to false after fetching products
       }
     };
     fetchProducts();
@@ -58,6 +55,15 @@ const Newsfeed = () => {
   const loadMoreProducts = () => {
     setPage((prevPage) => prevPage + 1);
   };
+
+  if (error) {
+    return (
+      <>
+        <h1 className={style.error}>Error: {error}</h1>
+        <Container style={{ height: "200px" }}></Container>
+      </>
+    );
+  }
 
   if (loading) {
     return <Loading message="Loading..." />; //show loading... while fetching data

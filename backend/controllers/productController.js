@@ -7,7 +7,7 @@ export const getAllProducts = async (req, res) => {
     const limit = parseInt(req.query.limit) || 8; //get the limit from the query parameter
     const skip = (page - 1) * limit; //calculate how many products to skip
     const totalProducts = await Product.countDocuments(); //get the total count of products
-    const products = await Product.find({}).skip(skip).limit(limit); //skip and limit products based on the query
+    const products = await Product.find({}).sort({ created_at: 1 }).skip(skip).limit(limit); //sort by created at time then skip and limit products based on the query
 
     //if no products found
     if (products.length === 0) {
