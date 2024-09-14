@@ -2,12 +2,13 @@ import coin from "../assets/star.png";
 import clock from "../assets/clock.png";
 import locImg from "../assets/location.png";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams,  useNavigate } from "react-router-dom";
 import Loading from "../Components/Loading";
 import "../Styles/ProductDetail.css";
-import { Breadcrumb } from "react-bootstrap";
+import { Breadcrumb, Row, Col, Container, Button } from "react-bootstrap";
 
 const ProductDetail = () => {
+  const navigate = useNavigate();
   // Get the 'id' parameter from the URL
   const { id } = useParams();
   // States to store product data, change quantity, and big photo
@@ -43,11 +44,13 @@ const ProductDetail = () => {
       {!product ? (
         <Loading />
       ) : (
-        <div className="product-detail-page">
-          <div className="product-detail-container">
-            <div>
-              <div className="go-back-button">
-                <i className="fa-solid fa-arrow-left"></i>Back to Home
+        <Container className="product-detail-page">
+          <Row className="product-detail-container" sm={1} md={2} lg={2}>
+            <Col sm={12} md={6} lg={6}>
+              <div className="go-back-button-container">
+                <button type="button" className="go-back-button" onClick={() => navigate(-1)}>
+                  <i className="fa-solid fa-arrow-left"></i>Back to Home
+                </button>
               </div>
               <section className="product-info-container">
                 <div>
@@ -113,8 +116,8 @@ const ProductDetail = () => {
                   </button>
                 </div>
               </section>
-            </div>
-            <section className="photos-container">
+            </Col>
+            <Col className="photos-container" sm={12} md={6} lg={6}>
               <div className="big-photo">
                 <img src={product.photos[bigPhotoIndex]} />
               </div>
@@ -168,9 +171,9 @@ const ProductDetail = () => {
                   ></i>
                 </div>
               </div>
-            </section>
-          </div>
-        </div>
+            </Col>
+          </Row>
+        </Container>
       )}
     </>
   );
