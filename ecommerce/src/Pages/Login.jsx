@@ -11,7 +11,11 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuthContext();
+  const { signIn, user } = useAuthContext();
+
+  if (user){
+    navigate("/")
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
