@@ -17,6 +17,7 @@ const SearchResults = () => {
   useEffect(() => {
     const fetchSearchResults = async () => {
       if (query) {
+        setLoading(true); //set loading when fetching new data
         try {
           const response = await fetch(
             `http://localhost:3000/api/product/search?query=${query}`,

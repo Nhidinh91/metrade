@@ -5,9 +5,20 @@ export const getAllProducts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1; //get the page number from the query parameter
     const limit = parseInt(req.query.limit) || 8; //get the limit from the query parameter
+
+    // Validate page and limit
+    if (page < 1 || limit < 1) {
+      return res
+        .status(400)
+        .json({ message: "Invalid page or limit parameter" });
+    }
+
     const skip = (page - 1) * limit; //calculate how many products to skip
     const totalProducts = await Product.countDocuments(); //get the total count of products
-    const products = await Product.find({}).sort({ created_at: 1 }).skip(skip).limit(limit); //sort by created at time then skip and limit products based on the query
+    const products = await Product.find({})
+      .sort({ created_at: 1 })
+      .skip(skip)
+      .limit(limit); //sort by created at time then skip and limit products based on the query
 
     //if no products found
     if (products.length === 0) {
@@ -18,6 +29,7 @@ export const getAllProducts = async (req, res) => {
       products,
       totalProducts,
     });
+    
   } catch (error) {
     console.error("Error fetching products:", error.message);
     res

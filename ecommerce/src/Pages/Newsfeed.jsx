@@ -41,7 +41,9 @@ const Newsfeed = () => {
       } catch (error) {
         setError(error.message);
       } finally {
-        setLoading(false); //set loading to false after fetching products
+        if (isMounted) {
+          setLoading(false)
+        }//set loading to false after fetching products
       }
     };
     fetchProducts();
