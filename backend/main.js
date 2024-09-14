@@ -6,6 +6,7 @@ import jwtAuthenticate from './middleware/jwtAuthenticate.js';
 import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import morgan from 'morgan';
 
 
 dotenv.config();
@@ -16,6 +17,7 @@ const app = express();
 connectDB();
 
 // Middleware
+app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
 app.use('/api/user', jwtAuthenticate);
@@ -24,9 +26,6 @@ app.use('/api/user', jwtAuthenticate);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/product', productRoutes);
-
-// Connect to MongoDB
-connectDB();
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
