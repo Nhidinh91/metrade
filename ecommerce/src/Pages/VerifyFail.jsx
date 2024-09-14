@@ -20,12 +20,10 @@ const containNotExist = (string) => {
 
 const containVerified = (string) => {
   return containString(string, "already verified");
-  // return string.toLowerCase().trim().includes("already verified");
 };
 
 const containToken = (string) => {
   return containString(string, "token");
-  // return string.toLowerCase().trim().includes("token");
 };
 
 const getMessageQr = (queryParams) => {
@@ -43,13 +41,11 @@ const VerifyFail = ({ emailProp, message }) => {
   const location = useLocation(); // to get path info
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
-  // const emailQr = queryParams.get("email");
   const emailQr = emailProp || "";
   const messageQr = getMessageQr(queryParams);
 
   const [email, setEmail] = useState(emailQr);
   const [validEmail, setValidEmail] = useState(emailQr !== null);
-  // const [error, setError] = useState(messageQr || "");
   const [error, setError] = useState(messageQr);
   const [needRegister, setNeedRegister] = useState(
     containNotExist(messageQr) || false
@@ -71,14 +67,10 @@ const VerifyFail = ({ emailProp, message }) => {
     try {
       setError("");
       setNeedRegister(false);
-      console.log("checking email", checkValidEmail(email));
-      console.log("valid email", validEmail);
-
       if (validEmail === false) {
         if (!email) {
           setError(NO_EMAIL_ERROR);
         }
-
         setError(EMAIL_ERROR);
       } else {
         console.log("sending link");
@@ -96,7 +88,6 @@ const VerifyFail = ({ emailProp, message }) => {
         if (!response.ok) {
           throw new Error(data.message || "Something went wrong");
         } else {
-          console.log("data: ", data);
           navigate("/confirm-sent");
         }
       }
@@ -123,7 +114,12 @@ const VerifyFail = ({ emailProp, message }) => {
         <h2>Verification Failed!</h2>
         {error != "" && (
           <>
-            <Alert variant="danger" onClose={() => setError("")} dismissible className="sign-up-alert">
+            <Alert
+              variant="danger"
+              onClose={() => setError("")}
+              dismissible
+              className="sign-up-alert"
+            >
               <p className="signup-error-item">
                 {error}{" "}
                 {needRegister && (

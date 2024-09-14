@@ -18,7 +18,6 @@ const Verify = () => {
     email,
   };
   console.log(tokenObj);
-  // const token = queryParams()
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -34,7 +33,7 @@ const Verify = () => {
           body: JSON.stringify(tokenObj),
         });
         const data = await response.json();
-        console.log(data)
+        console.log(data);
         if (!ignore) {
           setResult(data);
         }
@@ -59,9 +58,7 @@ const Verify = () => {
           </div>
           <div className="verify-fail-content" style={{ textAlign: "center" }}>
             <div className="fail-icon">
-              <div className="spinner-border" role="status">
-                {/* <span className="sr-only">Verifying...</span> */}
-              </div>
+              <div className="spinner-border" role="status"></div>
               <p style={{ textAlign: "center" }}>Verifying...</p>
             </div>
           </div>

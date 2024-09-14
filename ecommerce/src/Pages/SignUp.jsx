@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Alert } from "react-bootstrap";
+import { Form, Button, Alert, Spinner } from "react-bootstrap";
 
 import Logo from "./../../src/assets/logo.png";
 
+import "../../src/Styles/Login.css";
 import "../Styles/SignUp.css";
 
-const ERROR_NAME = "Missing Name";
+const ERROR_FIRST_NAME = "Missing First Name";
+const ERROR_LAST_NAME = "Missing Last Name";
 const ERROR_PASSWORD = "Password need to be more than 8 characters";
 const ERROR_EMAIL = "Must use Metropolia email";
 
@@ -21,23 +23,32 @@ const checkValidPassword = (string) => {
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [validName, setValidName] = useState(false);
+  const [validFirstName, setValidFirstName] = useState(false);
+  const [validLastName, setValidLastName] = useState(false);
   const [validEmail, setValidEmail] = useState(false);
   const [validPassword, setValidPassword] = useState(false);
-  // const [showPassword, setShowPassword] = useState(false);
   const [passwordType, setPasswordType] = useState("password");
   const [errors, setErrors] = useState([]);
 
-  const handleName = (e) => {
-    // console.log(e);
-    setName((n) => e.target.value);
+  const handleFirstName = (e) => {
+    setFirstName((fn) => e.target.value);
     if (e.target.value != "") {
-      setValidName(true);
+      setValidFirstName((vfn) => true);
     } else {
-      setValidName(false);
+      setValidFirstName((vfn) => false);
+    }
+  };
+  const handleLastName = (e) => {
+    setLastName((ln) => e.target.value);
+    if (e.target.value != "") {
+      setValidLastName((vln) => true);
+    } else {
+      setValidLastName((vln) => false);
     }
   };
 
@@ -55,15 +66,18 @@ const SignUp = () => {
       setValidPassword((vp) => true);
     } else {
       setValidPassword((vp) => false);
-      
     }
   };
 
   const isvalidForm = () => {
     setErrors((e) => []);
     let check = true;
-    if (!validName) {
-      setErrors((e) => [...e, ERROR_NAME]);
+    if (!validFirstName) {
+      setErrors((e) => [...e, ERROR_FIRST_NAME]);
+      check = false;
+    }
+    if (!validLastName) {
+      setErrors((e) => [...e, ERROR_LAST_NAME]);
       check = false;
     }
     if (!validEmail) {
@@ -88,15 +102,17 @@ const SignUp = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
+    // let ignore = false
     const isValid = isvalidForm();
 
     if (isValid) {
       const newUser = {
-        name,
+        first_name: firstName,
+        last_name: lastName,
         email,
         password,
       };
-      console.log(newUser);
       try {
         const response = await fetch(
           "http://127.0.0.1:3000/api/auth/register",
@@ -111,110 +127,126 @@ const SignUp = () => {
 
         const data = await response.json();
         if (!response.ok) {
-          console.log(response);
+          setFirstName((fn) => "");
+          setLastName((fn) => "");
           setEmail((e) => "");
           setPassword((p) => "");
-          setName((n) => "");
+          setValidFirstName((vn) => false);
+          setValidLastName((vn) => false);
           setValidEmail((ve) => false);
-          setValidName((vn) => false);
           setValidPassword((vp) => false);
           throw new Error(data.message || "Something went wrong");
         } else {
-          console.log("data: ", data);
           navigate("/");
         }
       } catch (err) {
         console.error("Error during registration:", err);
         setErrors((e) => [...e, err.message]);
       } finally {
-        // setLoading(false);
+        setLoading(false);
       }
     }
+    setLoading(false);
   };
-
   return (
-    <div className="signup-container">
-      <div className="signup-icon">
-        <img src={Logo} alt="metrade-logo" />
-      </div>
-      {errors.length > 0 && (
-        <Alert variant="danger" onClose={() => setErrors([])} dismissible>
-          {errors.map((error, index) => {
-            return (
-              <p className="signup-error-item" key={index}>
-                {error}
-              </p>
-            );
-          })}
-        </Alert>
-      )}
-      <div className="signup-form-container">
-        <div className="signup-title">
-          <h2>Get Started!</h2>
+    <>
+      <div className="signin-wrapper">
+        <div className="signin-image">
+          <img src={Logo} alt="logo" />
         </div>
-        <form onSubmit={handleSubmit} className="signup-form">
-          <div className="signup-item">
-            <label htmlFor="name">Name</label>
-            <input
-              type="text"
-              name="name"
-              id="signup-name"
-              onChange={handleName}
-              value={name}
-            />
-          </div>
-          <div className="signup-item">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              name="email"
-              id="signup-email"
-              onChange={handleEmail}
-              value={email}
-            />
-          </div>
-          <div className="signup-item">
-            <label htmlFor="password">Pasword</label>
-            <div className="password-container">
-              <input
-                type={passwordType}
-                name="password"
-                id="signup-password"
-                onChange={handlePassword}
-                value={password}
+        <div className="signin-form-container">
+          <h2 className="signin-title">Get Started!</h2>
+          {errors.length > 0 && (
+            <Alert variant="danger" onClose={() => setErrors([])} dismissible>
+              {errors.map((error, index) => {
+                return (
+                  <p className="signup-error-item" key={index}>
+                    {error}
+                  </p>
+                );
+              })}
+            </Alert>
+          )}
+          <Form className="signin-form" onSubmit={handleSubmit}>
+            <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Label className="signin-label">First Name</Form.Label>
+              <Form.Control
+                type="text"
+                name="firstName"
+                placeholder="Enter your first name"
+                value={firstName}
+                onChange={handleFirstName}
+                className="signin-input"
               />
-              {passwordType === "password" ? (
-                <i
-                  className="fa-solid fa-eye"
-                  id="show-password"
-                  onClick={handleTogglePassword}
-                ></i>
-              ) : (
-                <i
-                  className="fa-solid fa-eye-slash"
-                  onClick={handleTogglePassword}
-                ></i>
-              )}
-            </div>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Label className="signin-label">Last Name</Form.Label>
+              <Form.Control
+                type="text"
+                name="lastName"
+                placeholder="Enter your last name"
+                value={lastName}
+                onChange={handleLastName}
+                className="signin-input"
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Label className="signin-label">Email</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter your metropolia email"
+                name="email"
+                value={email}
+                onChange={handleEmail}
+                className="signin-input"
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="formBasicPassword">
+              <Form.Label className="signin-label">Password</Form.Label>
+              <div className="password-container">
+                <Form.Control
+                  type={passwordType}
+                  name="password"
+                  placeholder="Enter your password"
+                  onChange={handlePassword}
+                  value={password}
+                  // onChange={(e) => setPassword(e.target.value)}
+                  className="signin-input"
+                />
+                {passwordType === "password" ? (
+                  <i
+                    className="fa-solid fa-eye"
+                    id="show-password"
+                    onClick={handleTogglePassword}
+                  ></i>
+                ) : (
+                  <i
+                    className="fa-solid fa-eye-slash"
+                    onClick={handleTogglePassword}
+                  ></i>
+                )}
+              </div>
+            </Form.Group>
+            <Button variant="primary" type="submit" className="signin-button">
+              {loading ? <Spinner animation="border" size="sm" /> : "SIGN UP"}
+            </Button>
+          </Form>
+
+          <div className="signin-footer text-center">
+            <p>
+              Already have an account?{" "}
+              <span>
+                <Link to="/login" className="signin-link">
+                  <strong>Sign in</strong>
+                </Link>
+              </span>
+            </p>
           </div>
-          <div className="signup-submit">
-            <button type="submit" className="signup-btn">
-              SIGN UP
-            </button>
-          </div>
-        </form>
-        <div className="signin-text">
-          <p>
-            Already have an account?{" "}
-            <span>
-              <Link to="/login" className="signin-link">
-                <strong>Sign in</strong>
-              </Link>
-            </span>
-          </p>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 export default SignUp;
