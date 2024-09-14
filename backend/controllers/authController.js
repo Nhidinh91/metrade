@@ -33,15 +33,22 @@ export const register = async (req, res) => {
         // if not exist, create a new user , and a new cart with new user id
         const hashedPassword = await hashInput(password);
         const validation_token = await createToken(email);
+        // const { value, expired_at } = await createToken(email);
+        // console.log("validation_token", validation_token);
         const newUser = await User.create({
           name,
           email,
           password: hashedPassword,
+          // validation_token: {
+          //   value,
+          //   expired_at: Date.now(),
+          // },
           validation_token,
         });
         const newCart = await Cart.create({ user_id: newUser.id });
         // send confirmation email
         await sendConfirmationEmailService(email, validation_token.value);
+        // await sendConfirmationEmailService(email, value);
         // return response to FE
         res.status(201).json({
           status: "success",
@@ -101,7 +108,7 @@ export const getCheckVerify = async (req, res) => {
       );
       //if valid token redirect to home page
       // return res.redirect(FE_URL + "/verify-success");
-
+      console.log("updated user", updatedUser);
       res.status(200).json({
         status: "success",
         data: {
@@ -223,6 +230,7 @@ export const resendEmail = async (req, res) => {
     } else {
       //check if the user with email exist
       const user = await User.findOne({ email });
+
       if (!user) {
         res.status(404).json({
           status: "fail",
@@ -244,6 +252,7 @@ export const resendEmail = async (req, res) => {
           },
           { returnDocument: "after" }
         );
+        console.log(updatedUser);
         sendConfirmationEmailService(email, validation_token.value);
         res.status(201).json({
           status: "success",

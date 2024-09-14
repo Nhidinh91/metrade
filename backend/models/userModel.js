@@ -49,11 +49,9 @@ const userSchema = new mongoose.Schema(
     validation_token: {
       value: {
         type: String,
-
       },
       expired_at: {
         type: Date,
-
       },
     },
     deleted_at: {

@@ -9,12 +9,15 @@ const getExpectDuration = () => {
 
 export const createToken = async (email) => {
   const token = await hashInput(email);
-  const currentTime = Math.round(Date.now() / 1000);
+  // const currentTime = Math.round(Date.now() / 1000);
+  const currentTime = Date.now();
   const expired_at = currentTime + getExpectDuration();
+
   const tokenObject = {
     value: token,
     expired_at: expired_at,
   };
+  console.log(tokenObject);
   return tokenObject;
 };
 

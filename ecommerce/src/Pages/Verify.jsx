@@ -34,6 +34,7 @@ const Verify = () => {
           body: JSON.stringify(tokenObj),
         });
         const data = await response.json();
+        console.log(data)
         if (!ignore) {
           setResult(data);
         }
