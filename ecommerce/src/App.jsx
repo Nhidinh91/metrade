@@ -12,7 +12,8 @@ import SellingHistory from "./Pages/SellingHistory.jsx";
 import PurchaseHistory from "./Pages/PurchaseHistory.jsx";
 import Profile from "./Pages/Profile.jsx";
 import { AuthProvider } from "./contexts/AuthContext";
-import ProductDetail from "./Pages/ProductDetail.jsx"
+import ProductDetail from "./Pages/ProductDetail.jsx";
+import MyPage from "./Pages/MyPage.jsx";
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
             <Route path="/purchase-history" element={<PurchaseHistory />} />
             <Route path="category" element={<ProductListing />} />
             <Route path="/product/detail/:id" element={<ProductDetail/>} />
+            <Route path="/my-page" element={<MyPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

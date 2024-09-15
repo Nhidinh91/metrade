@@ -1,5 +1,10 @@
 import User from "../models/userModel.js";
 
 export const profile = async (req, res) => {
-    res.status(200).json({ success: true, message: "User profile", user: { "name": "John Doe" } });
+    try {
+        const user = await User.findById(req.user.id);
+        res.json({ success: true, user });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 };

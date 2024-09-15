@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useParams,  useNavigate } from "react-router-dom";
 import Loading from "../Components/Loading";
 import "../Styles/ProductDetail.css";
-import { Breadcrumb, Row, Col, Container, Button } from "react-bootstrap";
+import { Breadcrumb, Row, Col, Container} from "react-bootstrap";
 
 const ProductDetail = () => {
   const navigate = useNavigate();
