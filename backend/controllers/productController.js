@@ -66,6 +66,7 @@ export const searchProducts = async (req, res) => {
   }
 };
 
+//Get product detail by Id
 export const productDetail = async (req, res) => {
   const id = req.params.id;
   //if lack of id
@@ -93,7 +94,6 @@ export const productDetail = async (req, res) => {
           select: 'name'
         }
       })
-    console.log(product);
     //if no product found
     if (!product) {
       return res.status(404).json({
