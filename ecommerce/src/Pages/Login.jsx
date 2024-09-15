@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Form, Button, Alert, Spinner } from "react-bootstrap";
 import "../../src/Styles/Login.css";
 import Logo from "../../src/assets/logo.png";
-import { useAuthContext } from '../hooks/useAuthContext';
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -115,7 +115,14 @@ const Login = () => {
           <div className="help-text">
             <span>New to Metrade?</span>
           </div>
-          <Button className="signup-button">Create your Metrade account</Button>
+          <div className="signup-div">
+            <Link to="/signup">
+              <Button className="signup-button">
+                Create your Metrade account
+              </Button>
+            </Link>
+          </div>
+
         </div>
       </div>
     </div>
