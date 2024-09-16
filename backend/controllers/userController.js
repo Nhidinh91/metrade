@@ -17,7 +17,7 @@ export const profile = async (req, res) => {
   }
 
   try {
-    const userInfo = await User.findById(id, "first_name last_name photo_url phone email is_verified");
+    const userInfo = await User.findById(id, "_id first_name last_name email role photo_url is_verified phone balance");
 
     if (!userInfo) {
       return res.status(404).json({
@@ -98,11 +98,15 @@ export const updateProfile = async (req, res) => {
       success: true,
       message: "User Info updated",
       user: {
+        _id: updatedUser._id,
         first_name: updatedUser.first_name,
         last_name: updatedUser.last_name,
-        phone: updatedUser.phone,
         email: updatedUser.email,
+        role: updatedUser.role,
+        photo_url: updatedUser.photo_url,
         is_verified: updatedUser.is_verified,
+        phone: updatedUser.phone,
+        balance: updatedUser.balance,
       }
     });
 

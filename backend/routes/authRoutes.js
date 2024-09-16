@@ -8,12 +8,9 @@ import {
 
 const router = express.Router();
 
-router.route("/register").post(register); // register
-router.route("/register/verify").post(checkVerify);
-router.route("/register/resend").post(resendEmail);
-
-// resendEmailRoute
-
+router.post("/register", register);
+router.post("/register/verify", checkVerify);
+router.post("/resend-verification-email", resendEmail);
 router.post("/login", login);
 
 export default router;

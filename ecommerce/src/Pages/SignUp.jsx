@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Form, Button, Alert, Spinner } from "react-bootstrap";
 import { useAuthContext } from "../hooks/useAuthContext";
-
+import { emailValidation } from "../utils/emailValidation";
 import Logo from "./../../src/assets/logo.png";
 
 import "../../src/Styles/Login.css";
@@ -12,11 +12,6 @@ const ERROR_FIRST_NAME = "Missing First Name";
 const ERROR_LAST_NAME = "Missing Last Name";
 const ERROR_PASSWORD = "Password need to be more than 8 characters";
 const ERROR_EMAIL = "Must use Metropolia email";
-
-const checkValidEmail = (string) => {
-  const emailRegex = /^[a-zA-Z0-9._-]+@metropolia.fi$/;
-  return emailRegex.test(string);
-};
 
 const checkValidPassword = (string) => {
   return string.length >= 8;
@@ -57,7 +52,7 @@ const SignUp = () => {
 
   const handleEmail = (event) => {
     setEmail((e) => event.target.value);
-    if (checkValidEmail(event.target.value)) {
+    if (emailValidation(event.target.value)) {
       setValidEmail((ve) => true);
     } else {
       setValidEmail((ve) => false);

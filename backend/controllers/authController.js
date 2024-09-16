@@ -1,6 +1,6 @@
 import User from "../models/userModel.js";
 import Cart from "../models/cartModel.js";
-import { emailCheck } from "../utils/authUtils/mailValidation.js";
+import { emailCheck } from "../utils/authUtils/emailValidation.js";
 import { hashInput } from "../utils/authUtils/inputHashing.js";
 import { sendConfirmationEmailService } from "../utils/authUtils/emailSender.js";
 import {
@@ -23,7 +23,7 @@ export const register = async (req, res) => {
     if (!emailCheck(email)) {
       return res.status(400).json({
         status: "fail",
-        message: `wrong email format`,
+        message: `Invalid email format`,
       });
     } else {
       //check if the user with email exist
@@ -31,7 +31,7 @@ export const register = async (req, res) => {
       if (user) {
         return res.status(400).json({
           status: "fail",
-          message: `email ${email} is already used`,
+          message: `The email ${email} is already used`,
         });
       } else {
         // if not exist, create a new user , and a new cart with new user id
@@ -46,7 +46,7 @@ export const register = async (req, res) => {
           validation_token,
         });
         const newCart = await Cart.create({ user_id: newUser.id });
-
+        
         // send confirmation email
         await sendConfirmationEmailService(
           first_name,
@@ -170,6 +170,7 @@ export const resendEmail = async (req, res) => {
           },
           { returnDocument: "after" }
         );
+
         sendConfirmationEmailService(
           user.first_name,
           email,
@@ -218,7 +219,18 @@ export const login = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Login successful",
-      user: { ...user._doc, password: undefined, token },
+      user: {
+        _id: user._id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        role: user.role,
+        photo_url: user.photo_url,
+        is_verified: user.is_verified,
+        phone: user.phone,
+        balance: user.balance,
+        token: token,
+      },
     });
   } catch (error) {
     console.log(error);

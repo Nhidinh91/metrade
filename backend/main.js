@@ -21,10 +21,6 @@ app.use(cors());
 // A middleware function in Express.js that is used to parse incoming JSON payloads in HTTP requests
 app.use(express.json());
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/categories', categoryRoutes)
-
 // Connect to MongoDB
 connectDB();
 
@@ -41,6 +37,7 @@ app.use("/api/user", jwtAuthenticate);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/product', productRoutes);
+app.use('/api/categories', categoryRoutes)
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
