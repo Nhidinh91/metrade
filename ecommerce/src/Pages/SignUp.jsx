@@ -1,17 +1,17 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Form, Button, Alert, Spinner } from 'react-bootstrap';
-import { useAuthContext } from '../hooks/useAuthContext';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { Form, Button, Alert, Spinner } from "react-bootstrap";
+import { useAuthContext } from "../hooks/useAuthContext";
 
-import Logo from './../../src/assets/logo.png';
+import Logo from "./../../src/assets/logo.png";
 
-import '../../src/Styles/Login.css';
-import '../Styles/SignUp.css';
+import "../../src/Styles/Login.css";
+import "../Styles/SignUp.css";
 
-const ERROR_FIRST_NAME = 'Missing First Name';
-const ERROR_LAST_NAME = 'Missing Last Name';
-const ERROR_PASSWORD = 'Password need to be more than 8 characters';
-const ERROR_EMAIL = 'Must use Metropolia email';
+const ERROR_FIRST_NAME = "Missing First Name";
+const ERROR_LAST_NAME = "Missing Last Name";
+const ERROR_PASSWORD = "Password need to be more than 8 characters";
+const ERROR_EMAIL = "Must use Metropolia email";
 
 const checkValidEmail = (string) => {
   const emailRegex = /^[a-zA-Z0-9._-]+@metropolia.fi$/;
@@ -25,15 +25,15 @@ const checkValidPassword = (string) => {
 const SignUp = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [validFirstName, setValidFirstName] = useState(false);
   const [validLastName, setValidLastName] = useState(false);
   const [validEmail, setValidEmail] = useState(false);
   const [validPassword, setValidPassword] = useState(false);
-  const [passwordType, setPasswordType] = useState('password');
+  const [passwordType, setPasswordType] = useState("password");
   const [errors, setErrors] = useState([]);
   const { signIn, user } = useAuthContext();
 
@@ -43,7 +43,7 @@ const SignUp = () => {
 
   const handleFirstName = (e) => {
     setFirstName((fn) => e.target.value);
-    if (e.target.value != '') {
+    if (e.target.value != "") {
       setValidFirstName((vfn) => true);
     } else {
       setValidFirstName((vfn) => false);
@@ -51,7 +51,7 @@ const SignUp = () => {
   };
   const handleLastName = (e) => {
     setLastName((ln) => e.target.value);
-    if (e.target.value != '') {
+    if (e.target.value != "") {
       setValidLastName((vln) => true);
     } else {
       setValidLastName((vln) => false);
@@ -98,11 +98,11 @@ const SignUp = () => {
   };
 
   const handleTogglePassword = () => {
-    if (passwordType === 'password') {
-      setPasswordType((pt) => 'text');
+    if (passwordType === "password") {
+      setPasswordType((pt) => "text");
     }
-    if (passwordType === 'text') {
-      setPasswordType((pt) => 'password');
+    if (passwordType === "text") {
+      setPasswordType((pt) => "password");
     }
   };
 
@@ -121,11 +121,11 @@ const SignUp = () => {
       };
       try {
         const response = await fetch(
-          'http://127.0.0.1:3000/api/auth/register',
+          "http://127.0.0.1:3000/api/auth/register",
           {
-            method: 'POST',
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
             body: JSON.stringify(newUser),
           }
@@ -133,20 +133,20 @@ const SignUp = () => {
 
         const data = await response.json();
         if (!response.ok) {
-          setFirstName((fn) => '');
-          setLastName((fn) => '');
-          setEmail((e) => '');
-          setPassword((p) => '');
+          setFirstName((fn) => "");
+          setLastName((fn) => "");
+          setEmail((e) => "");
+          setPassword((p) => "");
           setValidFirstName((vn) => false);
           setValidLastName((vn) => false);
           setValidEmail((ve) => false);
           setValidPassword((vp) => false);
-          throw new Error(data.message || 'Something went wrong');
+          throw new Error(data.message || "Something went wrong");
         } else {
-          navigate('/login');
+          navigate("/login");
         }
       } catch (err) {
-        console.error('Error during registration:', err);
+        console.error("Error during registration:", err);
         setErrors((e) => [...e, err.message]);
       } finally {
         setLoading(false);
@@ -157,7 +157,7 @@ const SignUp = () => {
   return (
     <>
       {user ? (
-        navigate('/')
+        navigate("/")
       ) : (
         <div className="signin-wrapper">
           <div className="signin-image">
@@ -224,7 +224,7 @@ const SignUp = () => {
                     // onChange={(e) => setPassword(e.target.value)}
                     className="signin-input"
                   />
-                  {passwordType === 'password' ? (
+                  {passwordType === "password" ? (
                     <i
                       className="fa-solid fa-eye"
                       id="show-password"
@@ -239,13 +239,13 @@ const SignUp = () => {
                 </div>
               </Form.Group>
               <Button variant="primary" type="submit" className="signin-button">
-                {loading ? <Spinner animation="border" size="sm" /> : 'SIGN UP'}
+                {loading ? <Spinner animation="border" size="sm" /> : "SIGN UP"}
               </Button>
             </Form>
 
             <div className="signin-footer text-center">
               <p>
-                Already have an account?{' '}
+                Already have an account?{" "}
                 <span>
                   <Link to="/login" className="signin-link">
                     <strong>Sign in</strong>
