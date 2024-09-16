@@ -2,8 +2,8 @@ import express from "express";
 const router = express.Router();
 
 //Import category controllers
-import {getProductsByCategory} from '../controllers/productControllers.js'
-import {getCategories} from '../controllers/categoryControllers.js'
+import {getProductsByCategory} from '../controllers/productController.js'
+import {getCategories} from '../controllers/categoryController.js'
 
 //ROUTES
 router.get('/:categoryId', getProductsByCategory)

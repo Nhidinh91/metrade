@@ -354,7 +354,6 @@ export const navLinks = [
   },
 ];
 
-
 export const categories = [
   {
     _id: { $oid: "66e341dd97aaa45c6b839f7f" },
@@ -697,5 +696,3 @@ export const categories = [
     updated_at: "2024-09-12T12:00:00Z",
   },
 ];
-
-

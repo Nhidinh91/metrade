@@ -37,7 +37,7 @@ function App() {
             <Route path="/selling-history" element={<SellingHistory />} />
             <Route path="/purchase-history" element={<PurchaseHistory />} />
             <Route path="category" element={<ProductListing />} />
-            <Route path="/product/detail/:id" element={<ProductDetail/>} />
+            <Route path="/product/detail/:id" element={<ProductDetail />} />
             <Route path="/my-page" element={<MyPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
