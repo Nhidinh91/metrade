@@ -17,7 +17,7 @@ const Verify = () => {
     token,
     email,
   };
-  console.log(tokenObj);
+  
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -33,7 +33,6 @@ const Verify = () => {
           body: JSON.stringify(tokenObj),
         });
         const data = await response.json();
-        console.log(data);
         if (!ignore) {
           setResult(data);
         }
