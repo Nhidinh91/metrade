@@ -20,7 +20,7 @@ const AccountInfo = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const { user, setUser } = useAuthContext();
+  const { user, updateUser } = useAuthContext();
   const fileInputRef = useRef(null);
   const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
 
@@ -148,8 +148,9 @@ const AccountInfo = () => {
 
       if (response.ok) {
         setSuccess(data.message || "Profile updated successfully");
-        setUser((u) => ({ ...u, ...data.user }));
         fetchProfile();
+        // Update user in local storage and context
+        updateUser({ ...user, ...data.user });
       } else {
         setError(data.message || "Failed to update profile");
       }

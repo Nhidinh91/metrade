@@ -30,7 +30,7 @@ const SignUp = () => {
   const [validPassword, setValidPassword] = useState(false);
   const [passwordType, setPasswordType] = useState("password");
   const [errors, setErrors] = useState([]);
-  const { signIn, user } = useAuthContext();
+  const { user } = useAuthContext();
 
 
   const handleFirstName = (e) => {

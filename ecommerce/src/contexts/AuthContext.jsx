@@ -3,11 +3,12 @@ import { useLocalStorage } from "../hooks/useLocalStorage";
 
 export const AuthContext = createContext({
     user: null,
-    signIn: () => { },
-    signOut: () => { },
+    updateUser: () => { },
+    deleteUser: () => { },
     setUser: () => { },
     isAuthenticated: () => false,
-    isLoading: true
+    isLoading: true,
+    updateUser: () => { },
 });
 
 export const AuthProvider = ({ children }) => {
@@ -23,12 +24,12 @@ export const AuthProvider = ({ children }) => {
         setIsLoading(false);
     }, [getItem, setUser]);
 
-    const signIn = (user) => {
+    const updateUser = (user) => {
         setUser(user);
         setItem("user", user);
     }
 
-    const signOut = () => {
+    const deleteUser = () => {
         setUser(null);
         setItem("user", null);
     }
@@ -38,7 +39,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, signIn, signOut, setUser, isAuthenticated, isLoading }}>
+        <AuthContext.Provider value={{ user, updateUser, deleteUser, setUser, isAuthenticated, isLoading }}>
             {children}
         </AuthContext.Provider>
     );
