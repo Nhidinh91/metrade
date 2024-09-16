@@ -1,15 +1,39 @@
 import { Container, Row, Col } from 'react-bootstrap';
-import { products } from '../dummyData';
+// import { products } from '../dummyData';
 import { useSearchParams } from 'react-router-dom';
+import { useEffect, useMemo, useState } from "react";
 import ProductCard from '../Components/ProductCard';  
 
 
 const ProductListing = ({ }) => {
   const [searchParams] = useSearchParams();
-  const subCategory = searchParams.get('query');
-  const filteredProducts = products.filter(product => product.category_id === subCategory);
-
+  const subCategory = searchParams.get('query'); // This is equivalent to the category_id
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  console.log("category_id changed to: ", subCategory);
   
+  // const filteredProducts = products.filter(product => product.category_id === subCategory);
+  
+  useEffect(() => {
+    // Fetch products from backend
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/api/categories/${subCategory}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json(); 
+        setFilteredProducts(data);
+        console.log("Filtered products changed to:" ,data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, [subCategory]);
+ 
   return (
     <>
       <Container>
