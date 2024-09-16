@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Form, Button, Alert, Spinner } from "react-bootstrap";
+import { useAuthContext } from "../hooks/useAuthContext";
 import { emailValidation } from "../utils/emailValidation";
 import Logo from "./../../src/assets/logo.png";
 
@@ -29,6 +30,8 @@ const SignUp = () => {
   const [validPassword, setValidPassword] = useState(false);
   const [passwordType, setPasswordType] = useState("password");
   const [errors, setErrors] = useState([]);
+  const { signIn, user } = useAuthContext();
+
 
   const handleFirstName = (e) => {
     setFirstName((fn) => e.target.value);
@@ -132,9 +135,10 @@ const SignUp = () => {
           setValidPassword((vp) => false);
           throw new Error(data.message || "Something went wrong");
         } else {
-          navigate("/");
+          navigate("/login");
         }
       } catch (err) {
+        console.error("Error during registration:", err);
         setErrors((e) => [...e, err.message]);
       } finally {
         setLoading(false);
@@ -144,102 +148,106 @@ const SignUp = () => {
   };
   return (
     <>
-      <div className="signin-wrapper">
-        <div className="signin-image">
-          <img src={Logo} alt="logo" />
-        </div>
-        <div className="signin-form-container">
-          <h2 className="signin-title">Get Started!</h2>
-          {errors.length > 0 && (
-            <Alert variant="danger" onClose={() => setErrors([])} dismissible>
-              {errors.map((error, index) => {
-                return (
-                  <p className="signup-error-item" key={index}>
-                    {error}
-                  </p>
-                );
-              })}
-            </Alert>
-          )}
-          <Form className="signin-form" onSubmit={handleSubmit}>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label className="signin-label">First Name</Form.Label>
-              <Form.Control
-                type="text"
-                name="firstName"
-                placeholder="Enter your first name"
-                value={firstName}
-                onChange={handleFirstName}
-                className="signin-input"
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label className="signin-label">Last Name</Form.Label>
-              <Form.Control
-                type="text"
-                name="lastName"
-                placeholder="Enter your last name"
-                value={lastName}
-                onChange={handleLastName}
-                className="signin-input"
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label className="signin-label">Email</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter your metropolia email"
-                name="email"
-                value={email}
-                onChange={handleEmail}
-                className="signin-input"
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId="formBasicPassword">
-              <Form.Label className="signin-label">Password</Form.Label>
-              <div className="password-container">
+      {user ? (
+        navigate("/")
+      ) : (
+        <div className="signin-wrapper">
+          <div className="signin-image">
+            <img src={Logo} alt="logo" />
+          </div>
+          <div className="signin-form-container">
+            <h2 className="signin-title">Get Started!</h2>
+            {errors.length > 0 && (
+              <Alert variant="danger" onClose={() => setErrors([])} dismissible>
+                {errors.map((error, index) => {
+                  return (
+                    <p className="signup-error-item" key={index}>
+                      {error}
+                    </p>
+                  );
+                })}
+              </Alert>
+            )}
+            <Form className="signin-form" onSubmit={handleSubmit}>
+              <Form.Group className="mb-3" controlId="formBasicEmail">
+                <Form.Label className="signin-label">First Name</Form.Label>
                 <Form.Control
-                  type={passwordType}
-                  name="password"
-                  placeholder="Enter your password"
-                  onChange={handlePassword}
-                  value={password}
-                  // onChange={(e) => setPassword(e.target.value)}
+                  type="text"
+                  name="firstName"
+                  placeholder="Enter your first name"
+                  value={firstName}
+                  onChange={handleFirstName}
                   className="signin-input"
                 />
-                {passwordType === "password" ? (
-                  <i
-                    className="fa-solid fa-eye"
-                    id="show-password"
-                    onClick={handleTogglePassword}
-                  ></i>
-                ) : (
-                  <i
-                    className="fa-solid fa-eye-slash"
-                    onClick={handleTogglePassword}
-                  ></i>
-                )}
-              </div>
-            </Form.Group>
-            <Button variant="primary" type="submit" className="signin-button">
-              {loading ? <Spinner animation="border" size="sm" /> : "SIGN UP"}
-            </Button>
-          </Form>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="formBasicEmail">
+                <Form.Label className="signin-label">Last Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="lastName"
+                  placeholder="Enter your last name"
+                  value={lastName}
+                  onChange={handleLastName}
+                  className="signin-input"
+                />
+              </Form.Group>
 
-          <div className="signin-footer text-center">
-            <p>
-              Already have an account?{" "}
-              <span>
-                <Link to="/login" className="signin-link">
-                  <strong>Sign in</strong>
-                </Link>
-              </span>
-            </p>
+              <Form.Group className="mb-3" controlId="formBasicEmail">
+                <Form.Label className="signin-label">Email</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter your metropolia email"
+                  name="email"
+                  value={email}
+                  onChange={handleEmail}
+                  className="signin-input"
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3" controlId="formBasicPassword">
+                <Form.Label className="signin-label">Password</Form.Label>
+                <div className="password-container">
+                  <Form.Control
+                    type={passwordType}
+                    name="password"
+                    placeholder="Enter your password"
+                    onChange={handlePassword}
+                    value={password}
+                    // onChange={(e) => setPassword(e.target.value)}
+                    className="signin-input"
+                  />
+                  {passwordType === "password" ? (
+                    <i
+                      className="fa-solid fa-eye"
+                      id="show-password"
+                      onClick={handleTogglePassword}
+                    ></i>
+                  ) : (
+                    <i
+                      className="fa-solid fa-eye-slash"
+                      onClick={handleTogglePassword}
+                    ></i>
+                  )}
+                </div>
+              </Form.Group>
+              <Button variant="primary" type="submit" className="signin-button">
+                {loading ? <Spinner animation="border" size="sm" /> : "SIGN UP"}
+              </Button>
+            </Form>
+
+            <div className="signin-footer text-center">
+              <p>
+                Already have an account?{" "}
+                <span>
+                  <Link to="/login" className="signin-link">
+                    <strong>Sign in</strong>
+                  </Link>
+                </span>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </>
   );
 };
