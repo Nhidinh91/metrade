@@ -1,9 +1,16 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
+import { createToken } from "./../utils/authUtils/tokenValidation.js";
+
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    first_name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    last_name: {
       type: String,
       required: true,
       trim: true,
@@ -14,6 +21,10 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+    },
+    balance: {
+      type: Number,
+      default: 0,
     },
     password: {
       type: String,
@@ -39,9 +50,14 @@ const userSchema = new mongoose.Schema(
       enum: ["active", "deactive", "banned"],
       default: "active",
     },
+
     validation_token: {
-      type: String,
-      default: "",
+      value: {
+        type: String,
+      },
+      expired_at: {
+        type: Date,
+      },
     },
     deleted_at: {
       type: Date,
@@ -53,6 +69,19 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+//statics
+
+//methods
+
+userSchema.methods.createAndUpdateToken = async function () {
+  const tokenObject = await createToken(this.email);
+  const updatedUser = await this.findOneAndUpdate(
+    { email },
+    { $set: { validation_token: tokenObject } },
+    { returnDocument: "after" }
+  );
+  return updatedUser;
+};
 
 userSchema.methods.comparePassword = async function (inputPassword) {
   return await bcrypt.compare(inputPassword, this.password);

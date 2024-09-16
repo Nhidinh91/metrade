@@ -25,7 +25,7 @@ const SearchBar = () => {
   };
 
   return (
-    <div>
+    <div className={style.searchContainer}>
       <input
         type="text"
         value={searchTerm}

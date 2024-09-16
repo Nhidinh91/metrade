@@ -1,8 +1,194 @@
 import User from "../models/userModel.js";
+import Cart from "../models/cartModel.js";
+import { emailCheck } from "../utils/authUtils/mailValidation.js";
+import { hashInput } from "../utils/authUtils/inputHashing.js";
+import { sendConfirmationEmailService } from "../utils/authUtils/emailSender.js";
+import {
+  createToken,
+  isValidVerifyToken,
+} from "../utils/authUtils/tokenValidation.js";
 import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
-  
+  try {
+    //email and password
+    const { first_name, last_name, email, password } = req.body;
+
+    if (!first_name || !last_name || !email || !password) {
+      return res.status(400).json({
+        status: "fail",
+        message: `Missing information`,
+      });
+    }
+    if (!emailCheck(email)) {
+      return res.status(400).json({
+        status: "fail",
+        message: `wrong email format`,
+      });
+    } else {
+      //check if the user with email exist
+      const user = await User.findOne({ email });
+      if (user) {
+        return res.status(400).json({
+          status: "fail",
+          message: `email ${email} is already used`,
+        });
+      } else {
+        // if not exist, create a new user , and a new cart with new user id
+        const hashedPassword = await hashInput(password);
+        const validation_token = await createToken(email);
+
+        const newUser = await User.create({
+          first_name,
+          last_name,
+          email,
+          password: hashedPassword,
+          validation_token,
+        });
+        const newCart = await Cart.create({ user_id: newUser.id });
+        console.log(newUser);
+        // send confirmation email
+        await sendConfirmationEmailService(
+          first_name,
+          email,
+          validation_token.value
+        );
+        // return response to FE
+        return res.status(201).json({
+          status: "success",
+          data: {
+            user: newUser,
+            cart: newCart,
+          },
+        });
+      }
+    }
+  } catch (err) {
+    return res.status(500).json({
+      status: "fail",
+      message: "Cannot Register. Please try again later",
+    });
+  }
+};
+
+export const checkVerify = async (req, res) => {
+  try {
+    const { token, email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        status: "fail",
+        message: "an account with this email does not exist",
+      });
+    }
+
+    if (user.is_verified) {
+      return res.status(400).json({
+        status: "fail",
+        message: "User is already verified",
+      });
+    }
+
+    const validToken = await isValidVerifyToken(token, user);
+    if (validToken) {
+      const updatedUser = await User.findOneAndUpdate(
+        { email },
+        {
+          $set: {
+            is_verified: true,
+            validation_token: {
+              value: "",
+              expired_at: user.validation_token.expired_at,
+            },
+          },
+        },
+        { returnDocument: "after" }
+      );
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          message: "Email verified successfully",
+          updatedUser,
+        },
+      });
+    } else {
+      return res.status(404).json({
+        status: "fail",
+        message:
+          "Email verification failed, possibly the link is invalid or expired\nPlease request new verification link.",
+      });
+    }
+  } catch (err) {
+    return res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+export const resendEmail = async (req, res) => {
+  const { email } = req.body;
+  try {
+    //check contain email in res
+    if (!email) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Email is missing",
+      });
+    }
+    // check email format
+    else if (!emailCheck(email)) {
+      return res.status(400).json({
+        status: "fail",
+        message: "wrong email format",
+      });
+    } else {
+      //check if the user with email exist
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        return res.status(404).json({
+          status: "fail",
+          message:
+            "an account with this email does not exist. Please register!",
+        });
+
+        //create token and update user to db and send email
+      } else if (user.is_verified) {
+        return res.status(400).json({
+          status: "fail",
+          message: "user is already verified",
+        });
+      } else {
+        const validation_token = await createToken(email);
+        const updatedUser = await User.findOneAndUpdate(
+          { email },
+          {
+            $set: { validation_token },
+          },
+          { returnDocument: "after" }
+        );
+        sendConfirmationEmailService(
+          user.first_name,
+          email,
+          validation_token.value
+        );
+
+        return res.status(201).json({
+          status: "success",
+          data: updatedUser,
+        });
+      }
+    }
+  } catch (err) {
+    return res.status(500).json({
+      status: "fail",
+      message:
+        "Cannot send resend email. Please wait a for 10 minutes and try again",
+    });
+  }
 };
 
 export const login = async (req, res) => {
@@ -12,7 +198,7 @@ export const login = async (req, res) => {
   if (!email || !password) {
     return res
       .status(400)
-      .json({ message: "Email and password must be included" });
+      .json({ success: false, message: "Email and password must be included" });
   }
 
   try {
@@ -20,7 +206,9 @@ export const login = async (req, res) => {
 
     // If invalid email or password
     if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
     }
     // If email and password are correct, send res with token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -28,12 +216,13 @@ export const login = async (req, res) => {
     });
 
     res.status(200).json({
-      status: "Login successful",
-      token,
+      success: true,
+      message: "Login successful",
+      user: { ...user._doc, password: undefined, token },
     });
   } catch (error) {
     console.log(error);
     // Handle any server errors
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

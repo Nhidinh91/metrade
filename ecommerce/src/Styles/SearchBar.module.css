@@ -1,8 +1,15 @@
+.searchContainer {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    gap: 0.25rem;
+}
+
 .searchBar {
-    height: 2.5rem;
+    height: 3rem;
     border-radius: 13.339552879333496px;
     border: none;
-    width: 20rem;
+    width: 100%;
 }
 
 .searchBar:focus {

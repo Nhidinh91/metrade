@@ -6,10 +6,8 @@ import Newsfeed from "./Newsfeed";
 const Home = () => {
   return (
     <>
-      <Header />
       <Hero />
       <Newsfeed />
-      <Footer />
     </>
   );
 };

@@ -1,17 +1,9 @@
-import Hero from "../Pages/Hero.jsx";
-import Navbar from "../Pages/Navbar.jsx";
-import Footer from "../Pages/Footer.jsx";
-import Newsfeed from "../Pages/Newsfeed.jsx";
 
-const Main = () => {
+const Layout = () => {
   return (
     <>
-      <Navbar />
-      <Hero />
-      <Newsfeed />
-      <Footer />
     </>
   );
 };
 
-export default Main;
+export default Layout;
