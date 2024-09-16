@@ -1,4 +1,4 @@
 package-lock.json
 backend/.env
-
-.vscode/
+backend/public
+ecommerce/.env

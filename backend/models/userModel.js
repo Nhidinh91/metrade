@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+    phone:{
+      type: String,
+      default: ""
+    },
     balance: {
       type: Number,
       default: 0,

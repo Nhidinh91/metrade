@@ -10,13 +10,14 @@ import ProductListing from "./Pages/ProductListing.jsx";
 import NotFound from "./Pages/NotFound.jsx";
 import SellingHistory from "./Pages/SellingHistory.jsx";
 import PurchaseHistory from "./Pages/PurchaseHistory.jsx";
-import Profile from "./Pages/Profile.jsx";
 import { AuthProvider } from "./contexts/AuthContext";
 import SignUp from "./Pages/SignUp.jsx";
 import VerifyFail from "./Pages/VerifyFail.jsx";
 import VerifySuccess from "./Pages/VerifySuccess.jsx";
 import ConfirmSent from "./Pages/ConfirmSent.jsx";
-import Verify from "./Pages/Verify.jsx"
+import Verify from "./Pages/Verify.jsx";
+import ProductDetail from "./Pages/ProductDetail.jsx";
+import MyPage from "./Pages/MyPage.jsx";
 
 function App() {
   return (
@@ -33,10 +34,11 @@ function App() {
             <Route index element={<Home />} />
             <Route path="about" element={<AboutContact />} />
             <Route path="search-results" element={<SearchResults />} />
-            <Route path="/profile" element={<Profile />} />
             <Route path="/selling-history" element={<SellingHistory />} />
             <Route path="/purchase-history" element={<PurchaseHistory />} />
             <Route path="category" element={<ProductListing />} />
+            <Route path="/product/detail/:id" element={<ProductDetail/>} />
+            <Route path="/my-page" element={<MyPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

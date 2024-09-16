@@ -5,11 +5,14 @@ export const AuthContext = createContext({
     user: null,
     signIn: () => { },
     signOut: () => { },
-    setUser: () => { }
+    setUser: () => { },
+    isAuthenticated: () => false,
+    isLoading: true
 });
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(true); 
     const { getItem, setItem } = useLocalStorage("user");
 
     useEffect(() => {
@@ -17,6 +20,7 @@ export const AuthProvider = ({ children }) => {
         if (user) {
             setUser(user);
         }
+        setIsLoading(false);
     }, [getItem, setUser]);
 
     const signIn = (user) => {
@@ -29,8 +33,12 @@ export const AuthProvider = ({ children }) => {
         setItem("user", null);
     }
 
+    const isAuthenticated = () => {
+        return user !== null;
+    };
+
     return (
-        <AuthContext.Provider value={{ user, signIn, signOut, setUser }}>
+        <AuthContext.Provider value={{ user, signIn, signOut, setUser, isAuthenticated, isLoading }}>
             {children}
         </AuthContext.Provider>
     );

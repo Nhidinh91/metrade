@@ -3,7 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv';
 import morgan from "morgan";
 import connectDB from './configs/database.js';
-import jwtAuthenticate from './middleware/jwtAuthenticate.js';
+import jwtAuthenticate from './middlewares/jwtAuthenticate.js';
 import authRoutes from './routes/authRoutes.js';
 
 import categoryRoutes from './routes/categoryRoutes.js';
@@ -30,10 +30,11 @@ connectDB();
 
 app.use(morgan("dev"));
 
-// Handle CORS
-// app.use(cors());
+// Middlewares
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
 app.use("/api/user", jwtAuthenticate);
 
 // Routes

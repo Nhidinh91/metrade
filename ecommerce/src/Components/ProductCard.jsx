@@ -3,8 +3,9 @@ import coin from "../assets/star.png";
 import clock from "../assets/clock.png";
 import locImg from "../assets/location.png";
 import style from "../Styles/ProductCard.module.css";
+import { Link } from "react-router-dom";
 
-const ProductCard = ({ name, image, pickup_point, price, created_at }) => {
+const ProductCard = ({ _id, name, image, pickup_point, price, created_at }) => {
   //calculate days since creation
   const daysSinceCreation = Math.floor(
     (Date.now() - new Date(created_at)) / (1000 * 60 * 60 * 24)
@@ -44,7 +45,9 @@ const ProductCard = ({ name, image, pickup_point, price, created_at }) => {
           <Button variant="primary" hidden>
             Edit
           </Button>
-          <Button variant="primary">See more...</Button>
+          <Link to={`/product/detail/${_id}`} >
+            <Button variant="primary">See more...</Button>
+          </Link>
         </div>
       </Card.Body>
     </Card>
