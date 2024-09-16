@@ -37,9 +37,6 @@ const SignUp = () => {
   const [errors, setErrors] = useState([]);
   const { signIn, user } = useAuthContext();
 
-  // if (user) {
-  //   navigate('/');
-  // }
 
   const handleFirstName = (e) => {
     setFirstName((fn) => e.target.value);
