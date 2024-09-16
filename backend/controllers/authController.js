@@ -46,7 +46,7 @@ export const register = async (req, res) => {
           validation_token,
         });
         const newCart = await Cart.create({ user_id: newUser.id });
-        console.log(newUser);
+
         // send confirmation email
         await sendConfirmationEmailService(
           first_name,
