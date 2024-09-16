@@ -12,7 +12,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn, user } = useAuthContext();
+  const { updateUser, user } = useAuthContext();
   const [passwordType, setPasswordType] = useState("password");
 
   if (user) {
@@ -58,7 +58,7 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        signIn(data.user);
+        updateUser(data.user);
 
         navigate("/");
       } else {
