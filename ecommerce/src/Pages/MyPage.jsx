@@ -8,7 +8,13 @@ import { useAuthContext } from "../hooks/useAuthContext";
 const MyPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuthContext();
+  const { isAuthenticated, isLoading } = useAuthContext();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated()) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, isLoading, navigate]);
   
   return (
     <Container className="my-page">
