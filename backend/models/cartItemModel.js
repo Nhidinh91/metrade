@@ -46,6 +46,11 @@ const cartItemSchema = new mongoose.Schema(
       required: true,
       min: 0, // Calculated as adding_quantity * price
     },
+    status: {
+      type: String,
+      enum: ["active", "deactive"],
+      default: "active",
+    },
     deleted_at: {
       type: Date,
       default: null, // Will be set to the deletion time when the item is "soft deleted"

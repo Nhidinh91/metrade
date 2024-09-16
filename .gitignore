@@ -1,1 +1,4 @@
 package-lock.json
+backend/.env
+backend/public
+ecommerce/.env

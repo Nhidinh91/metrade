@@ -1,35 +1,50 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
+import LayoutEcom from "./Pages/LayoutEcom.jsx";
+import Home from "./Pages/Home.jsx";
+import Login from "./Pages/Login.jsx";
+import AboutContact from "./Pages/AboutContact.jsx";
+import SearchResults from "./Pages/SearchResult.jsx";
+import ProductListing from "./Pages/ProductListing.jsx";
+import NotFound from "./Pages/NotFound.jsx";
+import SellingHistory from "./Pages/SellingHistory.jsx";
+import PurchaseHistory from "./Pages/PurchaseHistory.jsx";
+import { AuthProvider } from "./contexts/AuthContext";
+import SignUp from "./Pages/SignUp.jsx";
+import VerifyFail from "./Pages/VerifyFail.jsx";
+import VerifySuccess from "./Pages/VerifySuccess.jsx";
+import ConfirmSent from "./Pages/ConfirmSent.jsx";
+import Verify from "./Pages/Verify.jsx";
+import ProductDetail from "./Pages/ProductDetail.jsx";
+import MyPage from "./Pages/MyPage.jsx";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/verify-fail" element={<VerifyFail />} />
+          <Route path="/verify-success" element={<VerifySuccess />} />
+          <Route path="/confirm-sent" element={<ConfirmSent />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/verify" element={<Verify />} />
+          <Route path="/" element={<LayoutEcom />}>
+            <Route index element={<Home />} />
+            <Route path="about" element={<AboutContact />} />
+            <Route path="search-results" element={<SearchResults />} />
+            <Route path="/selling-history" element={<SellingHistory />} />
+            <Route path="/purchase-history" element={<PurchaseHistory />} />
+            <Route path="category" element={<ProductListing />} />
+            <Route path="/product/detail/:id" element={<ProductDetail />} />
+            <Route path="/my-page" element={<MyPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;

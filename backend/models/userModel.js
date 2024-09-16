@@ -1,8 +1,16 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+
+import { createToken } from "./../utils/authUtils/tokenValidation.js";
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    first_name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    last_name: {
       type: String,
       required: true,
       trim: true,
@@ -14,6 +22,14 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+    phone: {
+      type: String,
+      default: "",
+    },
+    balance: {
+      type: Number,
+      default: 0,
+    },
     password: {
       type: String,
       required: true,
@@ -24,23 +40,28 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin", "seller"],
       default: "user",
     },
-    photoURL: {
+    photo_url: {
       type: String,
       default: "",
     },
-    isVerified: {
-      // Check verify email
+    is_verified: {
+      // Check verify email before checkout
       type: Boolean,
       default: false,
     },
     status: {
       type: String,
       enum: ["active", "deactive", "banned"],
-      default: "user",
+      default: "active",
     },
-    validationToken: {
-      type: String,
-      default: "",
+
+    validation_token: {
+      value: {
+        type: String,
+      },
+      expired_at: {
+        type: Date,
+      },
     },
     deleted_at: {
       type: Date,
@@ -52,6 +73,23 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-const User = mongoose.model("User", userSchema);
+//statics
 
+//methods
+
+userSchema.methods.createAndUpdateToken = async function () {
+  const tokenObject = await createToken(this.email);
+  const updatedUser = await this.findOneAndUpdate(
+    { email },
+    { $set: { validation_token: tokenObject } },
+    { returnDocument: "after" }
+  );
+  return updatedUser;
+};
+
+userSchema.methods.comparePassword = async function (inputPassword) {
+  return await bcrypt.compare(inputPassword, this.password);
+};
+
+const User = mongoose.model("User", userSchema);
 export default User;
