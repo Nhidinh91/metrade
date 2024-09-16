@@ -7,8 +7,7 @@ export const AuthContext = createContext({
     deleteUser: () => { },
     setUser: () => { },
     isAuthenticated: () => false,
-    isLoading: true,
-    updateUser: () => { },
+    isLoading: true
 });
 
 export const AuthProvider = ({ children }) => {
