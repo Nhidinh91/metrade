@@ -1,7 +1,7 @@
-.product-detail-page {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+@media (min-width: 1400px) {
+  .product-detail-page {
+    padding: 0 6rem;
+  }
 }
 
 .go-back-button {
