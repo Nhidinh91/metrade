@@ -30,7 +30,7 @@ const ProfileMenu = () => {
     return (
         <Dropdown className={`${style.profileMenu}`}>
             <Dropdown.Toggle as={ButtonGroup} className={`${style.profileButton}`} id="dropdown-profile-button">
-                <img src={user.photo_url || ProfileImage} alt="Profile" />
+                <img src={`${process.env.REACT_APP_API_PUBLIC_URL}/${user.photo_url}` || ProfileImage} alt="Profile" />
                 <span className={`${style.profileName}`}>{user.first_name}</span>
             </Dropdown.Toggle>
 

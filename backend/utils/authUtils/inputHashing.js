@@ -3,11 +3,9 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// const SALT_SECRET = 10;
 export const hashInput = async (input) => {
   try {
-    const SALT_SECRET = Number(process.env.SALT_SECRET);
-    const salt = await bcrypt.genSalt(SALT_SECRET);
+    const salt = await bcrypt.genSalt(Number(process.env.SALT_ROUNDS));
     const hash = await bcrypt.hash(input, salt);
     return hash;
   } catch (err) {

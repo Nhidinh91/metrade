@@ -1,24 +1,26 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
-import { Form, Button, Row, Col, Image, Container } from "react-bootstrap";
+import { Form, Button, Row, Col, Image, Container, Toast, Spinner } from "react-bootstrap";
 import ProfileImage from "../assets/profile-default-image.png";
 import "../Styles/AccountInfo.css";
 
 const AccountInfo = () => {
-  const [profile, setProfile] = useState(null);
   const [avatarData, setAvatarData] = useState(null); // for saving avatar in database
   const [avatarPreview, setAvatarPreview] = useState(ProfileImage); // For avatar preview
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [isVerified, setIsVerified] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const { user } = useAuthContext();
-  const fileInputRef = useRef(null); // Ref for file input
+  const fileInputRef = useRef(null);
   const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
 
   const fetchProfile = useCallback(async () => {
@@ -27,7 +29,7 @@ const AccountInfo = () => {
     }
     try {
       const response = await fetch(
-        `http://localhost:3000/api/user/profile/detail/${user._id}`,
+        `${process.env.REACT_APP_API_URL}/user/profile/detail/${user._id}`,
         {
           method: "GET",
           headers: {
@@ -40,12 +42,12 @@ const AccountInfo = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setProfile(data.user);
-        // Set initial avatar preview
-        setAvatarPreview(data.user.photo_url || ProfileImage);
+        setAvatarPreview(`${process.env.REACT_APP_API_PUBLIC_URL}/${data.user.photo_url}` || ProfileImage);
         setFirstName(data.user.first_name);
         setLastName(data.user.last_name);
         setPhone(data.user.phone);
+        setEmail(data.user.email);
+        setIsVerified(data.user.is_verified);
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -58,7 +60,6 @@ const AccountInfo = () => {
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
-    console.log(file);
     if (file) {
       setAvatarData(file);
       setAvatarPreview(URL.createObjectURL(file));
@@ -66,12 +67,13 @@ const AccountInfo = () => {
   };
 
   const handleSaveChanges = async (event) => {
-    event.prevenDefault();
+    event.preventDefault();
+
     setError("");
     setLoading(true);
 
     // File validation
-    if (avatarData & !allowedTypes.includes(avatarData.type)) {
+    if (avatarData & !allowedTypes.includes(avatarData?.type)) {
       setError("Only image files (JPEG, PNG, GIF) are allowed");
       setLoading(false);
       return;
@@ -105,45 +107,51 @@ const AccountInfo = () => {
       return;
     }
 
+    // New Password validation
+    if (newPassword & newPassword !== confirmNewPassword) {
+      setError("New password and confirm password do not match");
+      setLoading(false);
+      return;
+    }
+
+    // Update profile
+    const formData = new FormData();
+    formData.append("first_name", firstName);
+    formData.append("last_name", lastName);
+    formData.append("phone", phone);
+
+    // Add the avatar file only if it's selected
+    if (avatarData) {
+      formData.append("avatar", avatarData);
+    }
+
+    // Add password fields only if the user is changing the password
+    if (currentPassword && newPassword) {
+      formData.append("current_password", currentPassword);
+      formData.append("new_password", newPassword);
+    }
+
     try {
-      const formData = new FormData();
-      formData.append("firstName", firstName);
-      formData.append("lastName", lastName);
-      formData.append("phone", phone);
-
-      // Add the avatar file only if it's selected
-      if (avatarData) {
-        formData.append("avatar", avatarData);
-      }
-
-      // Add password fields only if the user is changing the password
-      if (currentPassword && newPassword) {
-        formData.append("currentPassword", currentPassword);
-        formData.append("newPassword", newPassword);
-      }
-
-      console.log(formData)
-      // Call backend API
       const response = await fetch(
-        `http://localhost:3000/api/user/profile/update/${user._id}`,
+        `${process.env.REACT_APP_API_URL}/user/profile/update/${user._id}`,
         {
           method: "PATCH",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${user.token}`,
           },
           body: formData,
         }
       );
+
       const data = await response.json();
 
       if (response.ok) {
-        // Handle success: e.g., update profile in UI or show success message
-        alert("Profile updated successfully!");
-        fetchProfile(); // Optionally refetch profile to update the UI
+        setSuccess(data.message || "Profile updated successfully");
+        fetchProfile();
       } else {
         setError(data.message || "Failed to update profile");
       }
+
     } catch (error) {
       console.error("Error updating profile:", error);
       setError("Server error. Please try again later.");
@@ -152,15 +160,40 @@ const AccountInfo = () => {
     }
   };
 
-  const verifyEmail = () => {};
+  const verifyEmail = () => { };
 
   const triggerFileInput = () => {
     fileInputRef.current.click();
   };
 
+
   return (
     <Container>
       <Row className="account-info py-4">
+        {error && (
+          <Toast
+            className="error-toast text-white"
+            onClose={() => setError("")}
+            delay={3000}
+            autohide
+            bg="danger"
+          >
+            <Toast.Body>{error}</Toast.Body>
+          </Toast>
+        )}
+
+        {success && (
+          <Toast
+            className="success-toast text-white"
+            onClose={() => setSuccess("")}
+            delay={3000}
+            autohide
+            bg="success"
+          >
+            <Toast.Body>{success}</Toast.Body>
+          </Toast>
+        )}
+
         <div className="avatar-container">
           <Image src={avatarPreview} roundedCircle className="avatar-image" />
 
@@ -186,7 +219,7 @@ const AccountInfo = () => {
                 <Form.Label>First Name</Form.Label>
                 <Form.Control
                   type="text"
-                  value={profile?.first_name}
+                  value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                 />
               </Form.Group>
@@ -196,7 +229,7 @@ const AccountInfo = () => {
                 <Form.Label>Last Name</Form.Label>
                 <Form.Control
                   type="text"
-                  value={profile?.last_name}
+                  value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                 />
               </Form.Group>
@@ -205,22 +238,27 @@ const AccountInfo = () => {
 
           <Row sm={1} md={2} className="mb-3">
             <Col sm={12} md={6}>
-              <Form.Group controlId="email">
-                <Form.Label>Email</Form.Label>
-                <Form.Control type="email" value={profile?.email} disabled/>
-              </Form.Group>
-              {!profile?.is_verified && (
-                <Button className="veriry-button" onClick={() => verifyEmail()}>
-                  Verify
-                </Button>
-              )}
+              <Row>
+                <Col sm={12} md={isVerified ? 12 : 9}>
+                  <Form.Group controlId="email">
+                    <Form.Label>Email</Form.Label>
+                    <Form.Control type="email" value={email} disabled />
+                  </Form.Group>
+                </Col>
+                {!isVerified && (<Col sm={12} md={3} className="align-self-end">
+                  <Button className="veriry-button" onClick={() => verifyEmail()}>
+                    Verify
+                  </Button>
+                </Col>
+                )}
+              </Row>
             </Col>
             <Col sm={12} md={6}>
               <Form.Group controlId="phone">
                 <Form.Label>Phone</Form.Label>
                 <Form.Control
                   type="text"
-                  value={profile?.phone}
+                  value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                 />
               </Form.Group>
@@ -261,9 +299,10 @@ const AccountInfo = () => {
             <Col sm={12} md={3}>
               <Button
                 type="submit"
-                className="btn btn-primary save-changes-btn"
+                className="save-changes-btn"
+                disabled={loading}
               >
-                Save Changes
+                <Spinner animation="border" hidden={!loading} /> Save Changes
               </Button>
             </Col>
           </Row>

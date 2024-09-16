@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
+import { hashInput } from "../utils/authUtils/inputHashing.js";
+import fs from "fs";
 
 // Profile fetching function
 export const profile = async (req, res) => {
@@ -15,7 +17,7 @@ export const profile = async (req, res) => {
   }
 
   try {
-    const userInfo = await User.findById(id, "first_name last_name photo_url phone email");
+    const userInfo = await User.findById(id, "first_name last_name photo_url phone email is_verified");
 
     if (!userInfo) {
       return res.status(404).json({
@@ -38,7 +40,8 @@ export const profile = async (req, res) => {
 // Profile updating function
 export const updateProfile = async (req, res) => {
   const id = req.params.id;
-  const { first_name, last_name, phone, currentPassword, newPassword } = req.body;
+  const { first_name, last_name, phone, current_password, new_password } = req.body;
+  const photo_url = req.file ? req.file.filename : null;
 
   // Check if the ID is valid
   if (!id || !mongoose.Types.ObjectId.isValid(id)) {
@@ -60,8 +63,8 @@ export const updateProfile = async (req, res) => {
     }
 
     // If the user is changing the password
-    if (currentPassword && newPassword) {
-      const isPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
+    if (current_password && new_password) {
+      const isPasswordCorrect = await bcrypt.compare(current_password, user.password);
 
       if (!isPasswordCorrect) {
         return res.status(401).json({
@@ -71,7 +74,7 @@ export const updateProfile = async (req, res) => {
       }
 
       // Hash the new password
-      user.password = await bcrypt.hash(newPassword);
+      user.password = await hashInput(new_password);
     }
 
     // Update other fields
@@ -79,18 +82,32 @@ export const updateProfile = async (req, res) => {
     if (last_name) user.last_name = last_name;
     if (phone) user.phone = phone;
 
-    // Save the updated user profile
+    // Update the photo URL if a new photo is uploaded
+    if (photo_url) {
+      // Delete the old photo if it exists
+      if (user.photo_url && fs.existsSync(`${process.env.UPLOAD_FOLDER_PATH}/${user.photo_url}`)) {
+        fs.unlinkSync(`${process.env.UPLOAD_FOLDER_PATH}/${user.photo_url}`);
+      }
+      user.photo_url = `${process.env.USER_AVATAR_UPLOAD_PATH}/${photo_url}`;
+    }
+
+    // Save the updated user
     const updatedUser = await user.save();
 
     res.status(200).json({
       success: true,
-      message: "Profile updated successfully",
-      user: updatedUser,
+      message: "User Info updated",
+      user: {
+        first_name: updatedUser.first_name,
+        last_name: updatedUser.last_name,
+        phone: updatedUser.phone,
+        email: updatedUser.email,
+        is_verified: updatedUser.is_verified,
+      }
     });
+
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
+
 };
