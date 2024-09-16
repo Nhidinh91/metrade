@@ -3,6 +3,7 @@ import { useAuthContext } from "../hooks/useAuthContext";
 import { Form, Button, Row, Col, Image, Container, Toast, Spinner } from "react-bootstrap";
 import ProfileImage from "../assets/profile-default-image.png";
 import "../Styles/AccountInfo.css";
+import { emailValidation } from "../utils/emailValidation";
 
 const AccountInfo = () => {
   const [avatarData, setAvatarData] = useState(null); // for saving avatar in database
@@ -19,7 +20,7 @@ const AccountInfo = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const { user } = useAuthContext();
+  const { user, setUser } = useAuthContext();
   const fileInputRef = useRef(null);
   const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
 
@@ -42,7 +43,7 @@ const AccountInfo = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setAvatarPreview(`${process.env.REACT_APP_API_PUBLIC_URL}/${data.user.photo_url}` || ProfileImage);
+        setAvatarPreview(data.user.photo_url ? `${process.env.REACT_APP_API_PUBLIC_URL}/${data.user.photo_url}` : ProfileImage);
         setFirstName(data.user.first_name);
         setLastName(data.user.last_name);
         setPhone(data.user.phone);
@@ -147,20 +148,56 @@ const AccountInfo = () => {
 
       if (response.ok) {
         setSuccess(data.message || "Profile updated successfully");
+        setUser((u) => ({ ...u, ...data.user }));
         fetchProfile();
       } else {
         setError(data.message || "Failed to update profile");
       }
 
     } catch (error) {
-      console.error("Error updating profile:", error);
       setError("Server error. Please try again later.");
     } finally {
       setLoading(false);
     }
   };
 
-  const verifyEmail = () => { };
+  const verifyEmail = async () => {
+    if (!user || !user.token) {
+      return;
+    }
+
+    const email = user.email;
+
+    if (!emailValidation(email)) {
+      setError("Email must be a valid Metropolia email");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/auth/resend-verification-email`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess(data.message || "Verification email sent successfully");
+      } else {
+        setError(data.message || "Failed to send verification email");
+      }
+    } catch (error) {
+      console.error("Error verifying email:", error);
+      setError("Server error. Please try again later.");
+    }
+  };
 
   const triggerFileInput = () => {
     fileInputRef.current.click();

@@ -4,6 +4,7 @@ import { Form, Button, Alert, Spinner } from "react-bootstrap";
 import "../../src/Styles/Login.css";
 import Logo from "../../src/assets/logo.png";
 import { useAuthContext } from "../hooks/useAuthContext";
+import { emailValidation } from "../utils/emailValidation";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -12,8 +13,9 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { signIn, user } = useAuthContext();
+  const [passwordType, setPasswordType] = useState("password");
 
-  if (user){
+  if (user) {
     navigate("/")
   }
 
@@ -37,16 +39,15 @@ const Login = () => {
     }
 
     // Email validation
-    const emailRegex = /^[a-zA-Z0-9._-]+@metropolia.fi$/;
-    if (!emailRegex.test(email)) {
-      setError("Invalid email address");
+    if (!emailValidation(email)) {
+      setError("Email must be a valid Metropolia email");
       setLoading(false);
       return;
     }
 
     try {
       // Call your backend API
-      const response = await fetch("http://localhost:3000/api/auth/login", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,6 +69,15 @@ const Login = () => {
       setError("Something went wrong. Please try again later.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleTogglePassword = () => {
+    if (passwordType === "password") {
+      setPasswordType((pt) => "text");
+    }
+    if (passwordType === "text") {
+      setPasswordType((pt) => "password");
     }
   };
 
@@ -95,15 +105,27 @@ const Login = () => {
             />
           </Form.Group>
 
-          <Form.Group className="mb-3" controlId="formBasicPassword">
+          <Form.Group className="mb-3 position-relative" controlId="formBasicPassword">
             <Form.Label className="signin-label">Password</Form.Label>
             <Form.Control
-              type="password"
+              type={passwordType}
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="signin-input"
             />
+            {passwordType === "password" ? (
+              <i
+                className="fa-solid fa-eye"
+                id="show-password"
+                onClick={handleTogglePassword}
+              ></i>
+            ) : (
+              <i
+                className="fa-solid fa-eye-slash"
+                onClick={handleTogglePassword}
+              ></i>
+            )}
           </Form.Group>
 
           <Button variant="primary" type="submit" className="signin-button">
