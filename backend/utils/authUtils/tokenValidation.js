@@ -46,13 +46,13 @@ const isSameHash = (token, user) => {
 
 const convertToUNIXTimeStamp = (timeStr) => {
   const time = new Date(timeStr);
-  return time.getTime();
+  return Math.floor(time.getTime()/1000);
 };
 
 const isValidTime = (user) => {
   const tokenExpireTime = user.validation_token.expired_at;
   const convertedExpireTime = convertToUNIXTimeStamp(tokenExpireTime);
-  const currentTime = Math.round(Date.now() / 1000);
+  const currentTime = Math.floor(Date.now() / 1000);
 
   return currentTime < convertedExpireTime;
 };
