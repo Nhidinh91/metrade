@@ -75,7 +75,7 @@ const VerifyFail = ({ emailProp, message }) => {
       } else {
         console.log("sending link");
         const response = await fetch(
-          "http://127.0.0.1:3000/api/auth/register/resend",
+          "http://127.0.0.1:3000/api/auth/resend-verification-email",
           {
             method: "POST",
             headers: {

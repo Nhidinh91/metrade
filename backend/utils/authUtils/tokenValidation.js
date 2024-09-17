@@ -3,13 +3,33 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const MILISECOND = 1;
+const SECOND = 1000 * MILISECOND;
+const MINUTE = 60 * SECOND;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+
+const getTimeUnit = (str) => {
+  switch (str.toLowerCase()) {
+    case "s":
+      return SECOND;
+    case "m":
+      return MINUTE;
+    case "h":
+      return HOUR;
+    case "d":
+      return DAY;
+  }
+};
+
 const getExpectDuration = () => {
-  return Number(process.env.VERIFICATION_EXPIRES_IN.slice(0, -1));
+  const value = Number(process.env.VERIFICATION_EXPIRES_IN.slice(0, -1));
+  const unit = getTimeUnit(process.env.VERIFICATION_EXPIRES_IN.slice(-1));
+  return value * unit;
 };
 
 export const createToken = async (email) => {
   const token = await hashInput(email);
-
   const currentTime = Date.now();
   const expired_at = currentTime + getExpectDuration();
   const tokenObject = {
