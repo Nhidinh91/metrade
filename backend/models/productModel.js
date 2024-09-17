@@ -36,8 +36,9 @@ const productSchema = new mongoose.Schema(
     },
     pickup_point: {
       type: String,
-      required: true,
+      enum: ["Myllypuro", "Karamalmi", "Myyrmäki"],
       trim: true,
+      required: true,
     },
     category_id: {
       type: mongoose.mongoose.Schema.Types.ObjectId,

@@ -35,6 +35,7 @@ const orderDetailSchema = new mongoose.Schema(
       type: String,
       enum: ["Myllypuro", "Karamalmi", "Myyrmäki"],
       trim: true,
+      required: true,
     },
     sub_total: {
       type: Number,
