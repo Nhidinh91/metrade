@@ -2,3 +2,4 @@ package-lock.json
 backend/.env
 backend/public
 ecommerce/.env
+node_modules/
