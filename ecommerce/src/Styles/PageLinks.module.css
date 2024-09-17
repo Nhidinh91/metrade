@@ -1,0 +1,7 @@
+.nav-dropdown::after { /*THIS DOES NOT WORK AS EXPECTED (REMOVE POINTER ICON)*/
+    display: none !important;
+}
+
+
+
+

@@ -1,5 +1,5 @@
 import {Nav, NavDropdown, Navbar} from 'react-bootstrap';
-import style from '../Styles/PageLink.module.css';
+import style from '../Styles/PageLinks.module.css';
 import { useNavigate} from 'react-router-dom';
 import { useEffect, useState } from "react";
 
@@ -43,8 +43,10 @@ const PageLinks = ({ parentClass, itemClass }) => {
               key={index}
               id={category._id}  
               title={category.name}
+              size="lg"
               className={`${itemClass} dropdown-menu-dark 
                                        dropend`}
+
             >
               {categoryShow(category.children)}
             </NavDropdown>
@@ -65,18 +67,16 @@ const PageLinks = ({ parentClass, itemClass }) => {
 
 
   return (
-    // <div className={parentClass}>
-      <Navbar className={parentClass}>
+      <Navbar className={`${parentClass} ${style.navBar}`}>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
+        {/* <Navbar.Collapse id="basic-navbar-nav"> */}
           <Nav
             className={`d-flex justify-content-center align-items-center mr-auto`}
           >
             {categoryShow(categories)}
           </Nav>
-        </Navbar.Collapse>
+        {/* </Navbar.Collapse> */}
       </Navbar>
-    // </div>
   );
 };
 
