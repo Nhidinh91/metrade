@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { ObjectId } from "mongodb";
 import Category from "../models/categoryModel.js";
 
+//Get all products that have the same category_id
 export const getProductsByCategory = async (req, res) => {
   const chosenCategory = req.params.categoryId;
 
@@ -22,6 +23,7 @@ export const getProductsByCategory = async (req, res) => {
   }
 };
 
+//Get all products belongs to Main Category
 export const getProductsByCategoryV1 = async (req, res) => {
   // handle when categoryId is not of Object Type
   let chosenCategoryId;
