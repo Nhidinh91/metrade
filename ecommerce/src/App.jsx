@@ -18,6 +18,7 @@ import ConfirmSent from "./Pages/ConfirmSent.jsx";
 import Verify from "./Pages/Verify.jsx";
 import ProductDetail from "./Pages/ProductDetail.jsx";
 import MyPage from "./Pages/MyPage.jsx";
+import SideBar from "./Components/SideBar.jsx";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
             <Route path="/product/detail/:id" element={<ProductDetail />} />
             <Route path="/my-page" element={<MyPage />} />
             <Route path="*" element={<NotFound />} />
+            <Route path="test" element={<SideBar pageName="Test"/>} />
           </Route>
         </Routes>
       </Router>
