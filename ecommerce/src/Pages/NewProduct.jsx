@@ -2,11 +2,11 @@ import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import "../Styles/MyPage.css";
-import AccountInfo from "../Components/AccountInfo";
+import ProductUpload from "../Components/ProductUpload";
 import { useAuthContext } from "../hooks/useAuthContext";
 import SideBar from "../Components/SideBar";
 
-const MyPage = () => {
+const NewProduct = () => {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useAuthContext();
 
@@ -15,14 +15,14 @@ const MyPage = () => {
       navigate("/login");
     }
   }, [isAuthenticated, isLoading, navigate]);
-  
+
   return (
     <Container>
       <SideBar pageName="My Page">
-        <AccountInfo />
+        <ProductUpload />
       </SideBar>
     </Container>
   );
 };
 
-export default MyPage;
+export default NewProduct;
