@@ -3,11 +3,14 @@ const router = express.Router();
 
 //Import category controllers
 import {getProductsByCategory} from '../controllers/productController.js'
-import {getCategories} from '../controllers/categoryController.js'
+import { categoryHierarchy } from "../controllers/categoryController.js";
 
 //ROUTES
+
+//Routes to categories
 router.get('/:categoryId', getProductsByCategory)
-router.get('/', getCategories)
+router.get("/main-category/main-relationship", categoryHierarchy);
+
 
 
 export default router;
