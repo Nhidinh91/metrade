@@ -1,13 +1,70 @@
 import { useState } from "react";
-import {Form, Button, InputGroup, Dropdown, DropdownButton} from "react-bootstrap";
+import { useAuthContext } from "../hooks/useAuthContext";
+import {
+  Form,
+  Button,
+  InputGroup,
+  Dropdown,
+  DropdownButton,
+} from "react-bootstrap";
+import { uploadProduct } from "../../../backend/controllers/productController";
 
 const ProductUpload = () => {
-  const [quantity, setQuantity] = useState(1);
+  const { user, updateUser } = useAuthContext();
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [subCategory, setSubCategory] = useState("");
+  const [keywords, setKeywords] = useState([""]);
+  const [price, setPrice] = useState();
   const [pickUpPoint, setPickUpPoint] = useState("Choose a pick-up point");
+  const [quantity, setQuantity] = useState(1);
+
+  const uploadProduct = async () => {
+    const product = {
+      user_id: user._id,
+      name: name,
+      image:
+        "https://www.utllibourne.com/wp-content/uploads/2023/09/yoga-pants-for-women-994hkt-1.jpg",
+      photos: [
+        "https://www.utllibourne.com/wp-content/uploads/2023/09/yoga-pants-for-women-994hkt-1.jpg",
+        "https://i.dailymail.co.uk/1s/2022/02/22/10/54495789-0-image-a-4_1645525342880.jpg",
+      ],
+      description: description,
+      price: price,
+      pickup_point: pickUpPoint,
+      category_id: { $oid: "66e341dd97aaa45c6b839f82" },
+      stock_quantity: quantity,
+      keywords: keywords.split(","),
+    };
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/product/upload`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(product),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      console.log("Product uploaded successfully:", data);
+    } catch (error) {
+      console.log("Error uploading product:", error);
+    }
+  };
 
   const handleQuantityChange = (type) => {
     setQuantity((prev) =>
-      type === "increase" ? prev + 1 : prev - 1 > 0 ? prev - 1 : 1
+      type === "increase" ? prev + 1 : prev > 1 ? prev - 1 : 1
     );
   };
 
@@ -38,18 +95,25 @@ const ProductUpload = () => {
       </Form.Group>
 
       {/* Product Title */}
-      <Form.Group className="mb-3" controlId="productTitle">
-        <Form.Label>Product title</Form.Label>
-        <Form.Control type="text" placeholder="e.g. Marvel themed backpack" />
+      <Form.Group className="mb-3" controlId="name">
+        <Form.Label>Product name</Form.Label>
+        <Form.Control
+          type="text"
+          placeholder="e.g. Marvel themed backpack"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
       </Form.Group>
 
       {/* Description */}
-      <Form.Group className="mb-3" controlId="productDescription">
+      <Form.Group className="mb-3" controlId="description">
         <Form.Label>Description</Form.Label>
         <Form.Control
           as="textarea"
           rows={3}
           placeholder="e.g. Featuring bold designs of your favorite Marvel characters..."
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
         />
       </Form.Group>
 
@@ -81,6 +145,8 @@ const ProductUpload = () => {
           <Form.Control
             type="text"
             placeholder="e.g. fashion, style, healthcare, vintage"
+            value={keywords}
+            onChange={(e) => setKeywords(e.target.value)}
           />
         </InputGroup>
       </Form.Group>
@@ -90,7 +156,17 @@ const ProductUpload = () => {
         <Form.Label>Price</Form.Label>
         <InputGroup>
           <InputGroup.Text>€</InputGroup.Text>
-          <Form.Control type="number" placeholder="0.00" />
+          <Form.Control
+            type="number"
+            placeholder="0,00"
+            value={price}
+            onChange={(e) => {
+              const value = parseFloat(e.target.value);
+              setPrice(value >= 0 ? value : 0);
+            }}
+            min="0"
+            step="0.01"
+          />
         </InputGroup>
       </Form.Group>
 
@@ -101,7 +177,7 @@ const ProductUpload = () => {
           <Dropdown.Item onClick={() => handlePickUpPointChange("Myyrmäki")}>
             Myyrmäki
           </Dropdown.Item>
-          <Dropdown.Item onClick={() => handlePickUpPointChange("Myllypurro")}>
+          <Dropdown.Item onClick={() => handlePickUpPointChange("Myllypuro")}>
             Myllypurro
           </Dropdown.Item>
           <Dropdown.Item onClick={() => handlePickUpPointChange("Karamalmi")}>
@@ -133,7 +209,9 @@ const ProductUpload = () => {
       {/* Actions */}
       <div className="d-flex justify-content-between">
         <Button variant="outline-secondary">Cancel</Button>
-        <Button variant="primary">Sell now</Button>
+        <Button variant="primary" onClick={uploadProduct}>
+          Sell now
+        </Button>
       </div>
     </Form>
   );
