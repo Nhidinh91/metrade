@@ -1,7 +1,7 @@
-import NavDropdown from 'react-bootstrap/NavDropdown';
-import style from '../Styles/PageLink.module.css';
+import {Nav, NavDropdown, Navbar} from 'react-bootstrap';
+import style from '../Styles/PageLinks.module.css';
 import { useNavigate} from 'react-router-dom';
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 // Updated PageLinks component to work with new data structure
 const PageLinks = ({ parentClass, itemClass }) => {
@@ -12,7 +12,7 @@ const PageLinks = ({ parentClass, itemClass }) => {
     // Fetch categories from backend
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/categories", {
+        const response = await fetch("http://localhost:3000/api/categories/main-category/main-relationship", {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -30,51 +30,52 @@ const PageLinks = ({ parentClass, itemClass }) => {
 
   // Function to handle subcategory click
   const handleSubCategoryClick = (category_id) => {
+    console.log(`Sending category_id from PageLinks: ${category_id}`);
     navigate(`/category?query=${category_id}`);
   };
 
-  // Memoize category structure for performance
-  const navLinks = useMemo(() => {
-    // Step 1: Get the main categories where parent_id is null
-    const mainCategories = categories.filter(category => !category.parent_id);
-    
-    // Step 2: For each main category, find and group its subcategories
-    return mainCategories.map(mainCategory => {
-      // Find subcategories whose parent_id matches the main category's _id
-      const subCategories = categories.filter(
-        category => category.parent_id && category.parent_id === mainCategory._id
-      );
-    // Step 3: Return an object with main category and its subcategories
-      return {
-        id: mainCategory._id,
-        main_category: mainCategory.name,
-        sub_categories: subCategories.map(subCategory => ({
-          id: subCategory._id,
-          name: subCategory.name})),
-      };
+// Function to display main categories, sub-categories and sub-categories' children
+  const categoryShow = (categories) => {
+    return categories.map((category, index) => {
+      if (category.children && category.children.length > 0) {
+          return (
+            <NavDropdown
+              key={index}
+              id={category._id}  
+              title={category.name}
+              size="lg"
+              className={`${itemClass}`}
+
+            >
+              {categoryShow(category.children)}
+            </NavDropdown>
+          );
+      } else {
+        return (
+          <Nav.Link
+            key={index}
+            id={category._id}
+            onClick={() => handleSubCategoryClick(category._id)}
+          >
+            {category.name}
+          </Nav.Link>
+        )
+      }
     });
-  }, [categories]);
+  };
+
 
   return (
-    <div className={parentClass}>
-      {navLinks.map((link) => (
-        <NavDropdown 
-          key={link.id} 
-          id={link.id} 
-          title={link.main_category} 
-          className={`${itemClass} ${style.navDropdownToggle}`}
-        >
-          {link.sub_categories.map((subCategory) => ( 
-            <NavDropdown.Item
-              key={subCategory.id}
-              onClick={() => handleSubCategoryClick(subCategory.id)}
-            >
-              {subCategory.name}
-            </NavDropdown.Item>
-          ))}
-        </NavDropdown>
-      ))}
-    </div>
+      <Navbar className={`${parentClass} ${style.navBar}`}>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        {/* <Navbar.Collapse id="basic-navbar-nav"> */}
+          <Nav
+            className={`d-flex justify-content-center align-items-center mr-auto`}
+          >
+            {categoryShow(categories)}
+          </Nav>
+        {/* </Navbar.Collapse> */}
+      </Navbar>
   );
 };
 
