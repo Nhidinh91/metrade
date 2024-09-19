@@ -18,6 +18,7 @@ import ConfirmSent from "./Pages/ConfirmSent.jsx";
 import Verify from "./Pages/Verify.jsx";
 import ProductDetail from "./Pages/ProductDetail.jsx";
 import MyPage from "./Pages/MyPage.jsx";
+import NewProduct from "./Pages/NewProduct.jsx";
 
 function App() {
   return (
@@ -39,7 +40,9 @@ function App() {
             <Route path="category" element={<ProductListing />} />
             <Route path="/product/detail/:id" element={<ProductDetail />} />
             <Route path="/my-page" element={<MyPage />} />
+            <Route path="/new-product" element={<NewProduct />} />
             <Route path="*" element={<NotFound />} />
+            
           </Route>
         </Routes>
       </Router>
