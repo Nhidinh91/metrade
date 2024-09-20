@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 
 const ProductUpload = () => {
-  const { user } = useAuthContext();
+  const { user, updateUser } = useAuthContext();
 
   //Form state to track product details
   const [form, setForm] = useState({
@@ -122,8 +122,42 @@ const ProductUpload = () => {
       if (!response.ok) throw new Error("Network response was not ok");
       const data = await response.json();
       console.log("Product uploaded successfully:", data);
+
+      // Check if user's role is "user", then update it to "seller"
+      if (user.role === "user") {
+        await updateUserRole();
+      }
+
     } catch (error) {
       console.log("Error uploading product:", error);
+    }
+  };
+
+  //Function to update user role to "seller"
+  const updateUserRole = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/user/changeRole/${user._id}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ role: "seller" }),
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        // Update user context with new role
+        updateUser({ ...user, role: "seller" });
+        console.log("User role updated to seller");
+      } else {
+        console.error("Failed to update user role");
+      }
+    } catch (error) {
+      console.error("Error updating user role:", error);
     }
   };
 
