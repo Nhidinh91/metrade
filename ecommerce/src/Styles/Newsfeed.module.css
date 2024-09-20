@@ -18,3 +18,9 @@
     text-align: center;
     margin: 2rem 0;
 }
+
+.pages{
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+}
