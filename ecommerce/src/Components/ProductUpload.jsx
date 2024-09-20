@@ -6,6 +6,7 @@ import {
   InputGroup,
   Dropdown,
   DropdownButton,
+  Alert,
 } from "react-bootstrap";
 
 const ProductUpload = () => {
@@ -23,7 +24,15 @@ const ProductUpload = () => {
     selectedSubCategory: null,
     selectedSubSubCategory: null,
   });
+
+  //State to store categories consider using useContext later to avoid fetching categories multiple times
   const [categories, setCategories] = useState([]);
+
+  //State for validation errors
+  const [errors, setErrors] = useState([]);
+
+  //State for showing alert
+  const [showAlert, setShowAlert] = useState(false);
 
   //Handle all changes in product details
   const handleChange = (e) => {
@@ -44,7 +53,7 @@ const ProductUpload = () => {
     }));
   };
 
-  //Handle quantity 
+  //Handle quantity
   const handleQuantityChange = (type) => {
     setForm((prev) => ({
       ...prev,
@@ -55,8 +64,26 @@ const ProductUpload = () => {
     }));
   };
 
+  // Validate form fields
+  const validateForm = () => {
+    const newErrors = [];
+    if (!form.name) newErrors.push("Product name is required");
+    if (!form.description) newErrors.push("Description is required");
+    if (!form.price || form.price <= 0)
+      newErrors.push("Price must be greater than 0");
+    if (!form.pickUpPoint || form.pickUpPoint === "Choose a pick-up point")
+      newErrors.push("Pick-up point is required");
+    if (!form.selectedCategory) newErrors.push("Category is required");
+
+    setErrors(newErrors);
+    setShowAlert(newErrors.length > 0); //alert if there are errors
+    return newErrors.length === 0;
+  };
+
   //Function to upload product to database
   const uploadProduct = async () => {
+    if (!validateForm()) return; //Stop if any missing details
+
     const categoryId =
       form.selectedSubSubCategory?._id ||
       form.selectedSubCategory?._id ||
@@ -126,6 +153,19 @@ const ProductUpload = () => {
       }}
     >
       <h3>Sell your product</h3>
+
+      {/* Show missing fields */}
+      {errors.length > 0 && showAlert && (
+        <Alert variant="danger" onClose={() => setShowAlert(false)} dismissible>
+          <ul>
+            {errors.map((error, index) => (
+              <li key={index}>
+                <span className="me-2">❌</span> {error}
+              </li>
+            ))}
+          </ul>
+        </Alert>
+      )}
 
       {/* Image Upload */}
       <Form.Group className="mb-3 text-center" controlId="formFileMultiple">
