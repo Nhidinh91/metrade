@@ -10,54 +10,73 @@ import {
 
 const ProductUpload = () => {
   const { user } = useAuthContext();
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
-  const [selectedSubSubCategory, setSelectedSubSubCategory] = useState(null);
-  const [keywords, setKeywords] = useState([""]);
-  const [price, setPrice] = useState();
-  const [pickUpPoint, setPickUpPoint] = useState("Choose a pick-up point");
-  const [quantity, setQuantity] = useState(1);
 
-  //Function to handle quantity change
-  const handleQuantityChange = (type) => {
-    setQuantity((prev) =>
-      type === "increase" ? prev + 1 : prev > 1 ? prev - 1 : 1
-    );
+  //Form state to track product details
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    price: 0,
+    quantity: 1,
+    pickUpPoint: "Choose a pick-up point",
+    keywords: "",
+    selectedCategory: null,
+    selectedSubCategory: null,
+    selectedSubSubCategory: null,
+  });
+  const [categories, setCategories] = useState([]);
+
+  //Handle all changes in product details
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  //Function to handle pick-up point change
-  const handlePickUpPointChange = (point) => {
-    setPickUpPoint(point);
+  //Handle chosen category dropdown
+  const handleDropdownChange = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+      ...(field === "selectedCategory" && {
+        selectedSubCategory: null,
+        selectedSubSubCategory: null,
+      }),
+      ...(field === "selectedSubCategory" && { selectedSubSubCategory: null }),
+    }));
+  };
+
+  //Handle quantity 
+  const handleQuantityChange = (type) => {
+    setForm((prev) => ({
+      ...prev,
+      quantity:
+        type === "increase"
+          ? prev.quantity + 1
+          : Math.max(prev.quantity - 1, 1),
+    }));
   };
 
   //Function to upload product to database
   const uploadProduct = async () => {
-
-    //Find the smallest chosen category id
     const categoryId =
-      selectedSubSubCategory?._id ||
-      selectedSubCategory?._id ||
-      selectedCategory?._id;
+      form.selectedSubSubCategory?._id ||
+      form.selectedSubCategory?._id ||
+      form.selectedCategory?._id;
 
-    //Create product object
     const product = {
       user_id: user._id,
-      name: name,
+      name: form.name,
       image:
         "https://www.utllibourne.com/wp-content/uploads/2023/09/yoga-pants-for-women-994hkt-1.jpg",
       photos: [
         "https://www.utllibourne.com/wp-content/uploads/2023/09/yoga-pants-for-women-994hkt-1.jpg",
         "https://i.dailymail.co.uk/1s/2022/02/22/10/54495789-0-image-a-4_1645525342880.jpg",
       ],
-      description: description,
-      price: price,
-      pickup_point: pickUpPoint,
+      description: form.description,
+      price: form.price,
+      pickup_point: form.pickUpPoint,
       category_id: categoryId,
-      stock_quantity: quantity,
-      keywords: keywords.split(","),
+      stock_quantity: form.quantity,
+      keywords: form.keywords.split(","),
     };
 
     try {
@@ -73,10 +92,7 @@ const ProductUpload = () => {
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
+      if (!response.ok) throw new Error("Network response was not ok");
       const data = await response.json();
       console.log("Product uploaded successfully:", data);
     } catch (error) {
@@ -84,18 +100,12 @@ const ProductUpload = () => {
     }
   };
 
-  // Fetch categories from backend
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/categories/main-category/main-relationship`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+          `${process.env.REACT_APP_API_URL}/categories/main-category/main-relationship`
         );
         const data = await response.json();
         setCategories(data);
@@ -105,60 +115,6 @@ const ProductUpload = () => {
     };
     fetchCategories();
   }, []);
-
-  // Function to handle category selection
-  const handleCategorySelect = (category) => {
-    setSelectedCategory(category);
-    setSelectedSubCategory(null);
-    setSelectedSubSubCategory(null);
-  };
-
-  // Function to handle subcategory selection
-  const handleSubCategorySelect = (subCategory) => {
-    setSelectedSubCategory(subCategory);
-    setSelectedSubSubCategory(null);
-  };
-
-  // Function to handle sub-subcategory selection
-  const handleSubSubCategorySelect = (subSubCategory) => {
-    setSelectedSubSubCategory(subSubCategory);
-  };
-
-  // Function to display categories in dropdown
-  const renderCategories = (categories) => {
-    return categories.map((category) => (
-      <Dropdown.Item
-        key={category._id}
-        onClick={() => handleCategorySelect(category)}
-      >
-        {category.name}
-      </Dropdown.Item>
-    ));
-  };
-
-  // Function to display subcategories in dropdown
-  const renderSubCategories = (subCategories) => {
-    return subCategories.map((subCategory) => (
-      <Dropdown.Item
-        key={subCategory._id}
-        onClick={() => handleSubCategorySelect(subCategory)}
-      >
-        {subCategory.name}
-      </Dropdown.Item>
-    ));
-  };
-
-  // Function to display sub-subcategories in dropdown
-  const renderSubSubCategories = (subSubCategories) => {
-    return subSubCategories.map((subSubCategory) => (
-      <Dropdown.Item
-        key={subSubCategory._id}
-        onClick={() => handleSubSubCategorySelect(subSubCategory)}
-      >
-        {subSubCategory.name}
-      </Dropdown.Item>
-    ));
-  };
 
   return (
     <Form
@@ -182,14 +138,15 @@ const ProductUpload = () => {
         <Form.Control type="file" multiple hidden />
       </Form.Group>
 
-      {/* Product Title */}
+      {/* Product Name */}
       <Form.Group className="mb-3" controlId="name">
         <Form.Label>Product name</Form.Label>
         <Form.Control
           type="text"
           placeholder="e.g. Marvel themed backpack"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          name="name"
+          value={form.name}
+          onChange={handleChange}
         />
       </Form.Group>
 
@@ -200,59 +157,83 @@ const ProductUpload = () => {
           as="textarea"
           rows={3}
           placeholder="e.g. Featuring bold designs of your favorite Marvel characters..."
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          name="description"
+          value={form.description}
+          onChange={handleChange}
         />
       </Form.Group>
 
-      {/* Category */}
+      {/* Category Dropdowns */}
       <Form.Group className="mb-3" controlId="category">
         <Form.Label>Category</Form.Label>
         <DropdownButton
           id="dropdown-category"
-          title={selectedCategory ? selectedCategory.name : "Select a category"}
+          title={
+            form.selectedCategory
+              ? form.selectedCategory.name
+              : "Select a category"
+          }
         >
-          {renderCategories(categories)}
+          {categories.map((category) => (
+            <Dropdown.Item
+              key={category._id}
+              onClick={() => handleDropdownChange("selectedCategory", category)}
+            >
+              {category.name}
+            </Dropdown.Item>
+          ))}
         </DropdownButton>
       </Form.Group>
 
-      {/* Sub-category */}
-      {selectedCategory &&
-        selectedCategory.children &&
-        selectedCategory.children.length > 0 && (
-          <Form.Group className="mb-3" controlId="subCategory">
-            <Form.Label>Sub-category</Form.Label>
-            <DropdownButton
-              id="dropdown-sub-category"
-              title={
-                selectedSubCategory
-                  ? selectedSubCategory.name
-                  : "Select a sub-category"
-              }
-            >
-              {renderSubCategories(selectedCategory.children)}
-            </DropdownButton>
-          </Form.Group>
-        )}
+      {form.selectedCategory?.children?.length > 0 && (
+        <Form.Group className="mb-3" controlId="subCategory">
+          <Form.Label>Sub-category</Form.Label>
+          <DropdownButton
+            id="dropdown-sub-category"
+            title={
+              form.selectedSubCategory
+                ? form.selectedSubCategory.name
+                : "Select a sub-category"
+            }
+          >
+            {form.selectedCategory.children.map((subCategory) => (
+              <Dropdown.Item
+                key={subCategory._id}
+                onClick={() =>
+                  handleDropdownChange("selectedSubCategory", subCategory)
+                }
+              >
+                {subCategory.name}
+              </Dropdown.Item>
+            ))}
+          </DropdownButton>
+        </Form.Group>
+      )}
 
-      {/* Sub-sub-category */}
-      {selectedSubCategory &&
-        selectedSubCategory.children &&
-        selectedSubCategory.children.length > 0 && (
-          <Form.Group className="mb-3" controlId="subSubCategory">
-            <Form.Label>Sub-sub-category</Form.Label>
-            <DropdownButton
-              id="dropdown-sub-sub-category"
-              title={
-                selectedSubSubCategory
-                  ? selectedSubSubCategory.name
-                  : "Select a sub-sub-category"
-              }
-            >
-              {renderSubSubCategories(selectedSubCategory.children)}
-            </DropdownButton>
-          </Form.Group>
-        )}
+      {form.selectedSubCategory?.children?.length > 0 && (
+        <Form.Group className="mb-3" controlId="subSubCategory">
+          <Form.Label>Sub-sub-category</Form.Label>
+          <DropdownButton
+            id="dropdown-sub-sub-category"
+            title={
+              form.selectedSubSubCategory
+                ? form.selectedSubSubCategory.name
+                : "Select a sub-sub-category"
+            }
+          >
+            {form.selectedSubCategory.children.map((subSubCategory) => (
+              <Dropdown.Item
+                key={subSubCategory._id}
+                onClick={() =>
+                  handleDropdownChange("selectedSubSubCategory", subSubCategory)
+                }
+              >
+                {subSubCategory.name}
+              </Dropdown.Item>
+            ))}
+          </DropdownButton>
+        </Form.Group>
+      )}
 
       {/* Keywords */}
       <Form.Group className="mb-3" controlId="keywords">
@@ -261,8 +242,9 @@ const ProductUpload = () => {
           <Form.Control
             type="text"
             placeholder="e.g. fashion, style, healthcare, vintage"
-            value={keywords}
-            onChange={(e) => setKeywords(e.target.value)}
+            name="keywords"
+            value={form.keywords}
+            onChange={handleChange}
           />
         </InputGroup>
       </Form.Group>
@@ -275,11 +257,9 @@ const ProductUpload = () => {
           <Form.Control
             type="number"
             placeholder="0,00"
-            value={price}
-            onChange={(e) => {
-              const value = parseFloat(e.target.value);
-              setPrice(value >= 0 ? value : 0);
-            }}
+            name="price"
+            value={form.price}
+            onChange={handleChange}
             min="0"
             step="0.01"
           />
@@ -289,16 +269,15 @@ const ProductUpload = () => {
       {/* Pick-up Point */}
       <Form.Group className="mb-3" controlId="pickUpPoint">
         <Form.Label>Pick-up point</Form.Label>
-        <DropdownButton id="dropdown-pickup-point" title={pickUpPoint}>
-          <Dropdown.Item onClick={() => handlePickUpPointChange("Myyrmäki")}>
-            Myyrmäki
-          </Dropdown.Item>
-          <Dropdown.Item onClick={() => handlePickUpPointChange("Myllypuro")}>
-            Myllypurro
-          </Dropdown.Item>
-          <Dropdown.Item onClick={() => handlePickUpPointChange("Karamalmi")}>
-            Karamalmi
-          </Dropdown.Item>
+        <DropdownButton id="dropdown-pickup-point" title={form.pickUpPoint}>
+          {["Myyrmäki", "Myllypuro", "Karamalmi"].map((point) => (
+            <Dropdown.Item
+              key={point}
+              onClick={() => handleDropdownChange("pickUpPoint", point)}
+            >
+              {point}
+            </Dropdown.Item>
+          ))}
         </DropdownButton>
       </Form.Group>
 
@@ -312,7 +291,7 @@ const ProductUpload = () => {
           >
             -
           </Button>
-          <Form.Control type="text" value={quantity} readOnly />
+          <Form.Control type="text" value={form.quantity} readOnly />
           <Button
             variant="outline-secondary"
             onClick={() => handleQuantityChange("increase")}
