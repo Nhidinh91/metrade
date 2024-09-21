@@ -274,3 +274,9 @@ export const uploadProduct = async (req, res) => {
     });
   }
 };
+
+//Upload new product images
+export const uploadProductImages = async (req, res) => {
+  const urls = req.files.map(file => file.path);
+  res.json({ urls });
+};

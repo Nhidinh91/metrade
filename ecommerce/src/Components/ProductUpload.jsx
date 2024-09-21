@@ -25,14 +25,11 @@ const ProductUpload = () => {
     selectedSubSubCategory: null,
   });
 
-  //State to store categories consider using useContext later to avoid fetching categories multiple times
-  const [categories, setCategories] = useState([]);
-
-  //State for validation errors
-  const [errors, setErrors] = useState([]);
-
-  //State for showing alert
-  const [showAlert, setShowAlert] = useState(false);
+  const [categories, setCategories] = useState([]);//State to store categories consider using useContext later to avoid fetching categories multiple times
+  const [errors, setErrors] = useState([]);//State for validation errors
+  const [showAlert, setShowAlert] = useState(false);//State for showing alert
+  const [selectedFiles, setSelectedFiles] = useState([]); //state to store photos
+  const [previewUrls, setPreviewUrls] = useState([]); //state to store preview before uploading
 
   //Handle all changes in product details
   const handleChange = (e) => {
@@ -64,6 +61,26 @@ const ProductUpload = () => {
     }));
   };
 
+  //Handle uploading images
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (selectedFiles.length + files.length > 4) {
+      alert("You can only upload up to 4 images"); //alert if more than 4 images
+      return;
+    }
+
+    setSelectedFiles((prevFiles) => [...prevFiles, ...files]); //add new photo to array
+
+    const urls = files.map((file) => URL.createObjectURL(file));
+    setPreviewUrls((prevUrls) => [...prevUrls, ...urls]); //add preview
+  };
+
+  //Handle removing images
+  const handleRemoveImage = (index) => {
+    setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    setPreviewUrls((prevUrls) => prevUrls.filter((_, i) => i !== index));
+  };
+
   // Validate form fields
   const validateForm = () => {
     const newErrors = [];
@@ -84,30 +101,54 @@ const ProductUpload = () => {
   const uploadProduct = async () => {
     if (!validateForm()) return; //Stop if any missing details
 
+    //get smallest category id
     const categoryId =
-      form.selectedSubSubCategory?._id ||
-      form.selectedSubCategory?._id ||
-      form.selectedCategory?._id;
-
-    const product = {
-      user_id: user._id,
-      name: form.name,
-      image:
-        "https://www.utllibourne.com/wp-content/uploads/2023/09/yoga-pants-for-women-994hkt-1.jpg",
-      photos: [
-        "https://www.utllibourne.com/wp-content/uploads/2023/09/yoga-pants-for-women-994hkt-1.jpg",
-        "https://i.dailymail.co.uk/1s/2022/02/22/10/54495789-0-image-a-4_1645525342880.jpg",
-      ],
-      description: form.description,
-      price: form.price,
-      pickup_point: form.pickUpPoint,
-      category_id: categoryId,
-      stock_quantity: form.quantity,
-      keywords: form.keywords.split(","),
-    };
+          form.selectedSubSubCategory?._id ||
+          form.selectedSubCategory?._id ||
+          form.selectedCategory?._id;
 
     try {
+      const formData = new FormData(); //form data to send photos to backend for upload to cloudinary
+      for (const file of selectedFiles) {
+        formData.append('files', file);
+      }
+      
+      //Upload images to cloudinary
       const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/product/imageUpload`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      const { urls } = data; //retrieve image urls after successful upload
+      const image = urls[0]; //set main image as first image
+      const photos = urls; //save photos' urls to send to database
+
+      const product = {
+        user_id: user._id,
+        name: form.name,
+        image: image,
+        photos: photos,
+        description: form.description,
+        price: form.price,
+        pickup_point: form.pickUpPoint,
+        category_id: categoryId,
+        stock_quantity: form.quantity,
+        keywords: form.keywords.split(","),
+      };
+
+      //Upload product to database
+      const productResponse = await fetch(
         `${process.env.REACT_APP_API_URL}/product/upload`,
         {
           method: "POST",
@@ -119,9 +160,9 @@ const ProductUpload = () => {
         }
       );
 
-      if (!response.ok) throw new Error("Network response was not ok");
-      const data = await response.json();
-      console.log("Product uploaded successfully:", data);
+      if (!productResponse.ok) throw new Error("Network response was not ok");
+      const productData = await response.json();
+      console.log("Product uploaded successfully:", productData);
 
       // Check if user's role is "user", then update it to "seller"
       if (user.role === "user") {
@@ -161,7 +202,7 @@ const ProductUpload = () => {
     }
   };
 
-  // Fetch categories
+  // Fetch categories may use useContext to avoid fetching categories multiple times
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -209,8 +250,44 @@ const ProductUpload = () => {
         >
           Add photos (up to 4)
         </Form.Label>
-        <Form.Control type="file" multiple hidden />
+        <Form.Control type="file" multiple hidden onChange={handleFileChange} />
       </Form.Group>
+
+      {/* Image Previews */}
+      <div>
+        {previewUrls.map((url, index) => (
+          <div
+            key={index}
+            style={{
+              display: "inline-block",
+              position: "relative",
+              margin: "10px",
+            }}
+          >
+            <img
+              src={url}
+              alt={`Preview ${index}`}
+              style={{ width: "100px", height: "100px" }}
+            />
+            <button
+              type="button"
+              onClick={() => handleRemoveImage(index)}
+              style={{
+                position: "absolute",
+                top: "0",
+                right: "0",
+                color: "red",
+                backgroundColor: "transparent",
+                border: "none",
+                borderRadius: "50%",
+                cursor: "pointer",
+              }}
+            >
+              &times;
+            </button>
+          </div>
+        ))}
+      </div>
 
       {/* Product Name */}
       <Form.Group className="mb-3" controlId="name">
