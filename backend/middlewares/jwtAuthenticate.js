@@ -1,29 +1,25 @@
 import jwt from "jsonwebtoken";
+import cookieParser from 'cookie-parser';
 
 const jwtAuthenticate = (req, res, next) => {
-    const authorizationHeader = req.headers.authorization;
+  console.log(req.cookies.accessToken)
+  const accessToken = req.cookies.accessToken;
 
-    if (!authorizationHeader || !authorizationHeader.startsWith("Bearer")) {
-        return res.status(401).json({ success: false, message: "Invalid authorization header" });
+  if (!accessToken) {
+    return res
+      .status(401)
+      .json({ success: false, message: "No access token provided" });
+  }
+  //Check if accessToken valid or not
+  jwt.verify(accessToken, process.env.JWT_SECRET, (error, decoded) => {
+    if (error) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid or expired access token" });
     }
-
-    const token = authorizationHeader.split(" ")[1];
-    if (!token) {
-        return res.status(401).json({ success: false, message: "Invalid token" });
-    }
-
-    try {
-        jwt.verify(token, process.env.JWT_SECRET, (error, decoded) => {
-            if (error) {
-                return res.status(401).json({ success: false, message: "Invalid token" });
-            }
-            req.user = decoded;
-            next();
-        });
-    } catch (error) {
-        console.error("Error during authentication:", error);
-        return res.status(500).json({ success: false, message: "Internal server error" });
-    }
-}
+    req.user = decoded;
+    next();
+  });
+};
 
 export default jwtAuthenticate;
