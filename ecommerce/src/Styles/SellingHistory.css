@@ -1,0 +1,40 @@
+.sellerImgContainer {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 2.5rem;
+    width: 100%;
+    max-width: 120px;
+    margin: 10px auto;
+    padding: 30px;
+}
+
+.sellerImg {
+    width: 100%;
+    height: auto;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.buttons {
+    display: flex;
+    gap: 17px;
+    margin-top: auto;
+    padding: 30px;
+}
+
+.btnSort {
+    background: none;
+    height: 40px;
+    width: 120px;
+    padding: 0;
+    color: var(--clr-navy);
+    letter-spacing: var(--spacing);
+    font-weight: 500;
+    text-transform: none;
+    transition: var(--transition);
+    font-size: 1rem;
+    border: 2px solid black;
+    border-radius: 10px;
+    cursor: pointer;
+}
