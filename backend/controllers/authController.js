@@ -220,48 +220,48 @@ export const login = async (req, res) => {
 
     //generate refreshToken and store in cookies and database
     const newRefreshToken = generateRefreshToken(user._id);
-    
     const savedToken = await User.findByIdAndUpdate(user._id, {
       refresh_token: newRefreshToken,
     });
-    console.log(newRefreshToken)
+    if (!savedToken) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User not found" });
+    }
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === 'production',
       path: "/api/get-access-token",
-      maxAge:
-        process.env.JWT_REFRESH_EXPIRES_IN.slice(0, -2) * 24 * 3600 * 1000,
+      maxAge: process.env.JWT_REFRESH_EXPIRES_IN.slice(0, -1) * 24 * 3600 * 1000,
     });
 
     //generate accessToken and store in cookies
     const newAccessToken = generateAccessToken(user._id);
     const expirationTime = Date.now() + 15 * 60 * 1000;
-    console.log(newAccessToken)
-    if (savedToken) {
-      res.cookie("accessToken", newAccessToken, {
-        httpOnly: true,
-        secure: true,
-        path: "/api",
-        maxAge: process.env.JWT_ACCESS_EXPIRES_IN.slice(0, -2) * 60 * 1000,
-      });
-      
-      res.status(200).json({
-        success: true,
-        message: "Login successful",
-        user: {
-          _id: user._id,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          email: user.email,
-          role: user.role,
-          photo_url: user.photo_url,
-          is_verified: user.is_verified,
-          phone: user.phone,
-          balance: user.balance,
-          token_expired_at: expirationTime
-        }            
-      });
-    }
+
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: "/",
+      maxAge: process.env.JWT_ACCESS_EXPIRES_IN.slice(0, -1) * 60 * 1000,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      user: {
+        _id: user._id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        role: user.role,
+        photo_url: user.photo_url,
+        is_verified: user.is_verified,
+        phone: user.phone,
+        balance: user.balance,
+        token_expired_at: expirationTime,
+      },
+    });
   } catch (error) {
     console.log(error);
     // Handle any server errors
@@ -271,12 +271,12 @@ export const login = async (req, res) => {
 
 //Logout action
 export const logout = async (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
-  if (!refreshToken) {
+  const accessToken = req.cookies.accessToken;
+  if (!accessToken) {
     return res.status(401).json({ success: false, message: "Invalid token" });
   }
   // Verify the refresh token
-  jwt.verify(refreshToken, process.env.JWT_SECRET, async (error, decoded) => {
+  jwt.verify(accessToken, process.env.JWT_SECRET, async (error, decoded) => {
     if (error) {
       return res.status(401).json({ success: false, message: "Invalid token" });
     }

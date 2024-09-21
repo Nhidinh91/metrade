@@ -140,9 +140,6 @@ const AccountInfo = () => {
         `${process.env.REACT_APP_API_URL}/user/profile/update/${user._id}`,
         {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: formData,
           credentials: "include"
         }

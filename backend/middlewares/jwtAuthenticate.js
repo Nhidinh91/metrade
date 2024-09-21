@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 import cookieParser from 'cookie-parser';
 
 const jwtAuthenticate = (req, res, next) => {
-  console.log(req.cookies.accessToken)
   const accessToken = req.cookies.accessToken;
 
   if (!accessToken) {

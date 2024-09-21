@@ -20,18 +20,22 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       // Call the backend logout API to clear the refresh token from the database and cookies
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/auth/logout`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
 
       if (response.ok) {
         // If the logout API is successful, clear the user state and localStorage
         setUser(null);
         setItem(null);
+        setIsLoading(false);
       } else {
         console.error("Failed to log out on the server.");
       }
@@ -86,8 +90,9 @@ export const AuthProvider = ({ children }) => {
     if (storedUser) {
       setUser(storedUser);
       scheduleTokenRenewal(storedUser.token_expired_at);
+    }
     setIsLoading(false);
-  }}, [getItem]);
+  }, [getItem]);
 
   const updateUser = (user) => {
     setUser(user);
