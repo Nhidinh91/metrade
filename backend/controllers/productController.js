@@ -205,3 +205,25 @@ export const getProductsByCategoryV1 = async (req, res) => {
     });
   }
 };
+
+//Get products by user_id
+export const getProductsByUserId = async (req, res) => {
+  const seller = req.params.userId;
+
+  try {
+    const products = await Product.find({ user_id: seller }).populate({
+      path: "user_id",
+      select: "first_name last_name balance",
+    });
+    if (products.length > 0) {
+      res.status(200).json(products);
+    } else {
+      console.log("No products found");
+      res.status(404).json({ message: "No products found" });
+    }
+  } catch (error) {
+    console.log(error);
+    // Handle any server errors
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
