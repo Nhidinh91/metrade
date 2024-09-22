@@ -6,7 +6,7 @@ import morgan from "morgan";
 import connectDB from "./configs/database.js";
 import jwtAuthenticate from "./middlewares/jwtAuthenticate.js";
 import authRoutes from "./routes/authRoutes.js";
-import getAccessTokenRoute from "./routes/tokenRoutes.js"
+import tokenRoutes from "./routes/tokenRoutes.js"
 
 import categoryRoutes from "./routes/categoryRoutes.js";
 
@@ -36,7 +36,7 @@ app.use("/api/user", jwtAuthenticate);
 
 
 // Routes
-app.use("/api/token", getAccessTokenRoute)
+app.use("/api/token", tokenRoutes)
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/product", productRoutes);
