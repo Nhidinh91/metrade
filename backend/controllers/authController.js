@@ -246,6 +246,8 @@ export const login = async (req, res) => {
       maxAge: process.env.JWT_ACCESS_EXPIRES_IN.slice(0, -1) * 60 * 1000,
     });
 
+    const card = await Cart.findOne({ user_id: user._id })
+
     res.status(200).json({
       success: true,
       message: "Login successful",
@@ -259,6 +261,7 @@ export const login = async (req, res) => {
         is_verified: user.is_verified,
         phone: user.phone,
         balance: user.balance,
+        card_id: card._id,
         token_expired_at: expirationTime,
       },
     });
@@ -271,39 +274,30 @@ export const login = async (req, res) => {
 
 //Logout action
 export const logout = async (req, res) => {
-  const accessToken = req.cookies.accessToken;
-  if (!accessToken) {
-    return res.status(401).json({ success: false, message: "Invalid token" });
-  }
-  // Verify the refresh token
-  jwt.verify(accessToken, process.env.JWT_SECRET, async (error, decoded) => {
-    if (error) {
-      return res.status(401).json({ success: false, message: "Invalid token" });
-    }
-    const { id: userId } = decoded;
-    try {
-      // Clear the refresh token in the database
-      const deletedToken = await User.findByIdAndUpdate(userId, {
-        refresh_token: "",
+  const { userId } = req.body;
+
+  try {
+    // Clear the refresh token in the database
+    const deletedToken = await User.findByIdAndUpdate(userId, {
+      refresh_token: "",
+    });
+
+    if (deletedToken) {
+      // Clear the refresh token from the cookie
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: true,
       });
 
-      if (deletedToken) {
-        // Clear the refresh token from the cookie
-        res.clearCookie("refreshToken", {
-          httpOnly: true,
-          secure: true,
-        });
-
-        return res
-          .status(200)
-          .json({ success: true, message: "Logout successfully" });
-      } else {
-        return res
-          .status(500)
-          .json({ success: false, message: "Error during logout" });
-      }
-    } catch (err) {
-      return res.status(500).json({ success: false, message: "Server error" });
+      return res
+        .status(200)
+        .json({ success: true, message: "Logout successfully" });
+    } else {
+      return res
+        .status(500)
+        .json({ success: false, message: "Error during logout" });
     }
-  });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
 };

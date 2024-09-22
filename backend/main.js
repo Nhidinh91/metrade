@@ -36,7 +36,7 @@ app.use("/api/user", jwtAuthenticate);
 
 
 // Routes
-app.use("/api/get-access-token", getAccessTokenRoute)
+app.use("/api/token", getAccessTokenRoute)
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/product", productRoutes);
