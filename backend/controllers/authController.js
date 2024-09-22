@@ -246,6 +246,8 @@ export const login = async (req, res) => {
       maxAge: process.env.JWT_ACCESS_EXPIRES_IN.slice(0, -1) * 60 * 1000,
     });
 
+    const card = await Cart.findOne({user_id:user._id})
+
     res.status(200).json({
       success: true,
       message: "Login successful",
@@ -259,6 +261,7 @@ export const login = async (req, res) => {
         is_verified: user.is_verified,
         phone: user.phone,
         balance: user.balance,
+        card_id: card._id,
         token_expired_at: expirationTime,
       },
     });

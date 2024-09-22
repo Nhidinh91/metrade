@@ -6,7 +6,15 @@ const cartSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // Reference to the User model
       required: true,
+      unique: true
+
     },
+    cart_item: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "CartItem" // Reference to the CartItem model
+      }
+    ],
     total_item_quantity: {
       type: Number,
       required: true,
