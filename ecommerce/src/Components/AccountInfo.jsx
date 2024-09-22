@@ -164,7 +164,7 @@ const AccountInfo = () => {
   };
 
   const verifyEmail = async () => {
-    if (!user || !user.token) {
+    if (!user) {
       return;
     }
 
@@ -182,7 +182,6 @@ const AccountInfo = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
           },
           body: JSON.stringify({ email }),
         }
