@@ -7,7 +7,7 @@ import {
   createToken,
   isValidVerifyToken,
 } from "../utils/authUtils/tokenValidation.js";
-import jwt from "jsonwebtoken";
+import { convertTimeToMilliseconds } from "../utils/time/time.js"
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -223,27 +223,29 @@ export const login = async (req, res) => {
     const savedToken = await User.findByIdAndUpdate(user._id, {
       refresh_token: newRefreshToken,
     });
+    
     if (!savedToken) {
       return res
         .status(400)
         .json({ success: false, message: "User not found" });
     }
+
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      path: "/api/get-access-token",
-      maxAge: process.env.JWT_REFRESH_EXPIRES_IN.slice(0, -1) * 24 * 3600 * 1000,
+      path: "/api/token/get-access-token",
+      maxAge: convertTimeToMilliseconds(process.env.JWT_REFRESH_EXPIRES_IN)
     });
 
     //generate accessToken and store in cookies
     const newAccessToken = generateAccessToken(user._id);
-    const expirationTime = Date.now() + 15 * 60 * 1000;
+    const accessTokenMaxAge = convertTimeToMilliseconds(process.env.JWT_ACCESS_EXPIRES_IN);
 
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      path: "/",
-      maxAge: process.env.JWT_ACCESS_EXPIRES_IN.slice(0, -1) * 60 * 1000,
+      path: "/api",
+      maxAge: accessTokenMaxAge,
     });
 
     const card = await Cart.findOne({ user_id: user._id })
@@ -262,7 +264,7 @@ export const login = async (req, res) => {
         phone: user.phone,
         balance: user.balance,
         card_id: card._id,
-        token_expired_at: expirationTime,
+        token_expired_at: Date.now() + accessTokenMaxAge,
       },
     });
   } catch (error) {
