@@ -8,6 +8,9 @@ import {
   DropdownButton,
   Alert,
 } from "react-bootstrap";
+import Pica from "pica";
+
+const pica = Pica(); //use pica for image resizing cause cloudinary has a 10MB limit for free plan 
 
 const ProductUpload = () => {
   const { user, updateUser } = useAuthContext();
@@ -62,17 +65,66 @@ const ProductUpload = () => {
   };
 
   //Handle uploading images
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
     if (selectedFiles.length + files.length > 4) {
       alert("You can only upload up to 4 images"); //alert if more than 4 images
       return;
     }
+    const resizedFiles = await Promise.all(files.map(file => resizeImage(file))); //resize images if larger than 10MB
 
-    setSelectedFiles((prevFiles) => [...prevFiles, ...files]); //add new photo to array
+    setSelectedFiles((prevFiles) => [...prevFiles, ...resizedFiles]); //add new photo to array
 
     const urls = files.map((file) => URL.createObjectURL(file));
     setPreviewUrls((prevUrls) => [...prevUrls, ...urls]); //add preview
+  };
+
+  //Resize images
+  const resizeImage = (file) => {
+    return new Promise((resolve, reject) => {
+      if (file.size <= 10 * 1024 * 1024) {
+        // If the file size is already under 10MB, resolve immediately
+        resolve(file);
+        return;
+      }
+
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const maxDimension = 800;
+        const scale = Math.min(
+          maxDimension / img.width,
+          maxDimension / img.height
+        );
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+
+        const resizeAndCompress = (quality) => {
+          pica
+            .resize(img, canvas)
+            .then((result) => pica.toBlob(result, "image/jpeg", quality))
+            .then((blob) => {
+              if (blob.size <= 10 * 1024 * 1024) {
+                // Check if the size is less than or equal to 10MB
+                console.log(`Resized image size: ${blob.size} bytes`); // Log the size of the resized image
+                const resizedFile = new File([blob], file.name, {
+                  type: "image/jpeg",
+                });
+                resolve(resizedFile);
+              } else if (quality > 0.1) {
+                // Reduce quality and try again if the size exceeds 10MB
+                resizeAndCompress(quality - 0.1);
+              } else {
+                reject(new Error("Unable to resize image to be under 10MB"));
+              }
+            })
+            .catch((error) => reject(error));
+        };
+
+        resizeAndCompress(0.8); // Start with 80% quality
+      };
+    });
   };
 
   //Handle removing images
@@ -126,7 +178,7 @@ const ProductUpload = () => {
       );
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error('Can not upload images');
       }
 
       const data = await response.json();

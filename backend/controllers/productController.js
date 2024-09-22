@@ -277,6 +277,11 @@ export const uploadProduct = async (req, res) => {
 
 //Upload new product images
 export const uploadProductImages = async (req, res) => {
-  const urls = req.files.map(file => file.path);
-  res.json({ urls });
+  try {
+    const urls = req.files.map((file) => file.path);
+    res.status(200).json({ urls });
+  } catch (error) {
+    console.error("Error uploading images:", error.message);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
 };
