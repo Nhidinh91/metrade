@@ -42,6 +42,11 @@ export const register = async (req, res) => {
         const hashedPassword = await hashInput(password);
         const validation_token = await createToken(email);
 
+        await sendConfirmationEmailService(
+          first_name,
+          email,
+          validation_token.value
+        );
         const newUser = await User.create({
           first_name,
           last_name,
@@ -52,11 +57,6 @@ export const register = async (req, res) => {
         const newCart = await Cart.create({ user_id: newUser.id });
 
         // send confirmation email
-        await sendConfirmationEmailService(
-          first_name,
-          email,
-          validation_token.value
-        );
         // return response to FE
         return res.status(201).json({
           status: "success",

@@ -12,6 +12,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 
 import productRoutes from "./routes/productRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+// import orderRoutes from "./routes/orderRoute.js";
 
 dotenv.config();
 
@@ -32,7 +33,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
-app.use("/api/user", jwtAuthenticate);
+// app.use("/api/user", jwtAuthenticate);
 
 
 // Routes
@@ -41,6 +42,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/categories", categoryRoutes);
+// app.use("/api/order", orderRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
