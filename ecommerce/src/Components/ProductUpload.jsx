@@ -144,8 +144,9 @@ const ProductUpload = () => {
     // Ensure the smallest category ID is selected
     if (
       !form.selectedSubSubCategory &&
+      form.selectedCategory &&
       form.selectedSubCategory &&
-      form.selectedCategory
+      form.selectedSubCategory.name === "Clothes"
     ) {
       newErrors.push("You must select the smallest category available");
     } else if (!form.selectedSubCategory && form.selectedCategory) {
