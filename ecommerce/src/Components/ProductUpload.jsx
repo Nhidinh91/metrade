@@ -191,9 +191,7 @@ const ProductUpload = () => {
         `${process.env.REACT_APP_API_URL}/product/imageUpload`,
         {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
+          credentials: "include",
           body: formData,
         }
       );
@@ -226,9 +224,9 @@ const ProductUpload = () => {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${user.token}`,
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify(product),
         }
       );

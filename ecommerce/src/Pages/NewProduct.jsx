@@ -14,7 +14,7 @@ const NewProduct = () => {
     if (!isLoading && !isAuthenticated()) {
       navigate("/login");
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated(), isLoading, navigate]);
 
   return (
     <Container>
