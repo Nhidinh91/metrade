@@ -28,11 +28,13 @@ const ProductUpload = () => {
     selectedSubSubCategory: null,
   });
 
-  const [categories, setCategories] = useState([]);//State to store categories consider using useContext later to avoid fetching categories multiple times
-  const [errors, setErrors] = useState([]);//State for validation errors
-  const [showAlert, setShowAlert] = useState(false);//State for showing alert
+  const [categories, setCategories] = useState([]); //State to store categories consider using useContext later to avoid fetching categories multiple times
+  const [errors, setErrors] = useState([]); //State for validation errors
+  const [showAlert, setShowAlert] = useState(false); //State for showing alert
   const [selectedFiles, setSelectedFiles] = useState([]); //state to store photos
   const [previewUrls, setPreviewUrls] = useState([]); //state to store preview before uploading
+  const [uploadStatus, setUploadStatus] = useState(null); //State for upload status
+  const [uploadMessage, setUploadMessage] = useState(""); //State for upload message
 
   //Handle all changes in product details
   const handleChange = (e) => {
@@ -71,7 +73,9 @@ const ProductUpload = () => {
       alert("You can only upload up to 4 images"); //alert if more than 4 images
       return;
     }
-    const resizedFiles = await Promise.all(files.map(file => resizeImage(file))); //resize images if larger than 10MB
+    const resizedFiles = await Promise.all(
+      files.map((file) => resizeImage(file))
+    ); //resize images if larger than 10MB
 
     setSelectedFiles((prevFiles) => [...prevFiles, ...resizedFiles]); //add new photo to array
 
@@ -136,6 +140,20 @@ const ProductUpload = () => {
   // Validate form fields
   const validateForm = () => {
     const newErrors = [];
+
+    // Ensure the smallest category ID is selected
+    if (
+      !form.selectedSubSubCategory &&
+      form.selectedSubCategory &&
+      form.selectedCategory
+    ) {
+      newErrors.push("You must select the smallest category available");
+    } else if (!form.selectedSubCategory && form.selectedCategory) {
+      newErrors.push("You must select the smallest category available");
+    } else if (!form.selectedCategory) {
+      newErrors.push("You must select a category");
+    }
+
     if (!form.name) newErrors.push("Product name is required");
     if (!form.description) newErrors.push("Description is required");
     if (!form.price || form.price <= 0)
@@ -143,6 +161,8 @@ const ProductUpload = () => {
     if (!form.pickUpPoint || form.pickUpPoint === "Choose a pick-up point")
       newErrors.push("Pick-up point is required");
     if (!form.selectedCategory) newErrors.push("Category is required");
+    if (selectedFiles.length === 0)
+      newErrors.push("At least one image is required");
 
     setErrors(newErrors);
     setShowAlert(newErrors.length > 0); //alert if there are errors
@@ -155,16 +175,16 @@ const ProductUpload = () => {
 
     //get smallest category id
     const categoryId =
-          form.selectedSubSubCategory?._id ||
-          form.selectedSubCategory?._id ||
-          form.selectedCategory?._id;
+      form.selectedSubSubCategory?._id ||
+      form.selectedSubCategory?._id ||
+      form.selectedCategory?._id;
 
     try {
       const formData = new FormData(); //form data to send photos to backend for upload to cloudinary
       for (const file of selectedFiles) {
-        formData.append('files', file);
+        formData.append("files", file);
       }
-      
+
       //Upload images to cloudinary
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/product/imageUpload`,
@@ -178,7 +198,7 @@ const ProductUpload = () => {
       );
 
       if (!response.ok) {
-        throw new Error('Can not upload images');
+        throw new Error("Can not upload images");
       }
 
       const data = await response.json();
@@ -213,11 +233,16 @@ const ProductUpload = () => {
       );
 
       if (!productResponse.ok) throw new Error("Network response was not ok");
-      const productData = await response.json();
+      const productData = await productResponse.json();
       console.log("Product uploaded successfully:", productData);
-
+      // Set upload status and message
+      setUploadStatus("success");
+      setUploadMessage("Product uploaded successfully!");
     } catch (error) {
       console.log("Error uploading product:", error);
+      // Set upload status and message
+      setUploadStatus("error");
+      setUploadMessage("Error uploading product. Please try again.");
     }
   };
 
@@ -478,6 +503,16 @@ const ProductUpload = () => {
           Sell now
         </Button>
       </div>
+
+      {/* Upload Status Message */}
+      {uploadStatus && (
+        <Alert
+          variant={uploadStatus === "success" ? "success" : "danger"}
+          className="mt-3"
+        >
+          {uploadMessage}
+        </Alert>
+      )}
     </Form>
   );
 };
