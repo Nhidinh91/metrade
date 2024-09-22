@@ -3,7 +3,6 @@ import coin from "../assets/star.png";
 import clock from "../assets/clock.png";
 import locImg from "../assets/location.png";
 import style from "../Styles/ProductStatus.module.css";
-import { Link } from "react-router-dom";
 
 const ProductStatus = ({ _id, name, image, pickup_point, price, created_at, status }) => {
   //calculate days since creation

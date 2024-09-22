@@ -1,26 +1,29 @@
-.sellerImgContainer {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    height: 2.5rem;
-    width: 100%;
-    max-width: 120px;
-    margin: 10px auto;
+.profileDetails {
     padding: 30px;
+    gap: 20px;
 }
 
+.profileImgContainer {
+    display: flex;
+    align-items: center;
+    width: 5rem;
+    height: 100%;
+}
+
+ .profileImgContainer h2 {
+    margin-top: 25px;
+}
 .sellerImg {
-    width: 100%;
-    height: auto;
-    border-radius: 50%;
-    object-fit: cover;
+    font-size: 10px;
 }
 
 .buttons {
     display: flex;
     gap: 17px;
-    margin-top: auto;
     padding: 30px;
+    justify-content: flex-end;
+    align-items: flex-end;
+    height: 100%;
 }
 
 .btnSort {

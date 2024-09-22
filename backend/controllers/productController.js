@@ -211,10 +211,7 @@ export const getProductsByUserId = async (req, res) => {
   const seller = req.params.userId;
 
   try {
-    const products = await Product.find({ user_id: seller }).populate({
-      path: "user_id",
-      select: "first_name last_name balance",
-    });
+    const products = await Product.find({ user_id: seller }).sort({status: 1});
     if (products.length > 0) {
       res.status(200).json(products);
     } else {
