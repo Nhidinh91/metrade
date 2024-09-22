@@ -63,6 +63,11 @@ const userSchema = new mongoose.Schema(
         type: Date,
       },
     },
+
+    refresh_token: {
+      type: String,
+    }, 
+    
     deleted_at: {
       type: Date,
       default: null,

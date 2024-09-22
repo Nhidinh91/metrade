@@ -8,6 +8,10 @@ import {
   isValidVerifyToken,
 } from "../utils/authUtils/tokenValidation.js";
 import jwt from "jsonwebtoken";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../utils/token/jwtToken.js";
 
 export const register = async (req, res) => {
   try {
@@ -46,7 +50,7 @@ export const register = async (req, res) => {
           validation_token,
         });
         const newCart = await Cart.create({ user_id: newUser.id });
-        
+
         // send confirmation email
         await sendConfirmationEmailService(
           first_name,
@@ -192,6 +196,7 @@ export const resendEmail = async (req, res) => {
   }
 };
 
+//Login controller
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -212,8 +217,33 @@ export const login = async (req, res) => {
         .json({ success: false, message: "Invalid email or password" });
     }
     // If email and password are correct, send res with token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
+
+    //generate refreshToken and store in cookies and database
+    const newRefreshToken = generateRefreshToken(user._id);
+    const savedToken = await User.findByIdAndUpdate(user._id, {
+      refresh_token: newRefreshToken,
+    });
+    if (!savedToken) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User not found" });
+    }
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: "/api/get-access-token",
+      maxAge: process.env.JWT_REFRESH_EXPIRES_IN.slice(0, -1) * 24 * 3600 * 1000,
+    });
+
+    //generate accessToken and store in cookies
+    const newAccessToken = generateAccessToken(user._id);
+    const expirationTime = Date.now() + 15 * 60 * 1000;
+
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: "/",
+      maxAge: process.env.JWT_ACCESS_EXPIRES_IN.slice(0, -1) * 60 * 1000,
     });
 
     res.status(200).json({
@@ -229,7 +259,7 @@ export const login = async (req, res) => {
         is_verified: user.is_verified,
         phone: user.phone,
         balance: user.balance,
-        token: token,
+        token_expired_at: expirationTime,
       },
     });
   } catch (error) {
@@ -237,4 +267,43 @@ export const login = async (req, res) => {
     // Handle any server errors
     res.status(500).json({ success: false, message: "Internal server error" });
   }
+};
+
+//Logout action
+export const logout = async (req, res) => {
+  const accessToken = req.cookies.accessToken;
+  if (!accessToken) {
+    return res.status(401).json({ success: false, message: "Invalid token" });
+  }
+  // Verify the refresh token
+  jwt.verify(accessToken, process.env.JWT_SECRET, async (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ success: false, message: "Invalid token" });
+    }
+    const { id: userId } = decoded;
+    try {
+      // Clear the refresh token in the database
+      const deletedToken = await User.findByIdAndUpdate(userId, {
+        refresh_token: "",
+      });
+
+      if (deletedToken) {
+        // Clear the refresh token from the cookie
+        res.clearCookie("refreshToken", {
+          httpOnly: true,
+          secure: true,
+        });
+
+        return res
+          .status(200)
+          .json({ success: true, message: "Logout successfully" });
+      } else {
+        return res
+          .status(500)
+          .json({ success: false, message: "Error during logout" });
+      }
+    } catch (err) {
+      return res.status(500).json({ success: false, message: "Server error" });
+    }
+  });
 };
