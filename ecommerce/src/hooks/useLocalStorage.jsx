@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 export const useLocalStorage = (key, initialValue = null) => {
     const [value, setValue] = useState(() => {
@@ -11,23 +11,48 @@ export const useLocalStorage = (key, initialValue = null) => {
         }
     });
 
-    const setItem = useCallback((key, value) => {
-        localStorage.setItem(key, JSON.stringify(value));
-        setValue(value);
+    // useEffect to handle dynamic key changes
+    useEffect(() => {
+        try {
+            const item = localStorage.getItem(key);
+            setValue(item ? JSON.parse(item) : initialValue);
+        } catch (error) {
+            console.error("Error reading localStorage key after key change:", key, error);
+            setValue(initialValue);
+        }
     }, []);
 
-    const getItem = useCallback((key) => {
-
-        const item = localStorage.getItem(key);
-        const parsedItem = item ? JSON.parse(item) : null;
-        setValue(parsedItem);
-
-        return parsedItem;
+    // Set the item in localStorage and update state
+    const setItem = useCallback((value) => {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+            setValue(value);
+        } catch (error) {
+            console.error("Error setting localStorage key:", key, error);
+        }
     }, []);
 
-    const removeItem = useCallback((key) => {
-        localStorage.removeItem(key);
-        setValue(null);
+    // Get the item from localStorage and update state
+    const getItem = useCallback(() => {
+        try {
+            const item = localStorage.getItem(key);
+            const parsedItem = item ? JSON.parse(item) : null;
+            setValue(parsedItem);
+            return parsedItem;
+        } catch (error) {
+            console.error("Error getting localStorage key:", key, error);
+            return null;
+        }
+    }, []);
+
+    // Remove the item from localStorage and update state
+    const removeItem = useCallback(() => {
+        try {
+            localStorage.removeItem(key);
+            setValue(null);
+        } catch (error) {
+            console.error("Error removing localStorage key:", key, error);
+        }
     }, []);
 
     return { value, setItem, getItem, removeItem };
