@@ -60,11 +60,9 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       //if renew successfully
-      const expiresAt = await response.json().token_expired_at;
-      const updatedUser = { ...user, token_expired_at: expiresAt };
-      setUser(updatedUser);
-      setItem(updatedUser);
-      scheduleTokenRenewal(expiresAt);
+      const data = await response.json();
+      
+      updateUser(data.user);
     } catch (error) {
       console.error("Error renewing access token:", error);
       await logout(); // Log the user out if an error occurs

@@ -285,8 +285,12 @@ export const logout = async (req, res) => {
     });
 
     if (deletedToken) {
-      // Clear the refresh token from the cookie
+      // Clear the tokens from the cookie
       res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: true,
+      });
+      res.clearCookie("accessToken", {
         httpOnly: true,
         secure: true,
       });
