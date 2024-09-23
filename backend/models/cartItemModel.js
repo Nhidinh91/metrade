@@ -12,34 +12,10 @@ const cartItemSchema = new mongoose.Schema(
       ref: "Product", // Reference to the Product model
       required: true,
     },
-    product_name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    image: {
-      type: String, // URL to the product image
-      required: true,
-    },
-    shop_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Shop", // Reference to the Shop model
-      required: true,
-    },
     adding_quantity: {
       type: Number,
       required: true,
       min: 0, // Ensures the quantity is not negative
-    },
-    price: {
-      type: Number,
-      required: true,
-      min: 0, // Ensures the price is not negative
-    },
-    pickup_point: {
-      type: String,
-      required: true, // The location where the product will be picked up
-      trim: true,
     },
     sub_total: {
       type: Number,

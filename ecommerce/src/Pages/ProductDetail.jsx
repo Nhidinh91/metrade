@@ -2,10 +2,10 @@ import coin from "../assets/star.png";
 import clock from "../assets/clock.png";
 import locImg from "../assets/location.png";
 import { useEffect, useState } from "react";
-import { useParams,  useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Loading from "../Components/Loading";
 import "../Styles/ProductDetail.css";
-import { Breadcrumb, Row, Col, Container} from "react-bootstrap";
+import { Breadcrumb, Row, Col, Container } from "react-bootstrap";
 
 const ProductDetail = () => {
   const navigate = useNavigate();
@@ -13,7 +13,8 @@ const ProductDetail = () => {
   const { id } = useParams();
   // States to store product data, change quantity, and big photo
   const [product, setProduct] = useState(null);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(0);
+  const [limitQuantity, setLimitQuantity] = useState(0);
   const [bigPhotoIndex, setBigPhotoIndex] = useState(0);
 
   useEffect(() => {
@@ -21,20 +22,55 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/product/detail/${id}`
+          `${process.env.REACT_APP_API_URL}/product/detail/${id}`
         );
+
         const data = await response.json();
-        setProduct(data.product);
+        if (response.ok) {
+          setProduct(data.product);
+          setLimitQuantity(data.product.stock_quantity);
+        }
       } catch (error) {
         console.error("Error fetching product:", error);
       }
     };
+
     fetchProduct();
   }, [id]); // 'id' is used as a dependency to refetch if the id changes
+
   const daysCreation = (dayCreated) => {
     return Math.floor(
       (Date.now() - new Date(dayCreated)) / (1000 * 60 * 60 * 24)
     );
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/cart/add-card-item`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            adding_quantity: quantity,
+            product: {
+              _id: product._id,
+              price: product.price,
+            },
+          }),
+        }
+      );
+      if (response.ok) {
+        console.log("Add product to card successfully");
+        setLimitQuantity((prevLimit) => prevLimit - quantity);
+        setQuantity(0);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // If the product data is still being fetched, display a Bootstrap spinner
@@ -48,7 +84,11 @@ const ProductDetail = () => {
           <Row className="product-detail-container" sm={1} md={2} lg={2}>
             <Col sm={12} md={6} lg={6}>
               <div className="go-back-button-container">
-                <button type="button" className="go-back-button" onClick={() => navigate(-1)}>
+                <button
+                  type="button"
+                  className="go-back-button"
+                  onClick={() => navigate(-1)}
+                >
                   <i className="fa-solid fa-arrow-left"></i>Back to Home
                 </button>
               </div>
@@ -98,9 +138,7 @@ const ProductDetail = () => {
                       className="quantity-btn"
                       onClick={() =>
                         setQuantity(
-                          quantity >= product.stock_quantity
-                            ? quantity
-                            : quantity + 1
+                          quantity >= limitQuantity ? quantity : quantity + 1
                         )
                       }
                     >
@@ -111,6 +149,7 @@ const ProductDetail = () => {
                     className="add-card-btn"
                     type="button"
                     name="add-to-cart-button"
+                    onClick={() => handleAddToCart()}
                   >
                     Add to Cart
                   </button>

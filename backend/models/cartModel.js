@@ -9,7 +9,7 @@ const cartSchema = new mongoose.Schema(
       unique: true
 
     },
-    cart_item: [
+    cart_items: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "CartItem" // Reference to the CartItem model
