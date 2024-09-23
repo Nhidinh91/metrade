@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
+import {SuccessModal, FailureModal, LoadingModal} from "./ProductUploadStatus";
 import {
   Form,
   Button,
@@ -13,7 +14,7 @@ import Pica from "pica";
 const pica = Pica(); //use pica for image resizing cause cloudinary has a 10MB limit for free plan 
 
 const ProductUpload = () => {
-  const { user, updateUser } = useAuthContext();
+  const { user } = useAuthContext();
 
   //Form state to track product details
   const [form, setForm] = useState({
@@ -33,8 +34,9 @@ const ProductUpload = () => {
   const [showAlert, setShowAlert] = useState(false); //State for showing alert
   const [selectedFiles, setSelectedFiles] = useState([]); //state to store photos
   const [previewUrls, setPreviewUrls] = useState([]); //state to store preview before uploading
-  const [uploadStatus, setUploadStatus] = useState(null); //State for upload status
-  const [uploadMessage, setUploadMessage] = useState(""); //State for upload message
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showFailure, setShowFailure] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
 
   //Handle all changes in product details
   const handleChange = (e) => {
@@ -71,6 +73,7 @@ const ProductUpload = () => {
     const files = Array.from(e.target.files);
     if (selectedFiles.length + files.length > 4) {
       alert("You can only upload up to 4 images"); //alert if more than 4 images
+
       return;
     }
     const resizedFiles = await Promise.all(
@@ -174,6 +177,7 @@ const ProductUpload = () => {
   const uploadProduct = async () => {
     if (!validateForm()) return; //Stop if any missing details
 
+    setShowLoading(true); //Show loading modal
     //get smallest category id
     const categoryId =
       form.selectedSubSubCategory?._id ||
@@ -234,14 +238,12 @@ const ProductUpload = () => {
       if (!productResponse.ok) throw new Error("Network response was not ok");
       const productData = await productResponse.json();
       console.log("Product uploaded successfully:", productData);
-      // Set upload status and message
-      setUploadStatus("success");
-      setUploadMessage("Product uploaded successfully!");
+      setShowLoading(false);
+      setShowSuccess(true);
     } catch (error) {
       console.log("Error uploading product:", error);
-      // Set upload status and message
-      setUploadStatus("error");
-      setUploadMessage("Error uploading product. Please try again.");
+      setShowLoading(false);
+      setShowFailure(true);
     }
   };
 
@@ -503,15 +505,14 @@ const ProductUpload = () => {
         </Button>
       </div>
 
-      {/* Upload Status Message */}
-      {uploadStatus && (
-        <Alert
-          variant={uploadStatus === "success" ? "success" : "danger"}
-          className="mt-3"
-        >
-          {uploadMessage}
-        </Alert>
-      )}
+      {/* Loading Modal */}
+      <LoadingModal show={showLoading} />
+
+      {/* Success Modal */}
+      <SuccessModal show={showSuccess} />
+
+      {/* Failure Modal */}
+      <FailureModal show={showFailure} />
     </Form>
   );
 };
