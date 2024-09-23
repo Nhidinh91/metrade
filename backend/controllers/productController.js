@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Product from "../models/productModel.js";
 import Category from "../models/categoryModel.js";
 
+
 //Get all products
 export const getAllProducts = async (req, res) => {
   try {
