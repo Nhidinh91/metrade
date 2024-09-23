@@ -3,13 +3,13 @@ import { useLocalStorage } from "../hooks/useLocalStorage";
 
 export const AuthContext = createContext({
   user: null,
-  updateUser: () => {},
-  deleteUser: () => {},
-  setUser: () => {},
+  updateUser: () => { },
+  deleteUser: () => { },
+  setUser: () => { },
   isAuthenticated: () => false,
   isLoading: true,
-  renewAccessToken: () => {},
-  scheduleTokenRenewal: () => {},
+  renewAccessToken: () => { },
+  scheduleTokenRenewal: () => { },
 });
 
 export const AuthProvider = ({ children }) => {
@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }) => {
             "Content-Type": "application/json",
           },
           credentials: "include",
+          body: JSON.stringify({ userId: user._id }),
         }
       );
 
@@ -47,7 +48,7 @@ export const AuthProvider = ({ children }) => {
   //function to renew access token
   const renewAccessToken = async () => {
     try {
-      const response = await fetch("/api/get-access-token", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/token/get-access-token`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,11 +60,9 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       //if renew successfully
-      const expiresAt = await response.json().token_expired_at;
-      const updatedUser = { ...user, token_expired_at: expiresAt };
-      setUser(updatedUser);
-      setItem(updatedUser);
-      scheduleTokenRenewal(expiresAt);
+      const data = await response.json();
+      
+      updateUser(data.user);
     } catch (error) {
       console.error("Error renewing access token:", error);
       await logout(); // Log the user out if an error occurs
@@ -81,6 +80,8 @@ export const AuthProvider = ({ children }) => {
         setTimeout(() => {
           renewAccessToken();
         }, timeToRenew);
+      } else {
+        renewAccessToken();
       }
     }
   };
