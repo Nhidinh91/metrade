@@ -1,14 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import {SuccessModal, FailureModal, LoadingModal} from "./ProductUploadStatus";
-import {
-  Form,
-  Button,
-  InputGroup,
-  Dropdown,
-  DropdownButton,
-  Alert,
-} from "react-bootstrap";
+import { Form, Button, InputGroup, Dropdown, DropdownButton, Alert, } from "react-bootstrap";
 import Pica from "pica";
 
 const pica = Pica(); //use pica for image resizing cause cloudinary has a 10MB limit for free plan 
@@ -505,13 +498,9 @@ const ProductUpload = () => {
         </Button>
       </div>
 
-      {/* Loading Modal */}
+      {/* Status Modal */}
       <LoadingModal show={showLoading} />
-
-      {/* Success Modal */}
       <SuccessModal show={showSuccess} />
-
-      {/* Failure Modal */}
       <FailureModal show={showFailure} />
     </Form>
   );
