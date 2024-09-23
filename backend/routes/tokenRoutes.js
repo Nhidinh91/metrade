@@ -1,5 +1,5 @@
 import express from "express";
-import { getAccessToken } from "../controllers/getAccessToken.js";
+import { getAccessToken } from "../controllers/tokenController.js";
 
 const router = express.Router();
 
