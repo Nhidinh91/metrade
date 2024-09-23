@@ -2,31 +2,12 @@ import {Nav, NavDropdown, Navbar} from 'react-bootstrap';
 import style from '../Styles/PageLinks.module.css';
 import { useNavigate} from 'react-router-dom';
 import { useEffect, useState } from "react";
+import { useCategoryContext } from "../contexts/CategoryContext";
 
 // Updated PageLinks component to work with new data structure
 const PageLinks = ({ parentClass, itemClass }) => {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
-    // Fetch categories from backend
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/api/categories/main-category/main-relationship", {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
+  const { categories, loading } = useCategoryContext();
 
   // Function to handle subcategory click
   const handleSubCategoryClick = (category_id) => {

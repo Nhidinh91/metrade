@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
+import { useCategoryContext } from "../contexts/CategoryContext";
 import {SuccessModal, FailureModal, LoadingModal} from "./ProductUploadStatus";
 import { Form, Button, InputGroup, Dropdown, DropdownButton, Alert, } from "react-bootstrap";
 import Pica from "pica";
@@ -8,6 +9,7 @@ const pica = Pica(); //use pica for image resizing cause cloudinary has a 10MB l
 
 const ProductUpload = () => {
   const { user } = useAuthContext();
+  const { categories, loading } = useCategoryContext();
 
   //Form state to track product details
   const [form, setForm] = useState({
@@ -22,7 +24,6 @@ const ProductUpload = () => {
     selectedSubSubCategory: null,
   });
 
-  const [categories, setCategories] = useState([]); //State to store categories consider using useContext later to avoid fetching categories multiple times
   const [errors, setErrors] = useState([]); //State for validation errors
   const [showAlert, setShowAlert] = useState(false); //State for showing alert
   const [selectedFiles, setSelectedFiles] = useState([]); //state to store photos
@@ -239,22 +240,6 @@ const ProductUpload = () => {
       setShowFailure(true);
     }
   };
-
-  // Fetch categories may use useContext to avoid fetching categories multiple times
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/categories/main-category/main-relationship`
-        );
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-    fetchCategories();
-  }, []);
 
   return (
     <Form
