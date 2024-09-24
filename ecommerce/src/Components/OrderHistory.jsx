@@ -192,7 +192,6 @@ const OrderHistory = () => {
               onKeyUp={handleKeyPress}
               placeholder="Type Order Number"
             />
-
             <i
               className="fa-solid fa-magnifying-glass"
               id="magnify"
@@ -220,9 +219,9 @@ const OrderHistory = () => {
         <div className="filter-item">
           <select
             name="status"
-            id="pickup"
+            className="filter-dropdown"
             value={status}
-            placeholder="Order Status"
+            // placeholder="Order Status"
             onChange={(e) => handleStatus(e)}
           >
             <option value="" disabled>
@@ -238,7 +237,7 @@ const OrderHistory = () => {
       </div>
 
       {loading ? (
-        <div class="spinner-border m-5 spinner-order" role="status">
+        <div class="spinner-border spinner-order" role="status">
           <span class="sr-only">Loading...</span>
         </div>
       ) : (

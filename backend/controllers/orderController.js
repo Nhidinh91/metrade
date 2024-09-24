@@ -5,11 +5,18 @@ import mongoose from "mongoose";
 
 export const getAllOrders = async (req, res) => {
   try {
-    const userid = req.params.id;
-    const userObjectId = new mongoose.Types.ObjectId(userid);
+    const userId = req.params.id;
+    // console.log(mongoose.Types.ObjectId.isValid(userId));
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Invalid User Id",
+      });
+    }
+    const userObjectId = new mongoose.Types.ObjectId(userId);
     const { id, status, pickup } = req.query;
     console.log(`${id} - ${status} - ${pickup}`);
-    // console.log("id string", userid);
+    // console.log("id string", userId);
     // console.log("object id", userObjectId);
 
     // const orderList = await Order.find({ _id: order_id });
@@ -49,17 +56,7 @@ export const getAllOrders = async (req, res) => {
         },
       });
     }
-    // const orderList = await Order.aggregate([
-    //   { $match: { user_id: mongoose.Types.ObjectId(userid) } },
-    //   {
-    //     $lookup: {
-    //       from: "orderdetails",
-    //       localField: "_id",
-    //       foreignField: "order_id",
-    //       as: "order_detail_list",
-    //     },
-    //   },
-    // ]);
+
     const orderDetailList = await Order.aggregate(pipeline);
     console.log(orderDetailList);
     // console.log(orderList);
