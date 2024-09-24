@@ -1,5 +1,10 @@
+import moment from "moment";
+
 import { useState, useEffect } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
+import { Container, Row, Col, Button, Dropdown } from "react-bootstrap";
+import "../Styles/OrderHistory.css";
+import Coin from "../assets/star.png";
 
 const STATUS_LIST = ["processing", "await-pickup", "delivered", "cancelled"];
 const PICKUP_LIST = ["Myllypuro", "Karamalmi", "Myyrmäki"];
@@ -10,6 +15,38 @@ const displayStatus = (str) => {
   result = result.join(" ");
   return result;
 };
+
+const displayButtonColor = (str) => {
+  switch (str) {
+    case "processing":
+      return "#ffc41f";
+    case "await-pickup":
+      return "#f37c25";
+    case "delivered":
+      return "#3f9c36";
+    case "cancelled":
+      return "#b43f3f";
+  }
+};
+
+const displayColor = (str) => {
+  // console.log(str);
+  switch (str) {
+    case "Myllypuro":
+      return "#3f9c36";
+    case "Karamalmi":
+      return "#b43f3f";
+    case "Myyrmäki":
+      return "#f37c25";
+  }
+};
+
+const diplayDate = (dateStr) => {
+  const date = moment(dateStr).format("DD-MM-YYYY");
+  // console.log(date);
+  return `${date}`;
+};
+
 const convertToQueryString = (qrArr) => {
   let result = "";
   if (qrArr.length > 0) {
@@ -46,7 +83,10 @@ const OrderHistory = () => {
           }/orders${convertToQueryString(queryStrArr)}`,
           {
             method: "GET",
-            headers: {},
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
           }
         );
         if (response.ok) {
@@ -137,28 +177,30 @@ const OrderHistory = () => {
       <h2>Filter</h2>
       <div className="filter-container">
         <div className="filter-item">
-          <button type="click" onClick={displayAll}>
+          <button type="click" onClick={displayAll} id="all-order-detail">
             All
           </button>
         </div>
         <div className="filter-item">
-          <label htmlFor="pickup" className="order-item-label">
-            Order number
-          </label>
-          <input
-            type="text"
-            name="pickup"
-            className="order-item-input"
-            value={id}
-            onChange={handleId}
-            onKeyUp={handleKeyPress}
-          />
-          <button onClick={handleSubmit}>Search</button>
+          <div className="search-container">
+            <input
+              type="text"
+              name="pickup"
+              className="order-item-input"
+              value={id}
+              onChange={handleId}
+              onKeyUp={handleKeyPress}
+              placeholder="Type Order Number"
+            />
+
+            <i
+              className="fa-solid fa-magnifying-glass"
+              id="magnify"
+              onClick={handleSubmit}
+            ></i>
+          </div>
         </div>
         <div className="filter-item">
-          <label htmlFor="pickup" className="order-item-label">
-            Pickup Location
-          </label>
           <select
             name="pickup"
             id="pickup"
@@ -166,7 +208,7 @@ const OrderHistory = () => {
             onChange={(e) => handlePickUp(e)}
           >
             <option value="" disabled>
-              Select...
+              Pick Up Place
             </option>
             {PICKUP_LIST.map((location, index) => (
               <option key={index} value={location}>
@@ -176,17 +218,15 @@ const OrderHistory = () => {
           </select>
         </div>
         <div className="filter-item">
-          <label htmlFor="status" className="order-item-label">
-            Order Status
-          </label>
           <select
             name="status"
             id="pickup"
             value={status}
+            placeholder="Order Status"
             onChange={(e) => handleStatus(e)}
           >
             <option value="" disabled>
-              Select...
+              Order Status
             </option>
             {STATUS_LIST.map((status, index) => (
               <option key={index} value={status}>
@@ -203,11 +243,51 @@ const OrderHistory = () => {
             key={detail._id}
             style={{ border: "1px solid black" }}
           >
-            <p>{detail.order_id}</p>
-            <p>{detail.product_name}</p>
-            <p>{detail.sold_quantity}</p>
-            <p>{detail.pickup_point}</p>
-            <p>{displayStatus(detail.selling_status)}</p>
+            <div className="order-item-image">
+              <img src={detail.image} alt={detail.name} />
+            </div>
+            <div className="order-item-info">
+              <h4>{detail.product_name}</h4>
+              {/* <>{detail.</p> */}
+              <p id="order-item-date">{diplayDate(detail.created_at)}</p>
+              <p id="order-item-orderno">
+                Order no:
+                <br />
+                <span>{detail.order_id}</span>
+              </p>
+            </div>
+            <div className="order-item-pickup">
+              <h4>Pickup</h4>
+              <p style={{ color: `${displayColor(detail.pickup_point)}` }}>
+                {detail.pickup_point}{" "}
+              </p>
+              {/* <p style={{ color: "" }}>{detail.pickup_point}</p> */}
+            </div>
+            <div className="order-item-quanlity">
+              <p>
+                Quantity: <span>{detail.sold_quantity}</span>
+              </p>
+            </div>
+            <div className="order-item-status-balance">
+              <button
+                id="order-item-status"
+                disabled
+                style={{
+                  background: `${displayButtonColor(detail.selling_status)}`,
+                }}
+              >
+                {displayStatus(detail.selling_status)}
+              </button>
+
+              <div className="order-item-total">
+                <p>
+                  <span id="coin">
+                    <img src={Coin} alt="Metra Coin" />
+                    {detail.sub_total ? detail.sub_total : 0}
+                  </span>
+                </p>
+              </div>
+            </div>
           </div>
         ))}
       </div>

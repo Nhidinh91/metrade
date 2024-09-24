@@ -26,6 +26,7 @@ export const getAllOrders = async (req, res) => {
           as: "order_detail_list",
         },
       },
+
       { $sort: { updated_at: -1 } },
       { $unwind: "$order_detail_list" },
       { $replaceRoot: { newRoot: "$order_detail_list" } },

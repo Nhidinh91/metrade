@@ -1,0 +1,154 @@
+.order-history-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.filter-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+}
+
+.filter-item {
+  box-sizing: border-box;
+  width: 25%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  /* margin: 0 0.5rem; */
+}
+
+#all-order-detail {
+  width: 90%;
+  text-align: center;
+}
+.search-container > input[type="text"] {
+  /* width: 100%; */
+  /* box-sizing: border-box; */
+}
+.search-container {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  align-items: center;
+  /* bpx-sizing: border-box; */
+  /* margin: auto; */
+}
+.order-item-input {
+  width: 80%;
+  /* z-index: -1; */
+  /* margin-bottom: auto; */
+  /* display: absolute;
+  width: 100%;
+  /* margin: 0 auto; */
+  /* padding: auto; */
+  /* transform: translateY(50%); */
+}
+#magnify {
+  width: 10%;
+  box-sizing: border-box;
+  margin-left: 0.5rem;
+  /* display: absolute;
+  z-index: 999; */
+  /* transform: translateY(-550%);
+  transform: translateX(700%); */
+  cursor: pointer;
+}
+.orders-container {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.order-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid black;
+  box-sizing: border-box;
+  margin-bottom: 0.25rem;
+  border-radius: 25px;
+  padding: 0.5rem;
+  /* height: 15dvh; */
+}
+
+.order-item-image {
+  width: 30%;
+  border: 1px solid var(--clr-blush);
+  border-radius: 5px;
+  padding: 0.5rem;
+}
+.order-item-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+  /* margin: 0.5; */
+}
+
+.order-item-info {
+  width: min-content;
+  max-width: 25%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.order-item-info h4 {
+  width: 100%;
+}
+
+.order-item-info span {
+  white-space: normal;
+  word-wrap: break-word;
+  font-size: 0.7rem;
+  /* width: 50%; */
+}
+#order-item-date {
+  /* margin: 0; */
+}
+
+#order-item-orderno {
+  margin-bottom: 0;
+}
+
+.order-item-quanlity p {
+  text-align: center;
+}
+
+.order-item-status-balance {
+  width: 20%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: end;
+}
+
+#order-item-status {
+  /* border: 1px solid black; */
+  border: none;
+  width: 6rem;
+  height: 2rem;
+  margin: auto;
+  padding: auto;
+  border-radius: 25px;
+  color: white;
+  /* font-weight: bold; */
+}
+
+#coin {
+  display: flex;
+  flex-direction: row;
+  gap: 0.25rem;
+}
+
+#coin img {
+  width: 1.5rem;
+  height: 1.5rem;
+}
