@@ -118,8 +118,8 @@
   align-items: center;
   border: 1px solid hsla(193, 50%, 18%, 34%);
   box-sizing: border-box;
-  margin-bottom: 0.25rem;
-  border-radius: 25px;
+  margin-bottom: 0.5rem;
+  border-radius: 5px;
   padding: 0.5rem;
   /* height: 15dvh; */
 }
@@ -204,6 +204,17 @@
   /* Styles */
   .order-item-image {
     width: 20%;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 1rem;
+    /* display: flex;
+    flex-direction: row; */
+  }
+  .order-item-image img {
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+    margin: 0;
   }
   .order-item-status-balance {
     align-items: center;
