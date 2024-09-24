@@ -236,61 +236,68 @@ const OrderHistory = () => {
           </select>
         </div>
       </div>
-      <div className="orders-container">
-        {orderDetails.map((detail) => (
-          <div
-            className="order-item"
-            key={detail._id}
-            style={{ border: "1px solid black" }}
-          >
-            <div className="order-item-image">
-              <img src={detail.image} alt={detail.name} />
-            </div>
-            <div className="order-item-info">
-              <h4>{detail.product_name}</h4>
-              {/* <>{detail.</p> */}
-              <p id="order-item-date">{diplayDate(detail.created_at)}</p>
-              <p id="order-item-orderno">
-                Order no:
-                <br />
-                <span>{detail.order_id}</span>
-              </p>
-            </div>
-            <div className="order-item-pickup">
-              <h4>Pickup</h4>
-              <p style={{ color: `${displayColor(detail.pickup_point)}` }}>
-                {detail.pickup_point}{" "}
-              </p>
-              {/* <p style={{ color: "" }}>{detail.pickup_point}</p> */}
-            </div>
-            <div className="order-item-quanlity">
-              <p>
-                Quantity: <span>{detail.sold_quantity}</span>
-              </p>
-            </div>
-            <div className="order-item-status-balance">
-              <button
-                id="order-item-status"
-                disabled
-                style={{
-                  background: `${displayButtonColor(detail.selling_status)}`,
-                }}
-              >
-                {displayStatus(detail.selling_status)}
-              </button>
 
-              <div className="order-item-total">
-                <p>
-                  <span id="coin">
-                    <img src={Coin} alt="Metra Coin" />
-                    {detail.sub_total ? detail.sub_total : 0}
-                  </span>
+      {loading ? (
+        <div class="spinner-border m-5 spinner-order" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      ) : (
+        <div className="orders-container">
+          {orderDetails.map((detail) => (
+            <div
+              className="order-item"
+              key={detail._id}
+              // style={{ border: "1px solid black" }}
+            >
+              <div className="order-item-image">
+                <img src={detail.image} alt={detail.name} />
+              </div>
+              <div className="order-item-info">
+                <h4>{detail.product_name}</h4>
+                {/* <>{detail.</p> */}
+                <p id="order-item-date">{diplayDate(detail.created_at)}</p>
+                <p id="order-item-orderno">
+                  Order no:
+                  <br />
+                  <span>{detail.order_id}</span>
                 </p>
               </div>
+              <div className="order-item-pickup">
+                <h4>Pickup</h4>
+                <p style={{ color: `${displayColor(detail.pickup_point)}` }}>
+                  {detail.pickup_point}{" "}
+                </p>
+                {/* <p style={{ color: "" }}>{detail.pickup_point}</p> */}
+              </div>
+              <div className="order-item-quanlity">
+                <p>
+                  Quantity: <span>{detail.sold_quantity}</span>
+                </p>
+              </div>
+              <div className="order-item-status-balance">
+                <button
+                  id="order-item-status"
+                  disabled
+                  style={{
+                    background: `${displayButtonColor(detail.selling_status)}`,
+                  }}
+                >
+                  {displayStatus(detail.selling_status)}
+                </button>
+
+                <div className="order-item-total">
+                  <p>
+                    <span id="coin">
+                      <img src={Coin} alt="Metra Coin" />
+                      {detail.sub_total ? detail.sub_total : 0}
+                    </span>
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
