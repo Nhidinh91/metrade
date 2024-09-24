@@ -18,6 +18,31 @@ const ProductDetail = () => {
   const [bigPhotoIndex, setBigPhotoIndex] = useState(0);
 
   useEffect(() => {
+    // Fetch cart item info to get limit quantity
+    const fetchCartItem = async (productId) => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/cart/get-cart-item`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              product_id: productId,
+            }),
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setLimitQuantity(data.cartItem.limit_quantity);
+        }
+      } catch (error) {
+        console.log("Error fetching product", error);
+      }
+    };
+
     // Fetch the product data using the 'id'
     const fetchProduct = async () => {
       try {
@@ -28,7 +53,9 @@ const ProductDetail = () => {
         const data = await response.json();
         if (response.ok) {
           setProduct(data.product);
-          setLimitQuantity(data.product.stock_quantity);
+          console.log(data.product, data.product._id )
+          fetchCartItem(data.product._id);
+          console.log(limitQuantity);
         }
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -47,7 +74,7 @@ const ProductDetail = () => {
   const handleAddToCart = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/cart/add-card-item`,
+        `${process.env.REACT_APP_API_URL}/cart/add-cart-item`,
         {
           method: "POST",
           headers: {
@@ -59,13 +86,15 @@ const ProductDetail = () => {
             product: {
               _id: product._id,
               price: product.price,
+              stock_quantity: product.stock_quantity,
             },
           }),
         }
       );
       if (response.ok) {
+        const data = await response.json();
         console.log("Add product to card successfully");
-        setLimitQuantity((prevLimit) => prevLimit - quantity);
+        setLimitQuantity(data.limit_quantity);
         setQuantity(0);
       }
     } catch (error) {
@@ -138,7 +167,9 @@ const ProductDetail = () => {
                       className="quantity-btn"
                       onClick={() =>
                         setQuantity(
-                          quantity >= limitQuantity ? quantity : quantity + 1
+                          quantity >= (limitQuantity || product.stock_quantity)
+                            ? quantity
+                            : quantity + 1
                         )
                       }
                     >

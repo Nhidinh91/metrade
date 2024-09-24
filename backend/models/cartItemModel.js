@@ -17,6 +17,11 @@ const cartItemSchema = new mongoose.Schema(
       required: true,
       min: 0, // Ensures the quantity is not negative
     },
+    limit_quantity: {
+      type: Number,
+      required: true,
+      min: 0, // Ensures the quantity is not negative
+    },
     sub_total: {
       type: Number,
       required: true,

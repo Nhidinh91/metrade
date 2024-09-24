@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Cart from "../models/cartModel.js";
 import CartItem from "../models/cartItemModel.js";
 
+//Add product to cart
 export const addCartItem = async (req, res) => {
   const product = req.body.product;
   const addingQuantity = req.body.adding_quantity;
@@ -46,14 +47,15 @@ export const addCartItem = async (req, res) => {
   if (cartItem) {
     const updatedCartItem = await CartItem.findByIdAndUpdate(cartItem._id, {
       adding_quantity: cartItem.adding_quantity + addingQuantity,
-      sub_total: (cartItem.adding_quantity + addingQuantity) * product.price
-      
+      limit_quantity: cartItem.limit_quantity - addingQuantity,
+      sub_total: (cartItem.adding_quantity + addingQuantity) * product.price,
     });
 
     if (updatedCartItem) {
       return res.status(200).json({
         success: true,
         message: "Add product to cart successfully",
+        limit_quantity: updatedCartItem.limit_quantity,
       });
     } else {
       return res.status(500).json({
@@ -69,6 +71,7 @@ export const addCartItem = async (req, res) => {
       cart_id: cart._id,
       product_id: product._id,
       adding_quantity: addingQuantity,
+      limit_quantity: product.stock_quantity - addingQuantity,
       sub_total: addingQuantity * product.price,
     });
 
@@ -94,6 +97,82 @@ export const addCartItem = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Add product to cart successfully",
+    });
+  }
+};
+
+// Get card item info
+export const getCartItem = async (req, res) => {
+  const userId = req.user.id;
+  const productId = req.body.product_id;
+  const cardId = req.card_id;
+
+  //if no valid productId or cardId
+  if (
+    (!productId && !cardId) ||
+    (!mongoose.Types.ObjectId.isValid(cardId) &&
+      !mongoose.Types.ObjectId.isValid(productId))
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid request",
+    });
+  }
+
+  try {
+    //when cardId is available (cart page)
+    if (cardId) {
+      const cartItem = await CartItem.findById(cardId);
+      if (cartItem) {
+        return res.status(200).json({
+          success: true,
+          message: "Get cart item info successfully",
+          cartItem: cartItem,
+        });
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Fail to get cart item",
+        });
+      }
+    }
+
+    //when no valid cartId, but has productId instead (product detail page)
+    if (!cardId) {
+      const cart = await Cart.findOne({ user_id: userId }).populate({
+        path: "cart_items",
+      });
+
+      if (!cart) {
+        return res.status(404).json({
+          success: false,
+          message: "No valid cart",
+        });
+      }
+
+      if (cart) {
+        const cartItem = cart.cart_items.find((item) =>
+          item.product_id.equals(productId)
+        );
+
+        if (cartItem) {
+          return res.status(200).json({
+            success: true,
+            message: "Get cart item info successfully",
+            cartItem: cartItem,
+          });
+        }
+
+        return res.status(404).json({
+          success: false,
+          message: "No valid cart item",
+        });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Internal server error",
     });
   }
 };
