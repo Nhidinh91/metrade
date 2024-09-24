@@ -1,10 +1,12 @@
 import express from "express";
+import cookieParser from 'cookie-parser';
 import cors from "cors";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import connectDB from "./configs/database.js";
 import jwtAuthenticate from "./middlewares/jwtAuthenticate.js";
 import authRoutes from "./routes/authRoutes.js";
+import tokenRoutes from "./routes/tokenRoutes.js"
 
 import categoryRoutes from "./routes/categoryRoutes.js";
 
@@ -14,11 +16,6 @@ import userRoutes from "./routes/userRoutes.js";
 dotenv.config();
 
 const app = express();
-app.use(cors());
-
-// Middleware
-// A middleware function in Express.js that is used to parse incoming JSON payloads in HTTP requests
-app.use(express.json());
 
 // Connect to MongoDB
 connectDB();
@@ -26,13 +23,20 @@ connectDB();
 app.use(morgan("dev"));
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
+
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use("/api/user", jwtAuthenticate);
 
+
 // Routes
+app.use("/api/token", tokenRoutes)
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/product", productRoutes);

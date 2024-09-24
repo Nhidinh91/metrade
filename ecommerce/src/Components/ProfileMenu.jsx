@@ -7,7 +7,7 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Coin from '../assets/star.png';
 
 const ProfileMenu = () => {
-    const { user, deleteUser } = useAuthContext();
+    const { user, logout } = useAuthContext();
 
     const navigate = useNavigate()
 
@@ -24,7 +24,7 @@ const ProfileMenu = () => {
     }
 
     const handleLogoutClick = () => {
-        deleteUser();
+        logout();
     };
 
     return (

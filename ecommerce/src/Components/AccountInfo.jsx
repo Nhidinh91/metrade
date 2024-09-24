@@ -20,12 +20,12 @@ const AccountInfo = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const { user, updateUser } = useAuthContext();
+  const { user, updateUser, scheduleTokenRenewal } = useAuthContext();
   const fileInputRef = useRef(null);
   const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
 
   const fetchProfile = useCallback(async () => {
-    if (!user || !user.token) {
+    if (!user) {
       return;
     }
     try {
@@ -35,8 +35,8 @@ const AccountInfo = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
           },
+          credentials: "include"
         }
       );
 
@@ -56,8 +56,11 @@ const AccountInfo = () => {
   }, [user]);
 
   useEffect(() => {
+    if (user && user.token_expired_at) {
+      scheduleTokenRenewal(user.token_expired_at); // Schedule token renewal
+    }
     fetchProfile();
-  }, [user, fetchProfile]);
+  }, [user, fetchProfile, scheduleTokenRenewal]);
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
@@ -137,10 +140,8 @@ const AccountInfo = () => {
         `${process.env.REACT_APP_API_URL}/user/profile/update/${user._id}`,
         {
           method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
           body: formData,
+          credentials: "include"
         }
       );
 
@@ -163,7 +164,7 @@ const AccountInfo = () => {
   };
 
   const verifyEmail = async () => {
-    if (!user || !user.token) {
+    if (!user) {
       return;
     }
 
@@ -181,7 +182,6 @@ const AccountInfo = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
           },
           body: JSON.stringify({ email }),
         }
