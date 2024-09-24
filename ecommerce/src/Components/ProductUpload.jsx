@@ -3,13 +3,14 @@ import { useAuthContext } from "../hooks/useAuthContext";
 import { useCategoryContext } from "../contexts/CategoryContext";
 import {SuccessModal, FailureModal, LoadingModal} from "./ProductUploadStatus";
 import { Form, Button, InputGroup, Dropdown, DropdownButton, Alert, } from "react-bootstrap";
+import "../Styles/ProductUpload.css";
 import Pica from "pica";
 
 const ProductUpload = () => {
   const { user } = useAuthContext();
-  const { categories, loading } = useCategoryContext();
+  const { categories } = useCategoryContext();
   const pica = Pica(); //use pica for image resizing cause cloudinary has a 10MB limit for free plan
-  const alertRef = useRef(null);
+  const alertRef = useRef(null); //reference to alert component for scrolling
 
   //Form state to track product details
   const [form, setForm] = useState({
@@ -19,36 +20,49 @@ const ProductUpload = () => {
     quantity: 1,
     pickUpPoint: "Choose a pick-up point",
     keywords: "",
-    selectedCategory: null,
-    selectedSubCategory: null,
-    selectedSubSubCategory: null,
   });
 
+  //States to track selected categories
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+  const [selectedSubSubCategory, setSelectedSubSubCategory] = useState(null);
+
+  //States to track and alert validation errors
   const [errors, setErrors] = useState([]); //State for validation errors
   const [showAlert, setShowAlert] = useState(false); //State for showing alert
+
+  //States to track photos and preview
   const [selectedFiles, setSelectedFiles] = useState([]); //state to store photos
   const [previewUrls, setPreviewUrls] = useState([]); //state to store preview before uploading
+
+  //States for uploading status modals
   const [showSuccess, setShowSuccess] = useState(false);
   const [showFailure, setShowFailure] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
 
-  //Handle changes in product's name. description, price, pick-up point, keywords
+  //Handle changes in product's name, description, price, keywords
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  //Handle chosen category dropdown
-  const handleDropdownChange = (field, value) => {
-    setForm((prev) => ({
-      ...prev,
-      [field]: value,
-      ...(field === "selectedCategory" && {
-        selectedSubCategory: null,
-        selectedSubSubCategory: null,
-      }),
-      ...(field === "selectedSubCategory" && { selectedSubSubCategory: null }),
-    }));
+  //Functions to handle chosen category dropdown
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+    setSelectedSubCategory(null);
+    setSelectedSubSubCategory(null);
+  };
+  const handleSubCategoryChange = (subCategory) => {
+    setSelectedSubCategory(subCategory);
+    setSelectedSubSubCategory(null);
+  };
+  const handleSubSubCategoryChange = (subSubCategory) => {
+    setSelectedSubSubCategory(subSubCategory);
+  };
+
+  //Handle pick-up point
+  const handlePickupChange = (point) => () => {
+    setForm((prev) => ({ ...prev, pickUpPoint: point }));
   };
 
   //Handle quantity
@@ -80,7 +94,7 @@ const ProductUpload = () => {
     setPreviewUrls((prevUrls) => [...prevUrls, ...urls]); //add preview
   };
 
-  //Resize images
+  //Handle resizing images
   const resizeImage = (file) => {
     return new Promise((resolve, reject) => {
       if (file.size <= 10 * 1024 * 1024) {
@@ -134,33 +148,31 @@ const ProductUpload = () => {
     setPreviewUrls((prevUrls) => prevUrls.filter((_, i) => i !== index));
   };
 
-  // Validate form fields
+  // Validate form fields before uploading
   const validateForm = () => {
     const newErrors = [];
 
-    // Ensure the smallest category ID is selected
+    if (selectedFiles.length === 0)
+          newErrors.push("At least one image is required"); //validate image
+    if (!form.name) newErrors.push("Product name is required"); //validate name
+    if (!form.description) newErrors.push("Description is required"); //validate description
+    //Validate the smallest category ID is selected
     if (
-      !form.selectedSubSubCategory &&
-      form.selectedCategory &&
-      form.selectedSubCategory &&
-      form.selectedSubCategory.name === "Clothes"
+      !selectedSubSubCategory &&
+      selectedCategory &&
+      selectedSubCategory &&
+      selectedSubCategory.name === "Clothes"
     ) {
       newErrors.push("You must select the smallest category available");
-    } else if (!form.selectedSubCategory && form.selectedCategory) {
-      newErrors.push("You must select the smallest category available");
-    } else if (!form.selectedCategory) {
+    } else if (!selectedSubCategory && selectedCategory) {
+      newErrors.push("You must select a sub category");
+    } else if (!selectedCategory) {
       newErrors.push("You must select a category");
     }
-
-    if (!form.name) newErrors.push("Product name is required");
-    if (!form.description) newErrors.push("Description is required");
     if (!form.price || form.price <= 0)
-      newErrors.push("Price must be greater than 0");
+      newErrors.push("Price must be greater than 0"); //validate price
     if (!form.pickUpPoint || form.pickUpPoint === "Choose a pick-up point")
-      newErrors.push("Pick-up point is required");
-    if (!form.selectedCategory) newErrors.push("Category is required");
-    if (selectedFiles.length === 0)
-      newErrors.push("At least one image is required");
+      newErrors.push("Pick-up point is required"); //validate pick-up point
 
     setErrors(newErrors);
     setShowAlert(newErrors.length > 0); //alert if there are errors
@@ -176,22 +188,20 @@ const ProductUpload = () => {
 
   //Function to upload product to database
   const uploadProduct = async () => {
-    if (!validateForm()) {
-      return; // Stop if any missing details and scroll up to Alert component
-    }
+    if (!validateForm()) {return;}// Stop if any missing details and scroll up to Alert component
     setShowLoading(true); //Show loading modal
+
     //get smallest category id
     const categoryId =
-      form.selectedSubSubCategory?._id ||
-      form.selectedSubCategory?._id ||
-      form.selectedCategory?._id;
+      selectedSubSubCategory?._id ||
+      selectedSubCategory?._id ||
+      selectedCategory?._id;
 
     try {
       const formData = new FormData(); //form data to send photos to backend for upload to cloudinary
       for (const file of selectedFiles) {
         formData.append("files", file);
       }
-
       //Upload images to cloudinary
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/product/imageUpload`,
@@ -201,16 +211,15 @@ const ProductUpload = () => {
           body: formData,
         }
       );
-
       if (!response.ok) {
         throw new Error("Can not upload images");
       }
-
       const data = await response.json();
       const { urls } = data; //retrieve image urls after successful upload
       const image = urls[0]; //set main image as first image
       const photos = urls; //save photos' urls to send to database
 
+      //Create product object
       const product = {
         user_id: user._id,
         name: form.name,
@@ -236,8 +245,7 @@ const ProductUpload = () => {
           body: JSON.stringify(product),
         }
       );
-
-      if (!productResponse.ok) throw new Error("Network response was not ok");
+      if (!productResponse.ok) throw new Error("Can not upload product");
       const productData = await productResponse.json();
       console.log("Product uploaded successfully:", productData);
       setShowLoading(false);
@@ -248,16 +256,8 @@ const ProductUpload = () => {
       setShowFailure(true);
     }
   };
-
   return (
-    <Form
-      className="p-4"
-      style={{
-        margin: "0 auto",
-        backgroundColor: "#fff",
-        borderRadius: "10px",
-      }}
-    >
+    <Form className="uploadForm">
       <h3>Sell your product</h3>
 
       {/* Show missing fields */}
@@ -281,49 +281,48 @@ const ProductUpload = () => {
       {/* Image Upload */}
       <Form.Group className="mb-3 text-center" controlId="formFileMultiple">
         <Form.Label
-          className="d-block border border-secondary p-5 rounded"
+          className="d-block border border-secondary p-3 rounded"
           style={{ cursor: "pointer", borderStyle: "dashed" }}
         >
           Add photos (up to 4)
+          {/* Image Previews */}
+          <div>
+            {previewUrls.map((url, index) => (
+              <div
+                key={index}
+                style={{
+                  display: "inline-block",
+                  position: "relative",
+                  margin: "10px",
+                }}
+              >
+                <img
+                  src={url}
+                  alt={`Preview ${index}`}
+                  style={{ width: "100px", height: "100px" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(index)}
+                  style={{
+                    position: "absolute",
+                    top: "0",
+                    right: "0",
+                    color: "red",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    borderRadius: "50%",
+                    cursor: "pointer",
+                  }}
+                >
+                  &times;
+                </button>
+              </div>
+            ))}
+          </div>
         </Form.Label>
         <Form.Control type="file" multiple hidden onChange={handleFileChange} />
       </Form.Group>
-
-      {/* Image Previews */}
-      <div>
-        {previewUrls.map((url, index) => (
-          <div
-            key={index}
-            style={{
-              display: "inline-block",
-              position: "relative",
-              margin: "10px",
-            }}
-          >
-            <img
-              src={url}
-              alt={`Preview ${index}`}
-              style={{ width: "100px", height: "100px" }}
-            />
-            <button
-              type="button"
-              onClick={() => handleRemoveImage(index)}
-              style={{
-                position: "absolute",
-                top: "0",
-                right: "0",
-                color: "red",
-                backgroundColor: "transparent",
-                border: "none",
-                borderRadius: "50%",
-                cursor: "pointer",
-              }}
-            >
-              &times;
-            </button>
-          </div>
-        ))}
-      </div>
 
       {/* Product Name */}
       <Form.Group className="mb-3" controlId="name">
@@ -334,6 +333,7 @@ const ProductUpload = () => {
           name="name"
           value={form.name}
           onChange={handleChange}
+          className="textInput"
         />
       </Form.Group>
 
@@ -347,6 +347,7 @@ const ProductUpload = () => {
           name="description"
           value={form.description}
           onChange={handleChange}
+          className="textInput"
         />
       </Form.Group>
 
@@ -355,16 +356,12 @@ const ProductUpload = () => {
         <Form.Label>Category</Form.Label>
         <DropdownButton
           id="dropdown-category"
-          title={
-            form.selectedCategory
-              ? form.selectedCategory.name
-              : "Select a category"
-          }
+          title={selectedCategory ? selectedCategory.name : "Select a category"}
         >
           {categories.map((category) => (
             <Dropdown.Item
               key={category._id}
-              onClick={() => handleDropdownChange("selectedCategory", category)}
+              onClick={() => handleCategoryChange(category)}
             >
               {category.name}
             </Dropdown.Item>
@@ -372,23 +369,21 @@ const ProductUpload = () => {
         </DropdownButton>
       </Form.Group>
 
-      {form.selectedCategory?.children?.length > 0 && (
+      {selectedCategory?.children?.length > 0 && (
         <Form.Group className="mb-3" controlId="subCategory">
           <Form.Label>Sub-category</Form.Label>
           <DropdownButton
             id="dropdown-sub-category"
             title={
-              form.selectedSubCategory
-                ? form.selectedSubCategory.name
+              selectedSubCategory
+                ? selectedSubCategory.name
                 : "Select a sub-category"
             }
           >
-            {form.selectedCategory.children.map((subCategory) => (
+            {selectedCategory.children.map((subCategory) => (
               <Dropdown.Item
                 key={subCategory._id}
-                onClick={() =>
-                  handleDropdownChange("selectedSubCategory", subCategory)
-                }
+                onClick={() => handleSubCategoryChange(subCategory)}
               >
                 {subCategory.name}
               </Dropdown.Item>
@@ -397,23 +392,21 @@ const ProductUpload = () => {
         </Form.Group>
       )}
 
-      {form.selectedSubCategory?.children?.length > 0 && (
+      {selectedSubCategory?.children?.length > 0 && (
         <Form.Group className="mb-3" controlId="subSubCategory">
           <Form.Label>Sub-sub-category</Form.Label>
           <DropdownButton
             id="dropdown-sub-sub-category"
             title={
-              form.selectedSubSubCategory
-                ? form.selectedSubSubCategory.name
+              selectedSubSubCategory
+                ? selectedSubSubCategory.name
                 : "Select a sub-sub-category"
             }
           >
-            {form.selectedSubCategory.children.map((subSubCategory) => (
+            {selectedSubCategory.children.map((subSubCategory) => (
               <Dropdown.Item
                 key={subSubCategory._id}
-                onClick={() =>
-                  handleDropdownChange("selectedSubSubCategory", subSubCategory)
-                }
+                onClick={() => handleSubSubCategoryChange(subSubCategory)}
               >
                 {subSubCategory.name}
               </Dropdown.Item>
@@ -432,6 +425,7 @@ const ProductUpload = () => {
             name="keywords"
             value={form.keywords}
             onChange={handleChange}
+            className="textInput"
           />
         </InputGroup>
       </Form.Group>
@@ -449,6 +443,7 @@ const ProductUpload = () => {
             onChange={handleChange}
             min="0"
             step="0.01"
+            className="textInput"
           />
         </InputGroup>
       </Form.Group>
@@ -456,12 +451,10 @@ const ProductUpload = () => {
       {/* Pick-up Point */}
       <Form.Group className="mb-3" controlId="pickUpPoint">
         <Form.Label>Pick-up point</Form.Label>
-        <DropdownButton id="dropdown-pickup-point" title={form.pickUpPoint}>
+        <DropdownButton
+          id="dropdown-pickup-point" title={form.pickUpPoint}>
           {["Myyrmäki", "Myllypuro", "Karamalmi"].map((point) => (
-            <Dropdown.Item
-              key={point}
-              onClick={() => handleDropdownChange("pickUpPoint", point)}
-            >
+            <Dropdown.Item key={point} onClick={handlePickupChange(point)}>
               {point}
             </Dropdown.Item>
           ))}
@@ -473,15 +466,15 @@ const ProductUpload = () => {
         <Form.Label>Quantity</Form.Label>
         <InputGroup>
           <Button
-            variant="outline-secondary"
             onClick={() => handleQuantityChange("decrease")}
+            className="cancelBtn"
           >
             -
           </Button>
           <Form.Control type="text" value={form.quantity} readOnly />
           <Button
-            variant="outline-secondary"
             onClick={() => handleQuantityChange("increase")}
+            className="cancelBtn"
           >
             +
           </Button>
@@ -489,9 +482,11 @@ const ProductUpload = () => {
       </Form.Group>
 
       {/* Actions */}
-      <div className="d-flex justify-content-between">
-        <Button variant="outline-secondary">Cancel</Button>
-        <Button variant="primary" onClick={uploadProduct}>
+      <div className="d-flex justify-content-end">
+        <Button href="/new-product" className="cancelBtn">
+          Cancel
+        </Button>
+        <Button onClick={uploadProduct} className="sellBtn">
           Sell now
         </Button>
       </div>
