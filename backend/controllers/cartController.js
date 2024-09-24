@@ -97,6 +97,7 @@ export const addCartItem = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Add product to cart successfully",
+      limit_quantity: cartItem.limit_quantity,
     });
   }
 };

@@ -94,6 +94,7 @@ const ProductDetail = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("Add product to card successfully");
+        console.log(data.limit_quantity);
         setLimitQuantity(data.limit_quantity);
         setQuantity(0);
       }
