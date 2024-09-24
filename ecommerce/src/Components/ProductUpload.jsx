@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useCategoryContext } from "../contexts/CategoryContext";
 import {SuccessModal, FailureModal, LoadingModal} from "./ProductUploadStatus";
 import { Form, Button, InputGroup, Dropdown, DropdownButton, Alert, } from "react-bootstrap";
 import Pica from "pica";
 
-const pica = Pica(); //use pica for image resizing cause cloudinary has a 10MB limit for free plan 
-
 const ProductUpload = () => {
   const { user } = useAuthContext();
   const { categories, loading } = useCategoryContext();
+  const pica = Pica(); //use pica for image resizing cause cloudinary has a 10MB limit for free plan
+  const alertRef = useRef(null);
 
   //Form state to track product details
   const [form, setForm] = useState({
@@ -32,7 +32,7 @@ const ProductUpload = () => {
   const [showFailure, setShowFailure] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
 
-  //Handle all changes in product details
+  //Handle changes in product's name. description, price, pick-up point, keywords
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -167,10 +167,18 @@ const ProductUpload = () => {
     return newErrors.length === 0;
   };
 
+  //Scroll to alert if there are errors
+  useEffect(() => {
+    if (errors.length > 0 && alertRef.current) {
+      alertRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }, [errors]);
+
   //Function to upload product to database
   const uploadProduct = async () => {
-    if (!validateForm()) return; //Stop if any missing details
-
+    if (!validateForm()) {
+      return; // Stop if any missing details and scroll up to Alert component
+    }
     setShowLoading(true); //Show loading modal
     //get smallest category id
     const categoryId =
@@ -254,7 +262,12 @@ const ProductUpload = () => {
 
       {/* Show missing fields */}
       {errors.length > 0 && showAlert && (
-        <Alert variant="danger" onClose={() => setShowAlert(false)} dismissible>
+        <Alert
+          ref={alertRef}
+          variant="danger"
+          onClose={() => setShowAlert(false)}
+          dismissible
+        >
           <ul>
             {errors.map((error, index) => (
               <li key={index}>
