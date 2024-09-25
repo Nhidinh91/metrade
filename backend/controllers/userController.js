@@ -6,7 +6,7 @@ import fs from "fs";
 
 // Profile fetching function
 export const profile = async (req, res) => {
-  const id = req.params.id;
+  const id = req.user.id;
 
   // Check if the ID is valid
   if (!id || !mongoose.Types.ObjectId.isValid(id)) {
@@ -39,7 +39,7 @@ export const profile = async (req, res) => {
 
 // Profile updating function
 export const updateProfile = async (req, res) => {
-  const id = req.params.id;
+  const id = req.user.id;
   const { first_name, last_name, phone, current_password, new_password } = req.body;
   const photo_url = req.file ? req.file.filename : null;
 

@@ -4,8 +4,8 @@ import { uploadUserAvatar } from '../middlewares/uploadPhotos.js';
 
 const router = express.Router();
 
-router.get('/profile/detail/:id', profile);
+router.get('/profile/detail', profile);
 
-router.patch('/profile/update/:id', uploadUserAvatar.single('avatar'), updateProfile);
+router.patch('/profile/update', uploadUserAvatar.single('avatar'), updateProfile);
 
 export default router;
