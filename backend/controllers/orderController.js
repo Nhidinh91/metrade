@@ -14,15 +14,13 @@ export const getAllOrders = async (req, res) => {
       });
     }
     const userObjectId = new mongoose.Types.ObjectId(userId);
-    const { id, status, pickup } = req.query;
-    console.log(`${id} - ${status} - ${pickup}`);
-    // console.log("id string", userId);
-    // console.log("object id", userObjectId);
+    const { id, status, pickup, page } = req.query;
+    console.log(`${id} - ${status} - ${pickup} - ${page}`);
 
-    // const orderList = await Order.find({ _id: order_id });
-    // const orderList = await Order.find({ user_id: user_id });
-    // const orderDetailList = await.OrderDetail.find({$in})
-    // const orderList = await Order.aggregate([
+    const currentPage = page || 1;
+    const limit = 5;
+    const skip = (currentPage - 1) * limit;
+
     const pipeline = [
       { $match: { user_id: userObjectId } },
       {
@@ -37,6 +35,15 @@ export const getAllOrders = async (req, res) => {
       { $sort: { updated_at: -1 } },
       { $unwind: "$order_detail_list" },
       { $replaceRoot: { newRoot: "$order_detail_list" } },
+      // {
+      //   $group: {
+      //     _id: null,
+      //     totalOrderDetail: { $sum: 1 },
+      //     // $push: "totalOrderDetail",
+      //   },
+      // },
+      // { $skip: skip },
+      // { $limit: limit },
     ];
     if (pickup) {
       pipeline.push({
@@ -56,9 +63,28 @@ export const getAllOrders = async (req, res) => {
         },
       });
     }
+    // if (page) {
+    //   pipeline.push({
+    //     $facet: {
+    //       $group: {
+    //         _id: null,
+    //         totalOrderDetail: { $sum: 1 },
+    //         // $push: "totalOrderDetail",
+    //       },
+    //       data: [{ $skip: skip }, { $limit: limit }],
+    //     },
+    //   });
+    // }
+    pipeline.push({
+      $facet: {
+        totalCount: [{ $count: "totalCount" }],
+        data: [{ $skip: skip }, { $limit: limit }],
+      },
+    });
 
     const orderDetailList = await Order.aggregate(pipeline);
     console.log(orderDetailList);
+    const { totalCount, data } = orderDetailList[0];
     // console.log(orderList);
     // let orderDetailList = [];
     // orderList.forEach((order) => [
@@ -71,8 +97,10 @@ export const getAllOrders = async (req, res) => {
     res.status(200).json({
       status: 200,
       data: {
-        count: orderDetailList.length,
-        orderDetailList,
+        // count: orderDetailList.length,
+        totalOrder: totalCount[0].totalCount,
+        limit: limit,
+        orderDetailList: data,
       },
     });
   } catch (err) {

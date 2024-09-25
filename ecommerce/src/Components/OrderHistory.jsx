@@ -2,7 +2,14 @@ import moment from "moment";
 
 import { useState, useEffect } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
-import { Container, Row, Col, Button, Dropdown } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  Dropdown,
+  Pagination,
+} from "react-bootstrap";
 import "../Styles/OrderHistory.css";
 import Coin from "../assets/star.png";
 
@@ -65,6 +72,8 @@ const OrderHistory = () => {
   const [pickUpPlace, setPickUpPlace] = useState("");
   const [status, setStatus] = useState("");
   const [id, setId] = useState("");
+  const [totalPages, setTotalPages] = useState(0);
+  const [page, setPage] = useState(1);
 
   //   console.log(useAuthContext());
 
@@ -90,10 +99,12 @@ const OrderHistory = () => {
           }
         );
         if (response.ok) {
-          const data = await response.json();
-          console.log(data);
-          if (data && isMounted) {
-            setOrderDetails((od) => [...od, ...data.data.orderDetailList]);
+          const orderData = await response.json();
+          const { totalOrder, limit, orderDetailList } = orderData.data;
+          if (orderData && isMounted) {
+            // console.log(orderData);
+            setOrderDetails((od) => [...od, ...orderDetailList]);
+            setTotalPages((tp) => Math.ceil(totalOrder / limit));
           }
         }
       } catch (err) {
@@ -107,7 +118,7 @@ const OrderHistory = () => {
       isMounted = false;
     };
     // setUserId((u) => user.id);
-  }, [user, queryStrArr]);
+  }, [user, queryStrArr, page]);
 
   useEffect(() => {
     // let updatedQryStr = "";
@@ -116,7 +127,10 @@ const OrderHistory = () => {
     const updateQueryStringArray = () => {
       setqueryStrArr((qtr) => {
         let newQueryStrArr = qtr.filter(
-          (param) => !param.includes("pickup") && !param.includes("status")
+          (param) =>
+            !param.includes("pickup") &&
+            !param.includes("status") &&
+            !param.includes("page")
         );
         if (pickUpPlace) {
           newQueryStrArr.push(`pickup=${pickUpPlace}`);
@@ -124,18 +138,22 @@ const OrderHistory = () => {
         if (status) {
           newQueryStrArr.push(`status=${status}`);
         }
+        if (page) {
+          newQueryStrArr.push(`page=${page}`);
+        }
         console.log(newQueryStrArr);
         return newQueryStrArr;
       });
     };
     updateQueryStringArray();
-  }, [pickUpPlace, status]);
+  }, [pickUpPlace, status, page]);
 
   const displayAll = () => {
     setqueryStrArr((qtr) => []);
     setPickUpPlace("");
     setStatus("");
     setId("");
+    setPage(1);
   };
 
   const handlePickUp = (e) => {
@@ -170,6 +188,10 @@ const OrderHistory = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     updateQueryStringArrayWithId();
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setPage((p) => pageNumber);
   };
 
   return (
@@ -284,19 +306,49 @@ const OrderHistory = () => {
                   {displayStatus(detail.selling_status)}
                 </button>
 
-                <div className="order-item-total">
-                  <p>
-                    <span id="coin">
-                      <img src={Coin} alt="Metra Coin" />
-                      {detail.sub_total ? detail.sub_total : 0}
-                    </span>
-                  </p>
-                </div>
+                <span id="coin">
+                  <img src={Coin} alt="Metra Coin" />
+                  {detail.sub_total ? detail.sub_total : 0}
+                </span>
+                {/* <div className="order-item-total">
+                  <p></p>
+                </div> */}
               </div>
             </div>
           ))}
         </div>
       )}
+      <Container className="d-flex justify-content-center">
+        <Pagination className="order-page">
+          {[...Array(totalPages)].map((_, index) => (
+            <Pagination.Item
+              key={index + 1}
+              active={index + 1 === page}
+              onClick={() => handlePageChange(index + 1)}
+              className="order-page-item"
+            >
+              {index + 1}
+            </Pagination.Item>
+          ))}
+        </Pagination>
+        {/* <Pagination>
+          <Pagination.First />
+          <Pagination.Prev />
+          <Pagination.Item>{1}</Pagination.Item>
+          <Pagination.Ellipsis />
+
+          <Pagination.Item>{10}</Pagination.Item>
+          <Pagination.Item>{11}</Pagination.Item>
+          <Pagination.Item active>{12}</Pagination.Item>
+          <Pagination.Item>{13}</Pagination.Item>
+          <Pagination.Item disabled>{14}</Pagination.Item>
+
+          <Pagination.Ellipsis />
+          <Pagination.Item>{20}</Pagination.Item>
+          <Pagination.Next />
+          <Pagination.Last />
+        </Pagination> */}
+      </Container>
     </div>
   );
 };

@@ -1,12 +1,12 @@
 import express from "express";
-import cookieParser from 'cookie-parser';
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import connectDB from "./configs/database.js";
 import jwtAuthenticate from "./middlewares/jwtAuthenticate.js";
 import authRoutes from "./routes/authRoutes.js";
-import tokenRoutes from "./routes/tokenRoutes.js"
+import tokenRoutes from "./routes/tokenRoutes.js";
 
 import categoryRoutes from "./routes/categoryRoutes.js";
 
@@ -24,20 +24,21 @@ connectDB();
 app.use(morgan("dev"));
 
 // Middlewares
-app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
-app.use("/api/user", jwtAuthenticate);
-
+// app.use("/api/user", jwtAuthenticate);
 
 // Routes
-app.use("/api/token", tokenRoutes)
+app.use("/api/token", tokenRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/product", productRoutes);
