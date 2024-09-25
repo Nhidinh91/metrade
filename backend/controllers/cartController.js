@@ -6,6 +6,7 @@ import CartItem from "../models/cartItemModel.js";
 export const addCartItem = async (req, res) => {
   const product = req.body.product;
   const addingQuantity = req.body.adding_quantity;
+
   if (!product || !mongoose.Types.ObjectId.isValid(product._id)) {
     return res.status(400).json({
       success: false,
@@ -29,6 +30,7 @@ export const addCartItem = async (req, res) => {
   //If no cart exists, create a new one
   if (!cart) {
     cart = await Cart.create({ user_id: userId });
+
     if (!cart) {
       return res.status(500).json({
         success: false,
@@ -45,11 +47,13 @@ export const addCartItem = async (req, res) => {
 
   // if the product is already in the cart, adding quantity
   if (cartItem) {
+    const newQuantity = cartItem.adding_quantity + addingQuantity;
+
     const updatedCartItem = await CartItem.findByIdAndUpdate(cartItem._id, {
-      adding_quantity: cartItem.adding_quantity + addingQuantity,
+      adding_quantity: newQuantity,
       limit_quantity: cartItem.limit_quantity - addingQuantity,
-      sub_total: (cartItem.adding_quantity + addingQuantity) * product.price,
-    });
+      sub_total: newQuantity * product.price,
+    }, {new: true});
 
     if (updatedCartItem) {
       return res.status(200).json({
@@ -57,6 +61,7 @@ export const addCartItem = async (req, res) => {
         message: "Add product to cart successfully",
         limit_quantity: updatedCartItem.limit_quantity,
       });
+
     } else {
       return res.status(500).json({
         success: false,
@@ -88,12 +93,14 @@ export const addCartItem = async (req, res) => {
       { cart_items: cart.cart_items },
       { new: true }
     );
+
     if (!updatedCart) {
       return res.status(500).json({
         success: false,
         message: "Fail to update cart with new cart item",
       });
     }
+
     return res.status(200).json({
       success: true,
       message: "Add product to cart successfully",
