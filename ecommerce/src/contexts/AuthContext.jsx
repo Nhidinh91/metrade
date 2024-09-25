@@ -75,11 +75,10 @@ export const AuthProvider = ({ children }) => {
     const tokenExpiresAt = expiresAt || user?.token_expired_at;
 
     if (tokenExpiresAt) {
-      const timeToRenew = tokenExpiresAt - currentTime - 0.2 * 60 * 1000;
+      const timeToRenew = tokenExpiresAt - currentTime - 5 * 60 * 1000;
       if (timeToRenew > 0) {
         setTimeout(() => {
           renewAccessToken();
-          console.log("renew");
         }, timeToRenew);
       } else {
         renewAccessToken();
@@ -92,7 +91,6 @@ export const AuthProvider = ({ children }) => {
     if (storedUser) {
       setUser(storedUser);
       scheduleTokenRenewal(storedUser.token_expired_at);
-      console.log("schedule")
     }
     setIsLoading(false);
   }, [getItem]);
