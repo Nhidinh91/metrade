@@ -9,6 +9,8 @@
     overflow-clip-margin: 1rem;
     text-overflow: ellipsis;
     max-width: 15ch;
+    font-weight: 600;
+    cursor: pointer;
 }
 
 .profileMenu .profileButton img {

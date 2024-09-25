@@ -6,6 +6,7 @@ import style from '../Styles/Navbar.module.css';
 import SearchBar from "../Components/SearchBar";
 import { useAuthContext } from '../hooks/useAuthContext';
 import ProfileMenu from "../Components/ProfileMenu";
+import CartMenu from "../Components/CartMenu";
 
 const Header = () => {
   const { user } = useAuthContext();
@@ -24,7 +25,7 @@ const Header = () => {
               ) : (
                 <Nav.Link className={`${style.btnLogin}`} href="/login">Login</Nav.Link>
               )}
-              <NavDropdown title={<i className={`${style.basketIcon} fa-solid fa-cart-shopping`} />} id="basic-nav-dropdown"></NavDropdown>
+              <CartMenu />
             </div>
           </Container>
         </Row>

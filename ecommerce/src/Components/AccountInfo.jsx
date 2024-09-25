@@ -30,7 +30,7 @@ const AccountInfo = () => {
     }
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/user/profile/detail/${user._id}`,
+        `${process.env.REACT_APP_API_URL}/user/profile/detail`,
         {
           method: "GET",
           headers: {
@@ -137,7 +137,7 @@ const AccountInfo = () => {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/user/profile/update/${user._id}`,
+        `${process.env.REACT_APP_API_URL}/user/profile/update`,
         {
           method: "PATCH",
           body: formData,
