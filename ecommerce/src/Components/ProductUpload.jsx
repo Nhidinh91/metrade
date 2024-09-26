@@ -204,7 +204,7 @@ const ProductUpload = () => {
       }
       //Upload images to cloudinary
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/product/imageUpload`,
+        `${process.env.REACT_APP_API_URL}/seller/imageUpload`,
         {
           method: "POST",
           credentials: "include",
@@ -235,7 +235,7 @@ const ProductUpload = () => {
 
       //Upload product to database
       const productResponse = await fetch(
-        `${process.env.REACT_APP_API_URL}/product/upload`,
+        `${process.env.REACT_APP_API_URL}/seller/upload`,
         {
           method: "POST",
           headers: {
@@ -451,8 +451,7 @@ const ProductUpload = () => {
       {/* Pick-up Point */}
       <Form.Group className="mb-3" controlId="pickUpPoint">
         <Form.Label>Pick-up point</Form.Label>
-        <DropdownButton
-          id="dropdown-pickup-point" title={form.pickUpPoint}>
+        <DropdownButton id="dropdown-pickup-point" title={form.pickUpPoint}>
           {["Myyrmäki", "Myllypuro", "Karamalmi"].map((point) => (
             <Dropdown.Item key={point} onClick={handlePickupChange(point)}>
               {point}
@@ -464,17 +463,17 @@ const ProductUpload = () => {
       {/* Quantity */}
       <Form.Group className="mb-3" controlId="quantity">
         <Form.Label>Quantity</Form.Label>
-        <InputGroup>
+        <InputGroup className="quantityInput">
           <Button
+            className="quantity-btn"
             onClick={() => handleQuantityChange("decrease")}
-            className="cancelBtn"
           >
             -
           </Button>
           <Form.Control type="text" value={form.quantity} readOnly />
           <Button
+            className="quantity-btn"
             onClick={() => handleQuantityChange("increase")}
-            className="cancelBtn"
           >
             +
           </Button>

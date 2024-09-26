@@ -18,7 +18,7 @@ const Header = () => {
             <Navbar.Brand href="/"><img src={logo2} alt="" height="100" /></Navbar.Brand>
             <SearchBar />
             <div className={`${style.rightContainer}`}>
-              <Button className={`${style.btnSellNow}`}>Sell Now</Button>
+              <Button className={`${style.btnSellNow}`} href="/new-product">Sell Now</Button>
               {user ? (
                 <ProfileMenu />
               ) : (
