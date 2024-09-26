@@ -61,7 +61,13 @@ const Login = () => {
       if (response.ok) {
         updateUser(data.user);
 
-        navigate("/");
+        // Check if user is admin
+        if (data.user.role === "admin") {
+          navigate("/admin-product");
+        } else {
+          navigate("/");
+        }
+        
       } else {
         setError(data.message || "Login failed. Please try again.");
       }

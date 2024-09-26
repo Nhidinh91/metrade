@@ -18,7 +18,7 @@ const AdminProduct = () => {
 
   return (
     <Container>
-      <AdminSideBar pageName="My Page">
+      <AdminSideBar pageName="Admin Dashboard">
         <AdminProductComp />
       </AdminSideBar>
     </Container>
