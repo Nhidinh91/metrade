@@ -63,7 +63,7 @@ const Login = () => {
 
         // Check if user is admin
         if (data.user.role === "admin") {
-          navigate("/admin-product");
+          navigate("/admin-user");
         } else {
           navigate("/");
         }

@@ -20,6 +20,8 @@ import ProductDetail from "./Pages/ProductDetail.jsx";
 import MyPage from "./Pages/MyPage.jsx";
 import NewProduct from "./Pages/NewProduct.jsx";
 import AdminProduct from "./Pages/AdminProduct.jsx";
+import AdminUser from "./Pages/AdminUser.jsx";
+import AdminOrder from "./Pages/AdminOrder.jsx";
 
 function App() {
   return (
@@ -43,7 +45,10 @@ function App() {
             <Route path="/my-page" element={<MyPage />} />
             <Route path="/new-product" element={<NewProduct />} />
             <Route path="*" element={<NotFound />} />
+
             <Route path="/admin-product" element={<AdminProduct />} />
+            <Route path="/admin-user" element={<AdminUser />} />
+            <Route path="/admin-order" element={<AdminOrder />} />
             
           </Route>
         </Routes>
