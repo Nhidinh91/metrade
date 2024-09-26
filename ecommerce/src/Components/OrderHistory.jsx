@@ -75,13 +75,13 @@ const OrderHistory = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(1);
 
-
   useEffect(() => {
     setOrderDetails((od) => []);
 
     let isMounted = true;
     const fetchOrderDetails = async () => {
       setLoading((l) => true);
+      console.log("fetch detail", queryStrArr);
       try {
         const response = await fetch(
           `${
@@ -102,6 +102,9 @@ const OrderHistory = () => {
             setOrderDetails((od) => [...od, ...orderDetailList]);
             setTotalPages((tp) => Math.ceil(totalOrder / limit));
           }
+        } else {
+          setTotalPages((tp) => 0);
+          // setPage(tp)
         }
       } catch (err) {
         console.error("Error fetching orders", err);
@@ -109,14 +112,20 @@ const OrderHistory = () => {
         setLoading(false);
       }
     };
+
     fetchOrderDetails();
     return () => {
       isMounted = false;
     };
-  }, [user, queryStrArr, page]);
+  }, [ queryStrArr]);
 
   useEffect(() => {
+    if (user && user.token_expired_at) {
+      scheduleTokenRenewal(user.token_expired_at);
+    }
+  }, [user, scheduleTokenRenewal]);
 
+  useEffect(() => {
     console.log("updating picking ");
     const updateQueryStringArray = () => {
       setqueryStrArr((qtr) => {
@@ -128,19 +137,20 @@ const OrderHistory = () => {
         );
         if (pickUpPlace) {
           newQueryStrArr.push(`pickup=${pickUpPlace}`);
+          setPage((p) => 1);
         }
         if (status) {
           newQueryStrArr.push(`status=${status}`);
+          setPage((p) => 1);
         }
-        if (page) {
-          newQueryStrArr.push(`page=${page}`);
-        }
-        console.log(newQueryStrArr);
+        // if (page) {
+        //   newQueryStrArr.push(`page=${page}`);
+        // }
         return newQueryStrArr;
       });
     };
     updateQueryStringArray();
-  }, [pickUpPlace, status, page]);
+  }, [pickUpPlace, status]);
 
   const displayAll = () => {
     setqueryStrArr((qtr) => []);
@@ -161,11 +171,28 @@ const OrderHistory = () => {
   };
   const updateQueryStringArrayWithId = () => {
     setqueryStrArr((qtr) => {
-      let updatedQueryStrArr = qtr.filter((param) => !param.includes("id"));
+      let updatedQueryStrArr = qtr.filter(
+        (param) => !param.includes("id") && !param.includes("page")
+      );
       if (id) {
         updatedQueryStrArr.push(`id=${id}`);
+        setPage((p) => 1);
       }
-      console.log(updateQueryStringArrayWithId);
+      // console.log(updateQueryStringArrayWithId);
+      return updatedQueryStrArr;
+    });
+  };
+
+  const updateQueryStringArrayWithPage = (pageNumber) => {
+    // setPage
+    setPage((p) => pageNumber);
+    setqueryStrArr((qtr) => {
+      let updatedQueryStrArr = qtr.filter((param) => !param.includes("page"));
+      if (page) {
+        updatedQueryStrArr.push(`page=${pageNumber}`);
+      }
+      console.log(updatedQueryStrArr);
+      // console.log(updateQueryStringArrayWithId);
       return updatedQueryStrArr;
     });
   };
@@ -182,7 +209,11 @@ const OrderHistory = () => {
   };
 
   const handlePageChange = (pageNumber) => {
-    setPage((p) => pageNumber);
+    // console.log(pageNumber);
+    // setPage((p) => pageNumber);
+    // setPage(pageNumber);
+    // e.preventDefault();
+    updateQueryStringArrayWithPage(pageNumber);
   };
 
   return (
@@ -253,13 +284,17 @@ const OrderHistory = () => {
         <div class="spinner-border spinner-order" role="status">
           <span class="sr-only">Loading...</span>
         </div>
+      ) : totalPages == 0 ? (
+        <div>
+          <p>Cannot find any order.</p>
+        </div>
       ) : (
         <div className="orders-container">
           {orderDetails.map((detail) => (
             <div
               className="order-item"
               key={detail._id}
-              // style={{ border: "1px solid black" }}
+
             >
               <div className="order-item-image">
                 <img src={detail.image} alt={detail.name} />
