@@ -8,13 +8,19 @@ import SideBar from "../Components/SideBar";
 
 const NewProduct = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading } = useAuthContext();
+  const { isAuthenticated, isLoading, user } = useAuthContext();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated()) {
-      navigate("/login");
+    if (!isLoading) {
+      if (!isAuthenticated()) {
+        //if user is not authenticated, navigate to login
+        navigate("/login");
+      } else if (user?.role !== "seller") {
+        //if user authenticated but not an seller, navigate to homepage
+        navigate("/");
+      }
     }
-  }, [isAuthenticated(), isLoading, navigate]);
+  }, [isAuthenticated, isLoading, user, navigate]);
 
   return (
     <Container>
