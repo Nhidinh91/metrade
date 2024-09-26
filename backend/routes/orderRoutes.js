@@ -1,12 +1,14 @@
 import express from "express";
-import { getAllOrders } from "../controllers/orderController.js";
+import { getOrderHistory } from "../controllers/orderController.js";
+import jwtAuthenthicate from "../middlewares/jwtAuthenticate.js";
 
-const router = express.Router({ mergeParams: true });
+// to merge route that make use of param of previous route that this route mounted on
+// const router = express.Router({ mergeParams: true }); 
+const router = express.Router();
 
-//get all routes for this user
-router.get("/", getAllOrders);
 
+// router.route("/order-history").get(jwtAuthenthicate, getOrderHistory)
+router.route("/order-history").get(getOrderHistory)
 
-//get a
 
 export default router;

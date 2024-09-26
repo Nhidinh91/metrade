@@ -75,21 +75,18 @@ const OrderHistory = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(1);
 
-  //   console.log(useAuthContext());
 
-  // /api/user/profile/detail/66ede2bc236b34ad58e35567/orders?pickup=Myllypuro
-  // /api/user/profile/detail/66ede2bc236b34ad58e35567/orders?pickup=Myllypuuro
   useEffect(() => {
     setOrderDetails((od) => []);
-    // console.log(user);
+
     let isMounted = true;
     const fetchOrderDetails = async () => {
       setLoading((l) => true);
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/user/profile/detail/${
-            user._id
-          }/orders${convertToQueryString(queryStrArr)}`,
+          `${
+            process.env.REACT_APP_API_URL
+          }/orders/order-history${convertToQueryString(queryStrArr)}`,
           {
             method: "GET",
             headers: {
@@ -102,7 +99,6 @@ const OrderHistory = () => {
           const orderData = await response.json();
           const { totalOrder, limit, orderDetailList } = orderData.data;
           if (orderData && isMounted) {
-            // console.log(orderData);
             setOrderDetails((od) => [...od, ...orderDetailList]);
             setTotalPages((tp) => Math.ceil(totalOrder / limit));
           }
@@ -117,12 +113,10 @@ const OrderHistory = () => {
     return () => {
       isMounted = false;
     };
-    // setUserId((u) => user.id);
   }, [user, queryStrArr, page]);
 
   useEffect(() => {
-    // let updatedQryStr = "";
-    // let isFilter = false;
+
     console.log("updating picking ");
     const updateQueryStringArray = () => {
       setqueryStrArr((qtr) => {
@@ -162,11 +156,8 @@ const OrderHistory = () => {
   const handleStatus = (e) => {
     setStatus((s) => e.target.value);
   };
-
   const handleId = (e) => {
-    // console.log(e.target.value);
     setId((i) => e.target.value);
-    console.log(id);
   };
   const updateQueryStringArrayWithId = () => {
     setqueryStrArr((qtr) => {
@@ -288,7 +279,6 @@ const OrderHistory = () => {
                 <p style={{ color: `${displayColor(detail.pickup_point)}` }}>
                   {detail.pickup_point}{" "}
                 </p>
-                {/* <p style={{ color: "" }}>{detail.pickup_point}</p> */}
               </div>
               <div className="order-item-quanlity">
                 <p>
@@ -310,9 +300,6 @@ const OrderHistory = () => {
                   <img src={Coin} alt="Metra Coin" />
                   {detail.sub_total ? detail.sub_total : 0}
                 </span>
-                {/* <div className="order-item-total">
-                  <p></p>
-                </div> */}
               </div>
             </div>
           ))}
@@ -331,23 +318,6 @@ const OrderHistory = () => {
             </Pagination.Item>
           ))}
         </Pagination>
-        {/* <Pagination>
-          <Pagination.First />
-          <Pagination.Prev />
-          <Pagination.Item>{1}</Pagination.Item>
-          <Pagination.Ellipsis />
-
-          <Pagination.Item>{10}</Pagination.Item>
-          <Pagination.Item>{11}</Pagination.Item>
-          <Pagination.Item active>{12}</Pagination.Item>
-          <Pagination.Item>{13}</Pagination.Item>
-          <Pagination.Item disabled>{14}</Pagination.Item>
-
-          <Pagination.Ellipsis />
-          <Pagination.Item>{20}</Pagination.Item>
-          <Pagination.Next />
-          <Pagination.Last />
-        </Pagination> */}
       </Container>
     </div>
   );
