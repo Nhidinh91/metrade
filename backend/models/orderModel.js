@@ -7,11 +7,11 @@ const orderSchema = new mongoose.Schema(
       ref: "User", // Reference to the User model
       required: true,
     },
-    order_number: {
-      type: String,
-      required: true,
-      unique: true,
-    },
+    // order_number: {
+    //   type: String,
+    //   required: true,
+    //   unique: true,
+    // },
     total_item_quantity: {
       type: Number,
       required: true,

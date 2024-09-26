@@ -46,7 +46,7 @@ const isSameHash = (token, user) => {
 
 const convertToUNIXTimeStamp = (timeStr) => {
   const time = new Date(timeStr);
-  return Math.floor(time.getTime()/1000);
+  return Math.floor(time.getTime() / 1000);
 };
 
 const isValidTime = (user) => {

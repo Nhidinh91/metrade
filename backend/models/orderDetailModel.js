@@ -44,7 +44,7 @@ const orderDetailSchema = new mongoose.Schema(
     },
     selling_status: {
       type: String,
-      enum: ["processing", "await pickup", "delivered", "cancelled"],
+      enum: ["processing", "await-pickup", "delivered", "cancelled"],
       default: "processing", // Default status when the order is created
     },
   },
