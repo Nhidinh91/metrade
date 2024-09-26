@@ -204,7 +204,7 @@ const ProductUpload = () => {
       }
       //Upload images to cloudinary
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/product/imageUpload`,
+        `${process.env.REACT_APP_API_URL}/seller/imageUpload`,
         {
           method: "POST",
           credentials: "include",
@@ -235,7 +235,7 @@ const ProductUpload = () => {
 
       //Upload product to database
       const productResponse = await fetch(
-        `${process.env.REACT_APP_API_URL}/product/upload`,
+        `${process.env.REACT_APP_API_URL}/seller/upload`,
         {
           method: "POST",
           headers: {
