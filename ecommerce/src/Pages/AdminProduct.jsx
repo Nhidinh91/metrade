@@ -8,13 +8,19 @@ import AdminSideBar from "../Components/AdminSideBar";
 
 const AdminProduct = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading } = useAuthContext();
+  const { isAuthenticated, isLoading, user } = useAuthContext();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated()) {
-      navigate("/login");
+    if (!isLoading) {
+      if (!isAuthenticated()) {
+        //if user is not authenticated, navigate to login
+        navigate("/login");
+      } else if (user?.role !== "admin") {
+        //if user authenticated but not an admin, navigate to homepage
+        navigate("/");
+      }
     }
-  }, [isAuthenticated(), isLoading, navigate]);
+  }, [isAuthenticated, isLoading, user, navigate]);
 
   return (
     <Container>
