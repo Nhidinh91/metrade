@@ -53,8 +53,7 @@ const isValidTime = (user) => {
   const tokenExpireTime = user.validation_token.expired_at;
   const convertedExpireTime = convertToUNIXTimeStamp(tokenExpireTime);
   const currentTime = Math.floor(Date.now() / 1000);
-  console.log(convertedExpireTime);
-  console.log(currentTime);
+
   return currentTime < convertedExpireTime;
 };
 
