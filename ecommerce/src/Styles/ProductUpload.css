@@ -27,3 +27,7 @@ button.sellBtn {
     background-color: #f37c25;
     color: #fbf5f5;
 }
+
+.quantityInput {
+    width: 100px;
+}
