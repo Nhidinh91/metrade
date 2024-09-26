@@ -5,15 +5,29 @@ import { useAuthContext } from "../hooks/useAuthContext";
 import ProfileImage from '../assets/profile-default-image.png';
 import '../Styles/SellingHistory.css';
 import coin from "../assets/star.png";
+import {useNavigate} from 'react-router-dom';
 
 const SellingHistory = () => {
     const [allProductsFetched, setAllProductsFetched] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
-    const { user, updateUser } = useAuthContext();
+    const { user, isAuthenticated, isLoading } = useAuthContext();
+    const navigate = useNavigate();
 
+    useEffect(() => {
+      if (!isLoading) {
+        if (!isAuthenticated()) {
+          //if user is not authenticated, navigate to login
+         navigate("/login");
+        } else if (user?.role !== "seller") {
+          //if user authenticated but not an seller, navigate to homepage
+          navigate("/");
+        }
+      }
+    }, [isAuthenticated, isLoading, user, navigate]);
 
     useEffect(() => {
         // Fetch products from backend
+        if (user?._id) {
         const fetchProducts = async () => {
         try {
             const response = await fetch(
@@ -34,8 +48,10 @@ const SellingHistory = () => {
             console.error('Error fetching products:', error);
         }
         };
+        fetchProducts();
+      }
 
-    fetchProducts();
+    
   }, [user]);
 
     function handleClickAll() {
@@ -62,11 +78,11 @@ const SellingHistory = () => {
                 <div className="profileDetails d-flex flex-column" >
                   <div className="profileImgContainer">
                       <img src={ ProfileImage} alt="Profile" className="sellerImg sameFontSize" />
-                      <h2>{user.first_name}{user.last_name[0]}</h2>
+                      <h2>{user?.first_name}{user?.last_name[0]}</h2>
                   </div>
 
                   <div className="d-flex align-items-center">
-                    <h3 style={{margin: 0}}>BALANCE: {user.balance}</h3>
+                    <h3 style={{margin: 0}}>BALANCE: {user?.balance}</h3>
                     <img
                         src={coin}
                         alt="coin"
@@ -91,7 +107,7 @@ const SellingHistory = () => {
         {filteredProducts.length > 0 ? (
           <Row sm={2} md={3} lg={4} className="g-4">
             {filteredProducts.map((product) => (
-              <Col key={product.id}>
+              <Col key={product._id}>
                 <ProductStatus {...product} />
               </Col>
             ))}
