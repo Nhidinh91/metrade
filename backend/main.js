@@ -35,7 +35,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use("/api/user", jwtAuthenticate);
-app.use("/api/orders", jwtAuthenticate);
+// app.use("/api/orders", jwtAuthenticate);
 
 // Routes
 app.use("/api/token", tokenRoutes);
@@ -43,7 +43,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/categories", categoryRoutes);
-app.use("/api/orders", orderRoutes);
+app.use("/api/orders", jwtAuthenticate, orderRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
