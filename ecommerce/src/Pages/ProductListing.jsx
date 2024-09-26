@@ -1,14 +1,24 @@
 import { Container, Row, Col } from 'react-bootstrap';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate} from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import ProductCard from '../Components/ProductCard';
 import style from "../Styles/ProductListing.module.css"
-
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const ProductListing = ({}) => {
   const [searchParams] = useSearchParams();
   const category_id = searchParams.get('query'); 
   const [filteredProducts, setFilteredProducts] = useState([]);
+  
+  const { isAuthenticated, isLoading } = useAuthContext();
+  const navigate = useNavigate();
+
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated()) {
+      navigate("/login");
+    }
+  }, [isAuthenticated(), isLoading, navigate]);
 
   useEffect(() => {
     // Fetch products from backend

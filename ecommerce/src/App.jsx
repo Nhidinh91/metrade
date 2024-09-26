@@ -8,7 +8,7 @@ import AboutContact from "./Pages/AboutContact.jsx";
 import SearchResults from "./Pages/SearchResult.jsx";
 import ProductListing from "./Pages/ProductListing.jsx";
 import NotFound from "./Pages/NotFound.jsx";
-import SellingHistory from "./Pages/SellingHistory.jsx";
+import MySellingHistory from "./Pages/MySellingHistory.jsx";
 import PurchaseHistory from "./Pages/PurchaseHistory.jsx";
 import { AuthProvider } from "./contexts/AuthContext";
 import SignUp from "./Pages/SignUp.jsx";
@@ -35,7 +35,7 @@ function App() {
             <Route index element={<Home />} />
             <Route path="about" element={<AboutContact />} />
             <Route path="search-results" element={<SearchResults />} />
-            <Route path="/selling-history" element={<SellingHistory />} />
+            <Route path="/selling-history" element={<MySellingHistory />} />
             <Route path="/purchase-history" element={<PurchaseHistory />} />
             <Route path="category" element={<ProductListing />} />
             <Route path="/product/detail/:id" element={<ProductDetail />} />

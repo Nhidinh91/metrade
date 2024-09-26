@@ -1,6 +1,6 @@
 import ProductStatus from "../Components/ProductStatus.jsx";
 import { Container, Row, Col, Button } from "react-bootstrap";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import ProfileImage from '../assets/profile-default-image.png';
 import '../Styles/SellingHistory.css';
@@ -9,33 +9,37 @@ import coin from "../assets/star.png";
 const SellingHistory = () => {
     const [allProductsFetched, setAllProductsFetched] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
-    const { user, updateUser } = useAuthContext();
+    const [userAvatar, setUserAvatar] = useState(ProfileImage);
+    const { user } = useAuthContext();
 
 
     useEffect(() => {
         // Fetch products from backend
-        const fetchProducts = async () => {
-        try {
-            const response = await fetch(
-            `${process.env.REACT_APP_API_URL}/product/selling-page/inventory/${user._id}`,
-            {
-                method: 'GET',
-                headers: {
-                'Content-Type': 'application/json',
-                },
+        if (user?._id) {
+            const fetchProducts = async () => {
+            try {
+                const response = await fetch(
+                `${process.env.REACT_APP_API_URL}/product/selling-page/inventory/${user._id}`,
+                {
+                    method: 'GET',
+                    headers: {
+                    'Content-Type': 'application/json',
+                    },
+                }
+                );
+                const data = await response.json();
+                setAllProductsFetched(data);
+                setFilteredProducts(data);
+                setUserAvatar(user.photo_url ? `${process.env.REACT_APP_API_PUBLIC_URL}/${user.photo_url}` : ProfileImage);
+
+                
+            } catch (error) {
+                console.error('Error fetching products:', error);
             }
-            );
-            const data = await response.json();
-            setAllProductsFetched(data);
-            setFilteredProducts(data);
-
-
-        } catch (error) {
-            console.error('Error fetching products:', error);
+          };
+          fetchProducts();
         }
-        };
 
-    fetchProducts();
   }, [user]);
 
     function handleClickAll() {
@@ -61,12 +65,14 @@ const SellingHistory = () => {
             <Col>
                 <div className="profileDetails d-flex flex-column" >
                   <div className="profileImgContainer">
-                      <img src={ ProfileImage} alt="Profile" className="sellerImg sameFontSize" />
-                      <h2>{user.first_name}{user.last_name[0]}</h2>
+                    <div className="profileImg">
+                      <img src={userAvatar} alt="Profile" className="sellerImg sameFontSize" />
+                    </div>
+                      <h2>{user?.first_name} {user?.last_name[0]}</h2>
                   </div>
 
                   <div className="d-flex align-items-center">
-                    <h3 style={{margin: 0}}>BALANCE: {user.balance}</h3>
+                    <h3 style={{margin: 0}}>BALANCE: {user?.balance}</h3>
                     <img
                         src={coin}
                         alt="coin"
@@ -91,7 +97,7 @@ const SellingHistory = () => {
         {filteredProducts.length > 0 ? (
           <Row sm={2} md={3} lg={4} className="g-4">
             {filteredProducts.map((product) => (
-              <Col key={product.id}>
+              <Col key={product._id}>
                 <ProductStatus {...product} />
               </Col>
             ))}

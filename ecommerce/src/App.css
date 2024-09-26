@@ -261,9 +261,9 @@ Navbar
     color: var(--clr-navy)!important;
 }
 
-/* .dropdown-toggle::after {
+.dropdown-toggle::after {
     display: none;
-} */
+}
 
 
 /*
