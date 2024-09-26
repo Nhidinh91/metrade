@@ -13,6 +13,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import sellerRoutes from "./routes/sellerRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/seller", sellerRoutes);
+app.use("/api/admin", adminRoutes);
 
 
 const PORT = process.env.PORT || 3000;
