@@ -7,7 +7,7 @@ import {
   createToken,
   isValidVerifyToken,
 } from "../utils/authUtils/tokenValidation.js";
-import { convertTimeToMilliseconds } from "../utils/time/time.js"
+import { convertTimeToMilliseconds } from "../utils/time/time.js";
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -42,6 +42,12 @@ export const register = async (req, res) => {
         const hashedPassword = await hashInput(password);
         const validation_token = await createToken(email);
 
+        // send confirmation email
+        await sendConfirmationEmailService(
+          first_name,
+          email,
+          validation_token.value
+        );
         const newUser = await User.create({
           first_name,
           last_name,
@@ -51,12 +57,6 @@ export const register = async (req, res) => {
         });
         const newCart = await Cart.create({ user_id: newUser.id });
 
-        // send confirmation email
-        await sendConfirmationEmailService(
-          first_name,
-          email,
-          validation_token.value
-        );
         // return response to FE
         return res.status(201).json({
           status: "success",
@@ -223,7 +223,7 @@ export const login = async (req, res) => {
     const savedToken = await User.findByIdAndUpdate(user._id, {
       refresh_token: newRefreshToken,
     });
-    
+
     if (!savedToken) {
       return res
         .status(400)
@@ -232,23 +232,25 @@ export const login = async (req, res) => {
 
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === "production",
       path: "/api/token/get-access-token",
-      maxAge: convertTimeToMilliseconds(process.env.JWT_REFRESH_EXPIRES_IN)
+      maxAge: convertTimeToMilliseconds(process.env.JWT_REFRESH_EXPIRES_IN),
     });
 
     //generate accessToken and store in cookies
     const newAccessToken = generateAccessToken(user._id);
-    const accessTokenMaxAge = convertTimeToMilliseconds(process.env.JWT_ACCESS_EXPIRES_IN);
+    const accessTokenMaxAge = convertTimeToMilliseconds(
+      process.env.JWT_ACCESS_EXPIRES_IN
+    );
 
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === "production",
       path: "/api",
       maxAge: accessTokenMaxAge,
     });
 
-    const card = await Cart.findOne({ user_id: user._id })
+    const card = await Cart.findOne({ user_id: user._id });
 
     res.status(200).json({
       success: true,
@@ -290,7 +292,7 @@ export const logout = async (req, res) => {
         httpOnly: true,
         secure: true,
       });
-      res.clearCookie("accessToken", {
+      res.clearCookie("accessToken", {      
         httpOnly: true,
         secure: true,
       });
