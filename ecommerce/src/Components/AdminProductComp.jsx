@@ -29,6 +29,37 @@ const AdminProductComp = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false); // State to control success modal visibility
   const [successMessage, setSuccessMessage] = useState(""); // State to store success message
 
+  // Fetch product counts from backend
+  const fetchCounts = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/admin/product/counts`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      setCounts({
+        all: data.allCount,
+        active: data.activeCount,
+        processing: data.processingCount,
+        sold: data.soldCount,
+      });
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
   useEffect(() => {
     let isMounted = true; // Track if the component is mounted
 
@@ -65,39 +96,6 @@ const AdminProductComp = () => {
         if (isMounted) {
           setLoading(false);
         } // Set loading to false after fetching products
-      }
-    };
-
-    // Fetch product counts from backend
-    const fetchCounts = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/admin/product/counts`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (isMounted) {
-          setCounts({
-            all: data.allCount,
-            active: data.activeCount,
-            processing: data.processingCount,
-            sold: data.soldCount,
-          });
-        }
-      } catch (error) {
-        setError(error.message);
       }
     };
 
@@ -171,6 +169,7 @@ const AdminProductComp = () => {
           handleCloseModal();
           setSuccessMessage("Product activated successfully!");
           setShowSuccessModal(true);
+          fetchCounts();
         } else {
           throw new Error("Failed to activate product");
         }
@@ -204,6 +203,7 @@ const AdminProductComp = () => {
           handleCloseModal();
           setSuccessMessage("Product deleted successfully!");
           setShowSuccessModal(true);
+          fetchCounts();
         } else {
           throw new Error("Failed to delete product");
         }
