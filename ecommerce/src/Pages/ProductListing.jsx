@@ -3,22 +3,11 @@ import { useSearchParams, useNavigate} from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import ProductCard from '../Components/ProductCard';
 import style from "../Styles/ProductListing.module.css"
-import { useAuthContext } from "../hooks/useAuthContext";
 
 const ProductListing = ({}) => {
   const [searchParams] = useSearchParams();
   const category_id = searchParams.get('query'); 
   const [filteredProducts, setFilteredProducts] = useState([]);
-  
-  const { isAuthenticated, isLoading } = useAuthContext();
-  const navigate = useNavigate();
-
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated()) {
-      navigate("/login");
-    }
-  }, [isAuthenticated(), isLoading, navigate]);
 
   useEffect(() => {
     // Fetch products from backend
@@ -35,7 +24,7 @@ const ProductListing = ({}) => {
         );
         const data = await response.json();
         setFilteredProducts(data);
-        console.log('Filtered products changed to:', data);
+        //console.log('Filtered products changed to:', data);
       } catch (error) {
         console.error('Error fetching products:', error);
       }

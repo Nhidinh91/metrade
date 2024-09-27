@@ -5,9 +5,7 @@ import { useCategoryContext } from "../contexts/CategoryContext";
 
 // Updated PageLinks component to work with new data structure
 const PageLinks = ({ parentClass, itemClass }) => {
-  const navigate = useNavigate();
   const { categories, loading } = useCategoryContext();
-
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
