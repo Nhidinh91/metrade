@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Container,
   Row,
@@ -8,77 +8,241 @@ import {
   Button,
   FormControl,
   InputGroup,
+  Pagination,
+  Modal,
 } from "react-bootstrap";
+import Loading from "../Components/Loading";
 
 const AdminProductComp = () => {
-  // Sample data
-  const initialProducts = [
-    { id: "#2345", status: "Processing" },
-    { id: "#5667", status: "Processing" },
-    { id: "#1998", status: "Processing" },
-    { id: "#1245", status: "Processing" },
-    { id: "#1234", status: "Active" },
-    { id: "#1236", status: "Active" },
-    { id: "#1237", status: "Active" },
-    { id: "#1239", status: "Active" },
-    { id: "#2345", status: "Active" },
-    { id: "#5678", status: "Active" },
-    { id: "#7890", status: "Active" },
-  ];
-  const activeProducts = 7539;
-  const soldProducts = 1663;
-  const processingProducts = 65;
-  const deletedProducts = 4;
+  const [products, setProducts] = useState([]); // State to hold products fetched from backend
+  const [loading, setLoading] = useState(true); // Loading state
+  const [page, setPage] = useState(1); // State to keep track of the current page
+  const [error, setError] = useState(null); // Error state
+  const limit = 8; // Limit of products to fetch per page
+  const [totalPages, setTotalPages] = useState(0); // Total number of pages
+  const [status, setStatus] = useState(null); // Status filter
+  const [searchTerm, setSearchTerm] = useState(""); // Search term state
+  const [counts, setCounts] = useState({ active: 0, processing: 0, sold: 0 }); // Counts for each status
+  const [selectedProduct, setSelectedProduct] = useState(null); // Selected product for action
+  const [showModal, setShowModal] = useState(false); // State to control modal visibility
 
-  const [products, setProducts] = useState(initialProducts);
-  const [searchTerm, setSearchTerm] = useState("");
+  useEffect(() => {
+    let isMounted = true; // Track if the component is mounted
 
-  // Filtering logic
-  const filteredProducts = products.filter((product) =>
-    product.id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    // Fetch products from backend
+    const fetchProducts = async () => {
+      setLoading(true); // Set loading when fetching new data
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/admin/product?page=${page}&status=${
+            status || ""
+          }`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) {
+          setProducts([]); // Set products to empty array if no products found
+        }
+
+        const data = await response.json();
+
+        if (isMounted) {
+          setProducts(data.products); // Get all products
+          setTotalPages(Math.ceil(data.totalProducts / limit)); // Calculate total pages
+        }
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        } // Set loading to false after fetching products
+      }
+    };
+
+    // Fetch product counts from backend
+    const fetchCounts = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/admin/product/counts`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (isMounted) {
+          setCounts({
+            active: data.activeCount,
+            processing: data.processingCount,
+            sold: data.soldCount,
+          });
+        }
+      } catch (error) {
+        setError(error.message);
+      }
+    };
+
+    fetchProducts();
+    fetchCounts();
+
+    return () => {
+      isMounted = false; // Cleanup function to track if the component is unmounted
+    };
+  }, [page, status]);
+
+  // Handle page change
+  const handlePageChange = (pageNumber) => {
+    setPage(pageNumber);
+  };
+
+  // Handle status change
+  const handleStatusChange = (newStatus) => {
+    setStatus(newStatus);
+    setPage(1); // Reset to first page when status changes
+  };
+
+  // Handle opening the modal with the selected product
+  const handleActionClick = (product) => {
+    setSelectedProduct(product);
+    setShowModal(true);
+  };
+
+  // Handle closing the modal
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedProduct(null);
+  };
+
+  // Handle activating a product
+  const handleActivateProduct = async () => {
+    if (selectedProduct) {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/admin/product/activate/${selectedProduct._id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+
+        if (response.ok) {
+          setProducts((prevProducts) =>
+            prevProducts.map((product) =>
+              product._id === selectedProduct._id
+                ? { ...product, status: "active" }
+                : product
+            )
+          );
+          handleCloseModal();
+        } else {
+          throw new Error("Failed to activate product");
+        }
+      } catch (error) {
+        setError(error.message);
+      }
+    }
+  };
+
+  // Handle deleting a product
+  const handleDeleteProduct = async () => {
+    if (selectedProduct) {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/admin/product/delete/${selectedProduct._id}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+
+        if (response.ok) {
+          setProducts((prevProducts) =>
+            prevProducts.filter(
+              (product) => product._id !== selectedProduct._id
+            )
+          );
+          handleCloseModal();
+        } else {
+          throw new Error("Failed to delete product");
+        }
+      } catch (error) {
+        setError(error.message);
+      }
+    }
+  };
+
+  if (error) {
+    return (
+      <>
+        <h1>Error: {error}</h1>
+        <Container style={{ height: "200px" }}></Container>
+      </>
+    );
+  }
+
+  if (loading) {
+    return <Loading message="Loading..." />; // Show loading... while fetching data
+  }
 
   return (
     <Container fluid className="p-4">
-      {/* Statistics Cards */}
+      {/* Status Cards */}
       <Row className="mb-4">
         <Col>
-          <Card className="text-center">
+          <Card
+            className="text-center"
+            onClick={() => handleStatusChange("active")}
+          >
             <Card.Body>
               <Card.Title>Active products</Card.Title>
               <Card.Text className="text-success fs-2">
-                {activeProducts}
+                {counts.active}
               </Card.Text>
             </Card.Body>
           </Card>
         </Col>
         <Col>
-          <Card className="text-center">
+          <Card
+            className="text-center"
+            onClick={() => handleStatusChange("processing")}
+          >
             <Card.Body>
               <Card.Title>Processing</Card.Title>
               <Card.Text className="text-warning fs-2">
-                {processingProducts}
+                {counts.processing}
               </Card.Text>
             </Card.Body>
           </Card>
         </Col>
         <Col>
-          <Card className="text-center">
+          <Card
+            className="text-center"
+            onClick={() => handleStatusChange("sold")}
+          >
             <Card.Body>
               <Card.Title>Sold</Card.Title>
-              <Card.Text className="text-success fs-2">
-                {soldProducts}
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col>
-          <Card className="text-center">
-            <Card.Body>
-              <Card.Title>Deleted</Card.Title>
-              <Card.Text className="text-danger fs-2">
-                {deletedProducts}
-              </Card.Text>
+              <Card.Text className="text-success fs-2">{counts.sold}</Card.Text>
             </Card.Body>
           </Card>
         </Col>
@@ -101,32 +265,84 @@ const AdminProductComp = () => {
       </Row>
 
       {/* Product Table */}
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Product Id</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredProducts.map((product, index) => (
-            <tr key={index}>
-              <td>{product.id}</td>
-              <td
-                className={
-                  product.status === "Processing" ? "text-warning" : "text-success"
-                }
-              >
-                {product.status}
-              </td>
-              <td>
-                <Button variant="primary">Action</Button>
-              </td>
+      {products && products.length > 0 ? (
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>Product Id</th>
+              <th>Status</th>
+              <th>Action</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {products.map((product) => (
+              <tr key={product._id}>
+                <td>{product._id}</td>
+                <td
+                  className={
+                    product.status === "processing"
+                      ? "text-warning"
+                      : "text-success"
+                  }
+                >
+                  {product.status}
+                </td>
+                <td>
+                  <Button onClick={() => handleActionClick(product)}>
+                    Action
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      ) : (
+        <h3>No products found for the selected status.</h3>
+      )}
+      {totalPages > 1 && (
+        <Container className="d-flex justify-content-center">
+          <Pagination>
+            {[...Array(totalPages)].map((_, index) => (
+              <Pagination.Item
+                key={index + 1}
+                active={index + 1 === page}
+                onClick={() => handlePageChange(index + 1)}
+              >
+                {index + 1}
+              </Pagination.Item>
+            ))}
+          </Pagination>
+        </Container>
+      )}
+
+      {/* Action Modal */}
+      <Modal show={showModal} onHide={handleCloseModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Product Action</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Product ID: {selectedProduct?._id}</p>
+          <p>Status: {selectedProduct?.status}</p>
+          {selectedProduct?.status === "processing" ? (
+            <>
+              <Button
+                variant="success"
+                className="me-2"
+                onClick={handleActivateProduct}
+              >
+                Activate
+              </Button>
+              <Button variant="danger" onClick={handleDeleteProduct}>
+                Delete
+              </Button>
+            </>
+          ) : (
+            <Button variant="danger" onClick={handleDeleteProduct}>
+              Delete
+            </Button>
+          )}
+        </Modal.Body>
+      </Modal>
     </Container>
   );
 };
