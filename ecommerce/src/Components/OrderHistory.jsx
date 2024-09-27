@@ -80,9 +80,13 @@ const OrderHistory = () => {
 
     let isMounted = true;
     const fetchOrderDetails = async () => {
-      setLoading((l) => true);
-      console.log("fetch detail", queryStrArr);
+      if (!user) {
+        return;
+      }
+      // console.log("fetch detail", queryStrArr);
       try {
+        setLoading((l) => true);
+        console.log("Start fetching order details");
         const response = await fetch(
           `${
             process.env.REACT_APP_API_URL
@@ -98,6 +102,7 @@ const OrderHistory = () => {
         if (response.ok) {
           const orderData = await response.json();
           const { totalOrder, limit, orderDetailList } = orderData.data;
+          console.log(orderDetailList);
           if (orderData && isMounted) {
             setOrderDetails((od) => [...od, ...orderDetailList]);
             setTotalPages((tp) => Math.ceil(totalOrder / limit));
@@ -117,7 +122,7 @@ const OrderHistory = () => {
     return () => {
       isMounted = false;
     };
-  }, [ queryStrArr]);
+  }, [queryStrArr]);
 
   useEffect(() => {
     if (user && user.token_expired_at) {
@@ -126,7 +131,6 @@ const OrderHistory = () => {
   }, [user, scheduleTokenRenewal]);
 
   useEffect(() => {
-    console.log("updating picking ");
     const updateQueryStringArray = () => {
       setqueryStrArr((qtr) => {
         let newQueryStrArr = qtr.filter(
@@ -281,8 +285,8 @@ const OrderHistory = () => {
       </div>
 
       {loading ? (
-        <div class="spinner-border spinner-order" role="status">
-          <span class="sr-only">Loading...</span>
+        <div className="spinner-border spinner-order" role="status">
+          <span className="sr-only">Loading...</span>
         </div>
       ) : totalPages == 0 ? (
         <div>
@@ -291,11 +295,7 @@ const OrderHistory = () => {
       ) : (
         <div className="orders-container">
           {orderDetails.map((detail) => (
-            <div
-              className="order-item"
-              key={detail._id}
-
-            >
+            <div className="order-item" key={detail._id}>
               <div className="order-item-image">
                 <img src={detail.image} alt={detail.name} />
               </div>

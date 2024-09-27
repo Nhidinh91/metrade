@@ -63,7 +63,6 @@
   border: none;
   border-radius: 20px;
   padding-left: 0.3rem;
-
 }
 .search-container input:focus {
   outline: none;
@@ -84,8 +83,6 @@
   cursor: pointer;
 }
 
-
-
 .spinner-order {
   margin: auto;
 }
@@ -100,7 +97,6 @@
   margin-bottom: 0.5rem;
   border-radius: 5px;
   padding: 0.5rem;
-
 }
 
 .order-item-image {
@@ -113,7 +109,6 @@
   width: 100%;
   height: auto;
   border-radius: 5px;
-
 }
 
 .order-item-info {
@@ -214,11 +209,11 @@
 }
 
 .pagination > .active > .page-link {
+  z-index: -1;
   color: white;
   background-color: var(--clr-orange) !important;
   border: solid 1px var(--clr-orange) !important;
 }
-
 
 /*large screen */
 @media only screen and (min-width: 1200px) {
@@ -228,11 +223,13 @@
     box-sizing: border-box;
     padding: 0;
     margin: 1rem;
-  
   }
   .order-item-image img {
     width: 100%;
-    height: auto;
+    width: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
     box-sizing: border-box;
     margin: 0.5rem;
   }
@@ -243,9 +240,7 @@
     margin-right: auto;
   }
   .order-item-pickup {
-
     width: 20%;
-
   }
 }
 
