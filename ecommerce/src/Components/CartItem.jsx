@@ -1,6 +1,7 @@
 import { Row, Button, Col } from "react-bootstrap";
 import coin from "../assets/star.png";
 import "../Styles/CartItem.css";
+import { Form } from "react-bootstrap";
 import { useCallback, useState } from "react";
 
 const CardItem = ({
@@ -14,7 +15,9 @@ const CardItem = ({
   adding_quantity,
   subTotal,
   updateQuantity,
-  deleteItem
+  deleteItem,
+  isSelected,
+  onSelectChange
 }) => {
   const handdleQuantityButton = (change) => {
     updateQuantity(change);
@@ -26,6 +29,11 @@ const CardItem = ({
   return (
     <Row className="cart-item-container">
       <Col className="image-name-pickup">
+      <Form.Check 
+        type="checkbox" 
+        checked={isSelected} 
+        onChange={() => onSelectChange(cartItemId)} 
+      />
         <div className="item-image">
           <img src={image} alt={productName} />
         </div>

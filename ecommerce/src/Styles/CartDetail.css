@@ -6,7 +6,16 @@
     padding-right: 10rem;
 }
 
-.cart-detail-page .cart-header {
+.cart-detail-page .cart-summary {
+    display: flex;
+    align-items: center;
+}
+
+.cart-detail-page .cart-total {
+    display: flex;
+    gap: 0.4rem;
+    font-size: 1rem;
+    align-items: center;
 }
 
 .cart-detail-page .go-back-button-container {
