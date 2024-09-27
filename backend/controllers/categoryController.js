@@ -89,7 +89,7 @@ export const getChildrenProducts = async (req, res) => {
     }
     //Find the products that belong to the children categories
     const allProducts = await Promise.all(allChildrenCategories.map(async (category) => {
-      const products = await Product.find({ category_id: category._id }).exec();
+      const products = await Product.find({ category_id: category._id, status: "active"}).exec();
       return products;
     }));
     //Remove empty arrays in array

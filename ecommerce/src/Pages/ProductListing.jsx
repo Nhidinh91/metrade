@@ -54,7 +54,7 @@ const ProductListing = ({}) => {
         {filteredProducts.length > 0 ? (
           <Row sm={2} md={3} lg={4} className="g-4">
             {filteredProducts.map((product) => (
-              <Col key={product.id}>
+              <Col key={product._id}>
                 <ProductCard {...product} />
               </Col>
             ))}
