@@ -26,6 +26,8 @@ const AdminProductComp = () => {
   const [counts, setCounts] = useState({ active: 0, processing: 0, sold: 0 }); // Counts for each status
   const [selectedProduct, setSelectedProduct] = useState(null); // Selected product for action
   const [showModal, setShowModal] = useState(false); // State to control modal visibility
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // State to control success modal visibility
+  const [successMessage, setSuccessMessage] = useState(""); // State to store success message
 
   useEffect(() => {
     let isMounted = true; // Track if the component is mounted
@@ -137,6 +139,12 @@ const AdminProductComp = () => {
     setSelectedProduct(null);
   };
 
+  // Handle closing the success modal
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    setSuccessMessage("");
+  };
+
   // Handle activating a product
   const handleActivateProduct = async () => {
     if (selectedProduct) {
@@ -161,6 +169,8 @@ const AdminProductComp = () => {
             )
           );
           handleCloseModal();
+          setSuccessMessage("Product activated successfully!");
+          setShowSuccessModal(true);
         } else {
           throw new Error("Failed to activate product");
         }
@@ -192,6 +202,8 @@ const AdminProductComp = () => {
             )
           );
           handleCloseModal();
+          setSuccessMessage("Product deleted successfully!");
+          setShowSuccessModal(true);
         } else {
           throw new Error("Failed to delete product");
         }
@@ -362,6 +374,16 @@ const AdminProductComp = () => {
               Delete
             </Button>
           )}
+        </Modal.Body>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal show={showSuccessModal} onHide={handleCloseSuccessModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Success</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>{successMessage}</p>
         </Modal.Body>
       </Modal>
     </Container>
