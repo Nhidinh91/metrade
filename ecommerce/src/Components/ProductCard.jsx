@@ -12,7 +12,14 @@ const ProductCard = ({ _id, name, image, pickup_point, price, created_at }) => {
   );
   return (
     <Card className={style.productCard}>
-      <Card.Img variant="top" src={image} className={style.productImg} alt={name} />
+      <Link to={`/product/detail/${_id}`}>
+        <Card.Img
+          variant="top"
+          src={image}
+          className={style.productImg}
+          alt={name}
+        />
+      </Link>
       <Card.Body>
         <Card.Title className="fw-bold" style={{ color: "#173b45" }}>
           {name}
@@ -45,7 +52,7 @@ const ProductCard = ({ _id, name, image, pickup_point, price, created_at }) => {
           <Button variant="primary" hidden>
             Edit
           </Button>
-          <Link to={`/product/detail/${_id}`} >
+          <Link to={`/product/detail/${_id}`}>
             <Button variant="primary">See more...</Button>
           </Link>
         </div>

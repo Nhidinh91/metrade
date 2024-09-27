@@ -17,8 +17,8 @@ export const getAllProducts = async (req, res) => {
     }
 
     const skip = (page - 1) * limit; //calculate how many products to skip
-    const totalProducts = await Product.countDocuments(); //get the total count of products
-    const products = await Product.find({status: 'active'})
+    const totalProducts = await Product.find({ status: "active" }).countDocuments(); //get the total count of products
+    const products = await Product.find({ status: "active" })
       .sort({ created_at: 1 })
       .skip(skip)
       .limit(limit); //sort by created at time then skip and limit products based on the query
@@ -44,11 +44,17 @@ export const getAllProducts = async (req, res) => {
 export const searchProducts = async (req, res) => {
   try {
     const { query } = req.query; //get the "query" parameter from the request
-    const products = await Product.find({ $and: [{status: 'active'}, { $or: [
-        { name: { $regex: query, $options: "i" } }, //search for query in the product's name
-        { description: { $regex: query, $options: "i" } }, //search for query in the product's description
-        { keywords: { $regex: query, $options: "i" } }, //search for query in the product's keywords
-      ]}]
+    const products = await Product.find({
+      $and: [
+        { status: "active" },
+        {
+          $or: [
+            { name: { $regex: query, $options: "i" } }, //search for query in the product's name
+            { description: { $regex: query, $options: "i" } }, //search for query in the product's description
+            { keywords: { $regex: query, $options: "i" } }, //search for query in the product's keywords
+          ],
+        },
+      ],
     });
 
     //if no products found
@@ -88,14 +94,13 @@ export const productDetail = async (req, res) => {
 
   try {
     //find product from product collection
-    const product = await Product.findById(id)
-      .populate({
-        path: 'category_id',
-        populate: {
-          path: 'ancestors',
-          select: 'name'
-        }
-      })
+    const product = await Product.findById(id).populate({
+      path: "category_id",
+      populate: {
+        path: "ancestors",
+        select: "name",
+      },
+    });
     //if no product found
     if (!product) {
       return res.status(404).json({
@@ -104,7 +109,7 @@ export const productDetail = async (req, res) => {
       });
     }
     //if found product successfully
-    
+
     res.status(200).json({
       success: true,
       message: "Product found",

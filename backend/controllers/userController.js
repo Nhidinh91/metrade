@@ -115,3 +115,33 @@ export const updateProfile = async (req, res) => {
   }
 
 };
+
+// Change user's role
+export const changeRole = async (req, res) => {
+  const id = req.params.id;
+  const { role } = req.body;
+
+  // Check if the ID is valid
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid User Id",
+    });
+  }
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { role },
+      { new: true }
+    );
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res
+      .status(200)
+      .json({ message: "Role updated successfully", user: updatedUser });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+}
