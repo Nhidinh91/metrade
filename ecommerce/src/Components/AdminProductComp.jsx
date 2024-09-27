@@ -22,6 +22,7 @@ const AdminProductComp = () => {
   const [totalPages, setTotalPages] = useState(0); // Total number of pages
   const [status, setStatus] = useState(null); // Status filter
   const [searchTerm, setSearchTerm] = useState(""); // Search term state
+  const [searchQuery, setSearchQuery] = useState(""); // Search query state
   const [counts, setCounts] = useState({ active: 0, processing: 0, sold: 0 }); // Counts for each status
   const [selectedProduct, setSelectedProduct] = useState(null); // Selected product for action
   const [showModal, setShowModal] = useState(false); // State to control modal visibility
@@ -36,7 +37,7 @@ const AdminProductComp = () => {
         const response = await fetch(
           `${process.env.REACT_APP_API_URL}/admin/product?page=${page}&status=${
             status || ""
-          }`,
+          }&search=${searchQuery}`,
           {
             method: "GET",
             headers: {
@@ -87,6 +88,7 @@ const AdminProductComp = () => {
 
         if (isMounted) {
           setCounts({
+            all: data.allCount,
             active: data.activeCount,
             processing: data.processingCount,
             sold: data.soldCount,
@@ -103,7 +105,7 @@ const AdminProductComp = () => {
     return () => {
       isMounted = false; // Cleanup function to track if the component is unmounted
     };
-  }, [page, status]);
+  }, [page, status, searchQuery]);
 
   // Handle page change
   const handlePageChange = (pageNumber) => {
@@ -114,6 +116,13 @@ const AdminProductComp = () => {
   const handleStatusChange = (newStatus) => {
     setStatus(newStatus);
     setPage(1); // Reset to first page when status changes
+  };
+
+  // Handle search
+  const handleSearch = (e) => {
+    if (e.key === "Enter" || e.type === "click") {
+      setSearchQuery(searchTerm);
+    }
   };
 
   // Handle opening the modal with the selected product
@@ -212,10 +221,21 @@ const AdminProductComp = () => {
         <Col>
           <Card
             className="text-center"
+            onClick={() => handleStatusChange(null)}
+          >
+            <Card.Body>
+              <Card.Title>All Products</Card.Title>
+              <Card.Text className="text-primary fs-2">{counts.all}</Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col>
+          <Card
+            className="text-center"
             onClick={() => handleStatusChange("active")}
           >
             <Card.Body>
-              <Card.Title>Active products</Card.Title>
+              <Card.Title>Active Products</Card.Title>
               <Card.Text className="text-success fs-2">
                 {counts.active}
               </Card.Text>
@@ -251,16 +271,17 @@ const AdminProductComp = () => {
       {/* Search Bar */}
       <Row className="mb-3">
         <Col>
-          <InputGroup>
+          <Container fluid className="d-flex">
             <FormControl
               placeholder="Search product id..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch(e)}
             />
-            <Button>
+            <Button onClick={handleSearch}>
               <i className="fa-solid fa-magnifying-glass" />
             </Button>
-          </InputGroup>
+          </Container>
         </Col>
       </Row>
 
@@ -297,7 +318,7 @@ const AdminProductComp = () => {
           </tbody>
         </Table>
       ) : (
-        <h3>No products found for the selected status.</h3>
+        <h3>No products found</h3>
       )}
       {totalPages > 1 && (
         <Container className="d-flex justify-content-center">

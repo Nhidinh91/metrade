@@ -9,10 +9,22 @@ import Order from "../models/orderModel.js";
 ///Product management
 
 //create aggregation pipeline for fetching products sort by status then created_at
-const createAggregationPipeline = (status, skip, limit) => {
-  const matchStage = status ? { $match: { status } } : {};
+const createAggregationPipeline = (status, search, skip, limit) => {
+  const matchStage = {};
+  if (status) {
+    matchStage.status = status;
+  }
+  if (search) {
+    if (mongoose.Types.ObjectId.isValid(search)) {
+      matchStage._id = new mongoose.Types.ObjectId(search);
+    } else {
+      // If search term is invalid, return an empty result set
+      return [{ $match: { _id: null } }];
+    }
+  }
+
   return [
-    matchStage,
+    { $match: matchStage },
     {
       $addFields: {
         sortOrder: {
@@ -30,15 +42,16 @@ const createAggregationPipeline = (status, skip, limit) => {
     { $sort: { sortOrder: 1, created_at: -1 } },
     { $skip: skip },
     { $limit: limit },
-  ].filter((stage) => Object.keys(stage).length > 0); // Remove empty match stage if no status filter
+  ];
 };
 
-// Get all products with optional status filter
+// Get all products with optional status and search filter
 export const adminGetAllProducts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1; // Get the page number from the query parameter
     const limit = 8; // Get the limit from the query parameter
     const status = req.query.status || null; // Get the status filter from the query parameter
+    const search = req.query.search || null; // Get the search filter from the query parameter
 
     // Validate page and limit
     if (page < 1) {
@@ -46,14 +59,16 @@ export const adminGetAllProducts = async (req, res) => {
     }
 
     const skip = (page - 1) * limit; // Calculate how many products to skip
-    const totalProducts = await Product.countDocuments(
-      status ? { status } : {}
-    ); // Get the total count of products based on status
 
     // Fetch and sort products using aggregation
     const products = await Product.aggregate(
-      createAggregationPipeline(status, skip, limit)
+      createAggregationPipeline(status, search, skip, limit)
     );
+
+    // Get the total count of products based on status and search
+    const totalProducts = search
+      ? products.length
+      : await Product.countDocuments(status ? { status } : {});
 
     // If no products found
     if (products.length === 0) {
@@ -81,8 +96,10 @@ export const adminGetProductCounts = async (req, res) => {
       status: "processing",
     });
     const soldCount = await Product.countDocuments({ status: "sold" });
+    const allCount = await Product.countDocuments();
 
     res.status(200).json({
+      allCount,
       activeCount,
       processingCount,
       soldCount,
