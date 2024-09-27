@@ -6,6 +6,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Loading from "../Components/Loading";
 import "../Styles/ProductDetail.css";
 import { Breadcrumb, Row, Col, Container } from "react-bootstrap";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const ProductDetail = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(0);
   const [limitQuantity, setLimitQuantity] = useState(0);
   const [bigPhotoIndex, setBigPhotoIndex] = useState(0);
+  const { cartCount, setCartCount } = useAuthContext();
 
   useEffect(() => {
     // Fetch cart item info to get limit quantity
@@ -95,6 +97,7 @@ const ProductDetail = () => {
         const data = await response.json();
         setLimitQuantity(data.limit_quantity);
         setQuantity(0);
+        setCartCount(cartCount + quantity);
       }
     } catch (error) {
       console.log(error);

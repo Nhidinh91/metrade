@@ -10,12 +10,16 @@ export const AuthContext = createContext({
   isLoading: true,
   renewAccessToken: () => { },
   scheduleTokenRenewal: () => { },
+  logout: () => { },
+  cartCount: 0,
+  setCartCount: () => { },
 });
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const { getItem, setItem } = useLocalStorage("user");
+  const [cartCount, setCartCount] = useState(0);
 
   const logout = async () => {
     try {
@@ -116,6 +120,8 @@ export const AuthProvider = ({ children }) => {
         isLoading,
         renewAccessToken,
         scheduleTokenRenewal,
+        cartCount,
+        setCartCount,
       }}
     >
       {children}
