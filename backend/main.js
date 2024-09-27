@@ -12,6 +12,8 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import sellerRoutes from "./routes/sellerRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
 
@@ -35,7 +37,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use("/api/user", jwtAuthenticate);
-// app.use("/api/orders", jwtAuthenticate);
+app.use("/api/seller", jwtAuthenticate);
+
 
 // Routes
 app.use("/api/token", tokenRoutes);
@@ -44,6 +47,9 @@ app.use("/api/user", userRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/orders", jwtAuthenticate, orderRoutes);
+app.use("/api/seller", sellerRoutes);
+app.use("/api/admin", adminRoutes);
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

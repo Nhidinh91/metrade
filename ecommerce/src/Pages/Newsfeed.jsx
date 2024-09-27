@@ -1,5 +1,5 @@
 import ProductCard from "../Components/ProductCard";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Pagination } from "react-bootstrap";
 import style from "../Styles/Newsfeed.module.css";
 import { useState, useEffect } from "react";
 import Loading from "../Components/Loading";
@@ -8,9 +8,9 @@ const Newsfeed = () => {
   const [products, setProducts] = useState([]); //state to hold products fetch from backend
   const [loading, setLoading] = useState(true); //Loading state
   const [page, setPage] = useState(1); //state to keep track of the current page
-  const [hasMore, setHasMore] = useState(true); //check if more products are available
   const [error, setError] = useState(null); //error state
   const limit = 8; //limit of products to fetch per page
+  const [totalPages, setTotalPages] = useState(0); // total number of pages
 
   useEffect(() => {
     let isMounted = true; //track if the component is mounted
@@ -20,7 +20,7 @@ const Newsfeed = () => {
       setLoading(true); //set loading when fetching new data
       try {
         const response = await fetch(
-          `http://localhost:3000/api/product/newsfeed?page=${page}&limit=${limit}`,
+          `${process.env.REACT_APP_API_URL}/product/newsfeed?page=${page}&limit=${limit}`,
           {
             method: "GET",
             headers: {
@@ -32,11 +32,8 @@ const Newsfeed = () => {
         const data = await response.json();
 
         if (isMounted) {
-          setProducts((prevProducts) => {
-            const newProducts = [...prevProducts, ...data.products];
-            setHasMore(newProducts.length < data.totalProducts); //check if more products are available
-            return newProducts;
-          });
+          setProducts(data.products);
+          setTotalPages(Math.ceil(data.totalProducts / limit)); // calculate total pages
         }
       } catch (error) {
         setError(error.message);
@@ -53,9 +50,9 @@ const Newsfeed = () => {
     };
   }, [page]);
 
-  // Load more products when "Load more" button is clicked
-  const loadMoreProducts = () => {
-    setPage((prevPage) => prevPage + 1);
+  // Handle page change
+  const handlePageChange = (pageNumber) => {
+    setPage(pageNumber);
   };
 
   if (error) {
@@ -86,11 +83,17 @@ const Newsfeed = () => {
         </Row>
       </Container>
       <Container className="d-flex justify-content-center">
-        {hasMore && (
-          <Button variant="primary" className="mt-4" onClick={loadMoreProducts}>
-            Load more...
-          </Button>
-        )}
+        <Pagination className={style.pages}>
+          {[...Array(totalPages)].map((_, index) => (
+            <Pagination.Item
+              key={index + 1}
+              active={index + 1 === page}
+              onClick={() => handlePageChange(index + 1)}
+            >
+              {index + 1}
+            </Pagination.Item>
+          ))}
+        </Pagination>
       </Container>
     </Container>
   );
