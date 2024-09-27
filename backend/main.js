@@ -6,12 +6,12 @@ import morgan from "morgan";
 import connectDB from "./configs/database.js";
 import jwtAuthenticate from "./middlewares/jwtAuthenticate.js";
 import authRoutes from "./routes/authRoutes.js";
-import tokenRoutes from "./routes/tokenRoutes.js"
+import tokenRoutes from "./routes/tokenRoutes.js";
 
 import categoryRoutes from "./routes/categoryRoutes.js";
-
 import productRoutes from "./routes/productRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 import sellerRoutes from "./routes/sellerRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 
@@ -25,10 +25,12 @@ connectDB();
 app.use(morgan("dev"));
 
 // Middlewares
-app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 app.use(cookieParser());
 app.use(express.json());
@@ -39,11 +41,12 @@ app.use("/api/seller", jwtAuthenticate);
 
 
 // Routes
-app.use("/api/token", tokenRoutes)
+app.use("/api/token", tokenRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/orders", jwtAuthenticate, orderRoutes);
 app.use("/api/seller", sellerRoutes);
 app.use("/api/admin", adminRoutes);
 
