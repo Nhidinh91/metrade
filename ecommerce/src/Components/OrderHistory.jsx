@@ -281,8 +281,8 @@ const OrderHistory = () => {
       </div>
 
       {loading ? (
-        <div class="spinner-border spinner-order" role="status">
-          <span class="sr-only">Loading...</span>
+        <div className="spinner-border spinner-order" role="status">
+          <span className="sr-only">Loading...</span>
         </div>
       ) : totalPages == 0 ? (
         <div>
