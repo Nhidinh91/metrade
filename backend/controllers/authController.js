@@ -101,6 +101,7 @@ export const checkVerify = async (req, res) => {
         {
           $set: {
             is_verified: true,
+            role: "seller",
             validation_token: {
               value: "",
               expired_at: user.validation_token.expired_at,

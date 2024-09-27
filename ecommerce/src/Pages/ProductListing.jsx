@@ -1,25 +1,31 @@
 import { Container, Row, Col } from 'react-bootstrap';
-// import { products } from '../dummyData';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate} from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import Footer from './Footer';
 import ProductCard from '../Components/ProductCard';
-import Header from './Header';
+import style from "../Styles/ProductListing.module.css"
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const ProductListing = ({}) => {
   const [searchParams] = useSearchParams();
-  const subCategory = searchParams.get('query'); // This is equivalent to the category_id
+  const category_id = searchParams.get('query'); 
   const [filteredProducts, setFilteredProducts] = useState([]);
-  console.log('category_id received in ProductListing to: ', subCategory);
+  
+  const { isAuthenticated, isLoading } = useAuthContext();
+  const navigate = useNavigate();
 
-  // const filteredProducts = products.filter(product => product.category_id === subCategory);
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated()) {
+      navigate("/login");
+    }
+  }, [isAuthenticated(), isLoading, navigate]);
 
   useEffect(() => {
     // Fetch products from backend
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/categories/${subCategory}`,
+          `${process.env.REACT_APP_API_URL}/categories/get-children-categories/${category_id}`,
           {
             method: 'GET',
             headers: {
@@ -36,18 +42,19 @@ const ProductListing = ({}) => {
     };
 
     fetchProducts();
-  }, [subCategory]);
+  }, [category_id]);
+
 
   return (
     <>
-      <Container>
-        <h2>Search Results</h2>
+      <Container className={`${style.resultTextContainer}`}>
+        <h2 className={`${style.resultText}`}>Search Results</h2>
       </Container>
       <Container>
         {filteredProducts.length > 0 ? (
           <Row sm={2} md={3} lg={4} className="g-4">
             {filteredProducts.map((product) => (
-              <Col key={product.id}>
+              <Col key={product._id}>
                 <ProductCard {...product} />
               </Col>
             ))}
