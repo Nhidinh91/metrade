@@ -6,27 +6,14 @@ const cartSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // Reference to the User model
       required: true,
-      unique: true
-
+      unique: true,
     },
     cart_items: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "CartItem" // Reference to the CartItem model
-      }
+        ref: "CartItem", // Reference to the CartItem model
+      },
     ],
-    total_item_quantity: {
-      type: Number,
-      required: true,
-      min: 0,
-      default: 0, // Default value is 0 when the cart is created
-    },
-    total_price: {
-      type: Number,
-      required: true,
-      min: 0, // Ensures the price is not negative
-      default: 0, // Default value is 0 when the cart is created
-    },
     is_active: {
       type: Boolean,
       default: true, // Indicates whether the cart is active

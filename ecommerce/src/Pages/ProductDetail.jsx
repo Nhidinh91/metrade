@@ -53,9 +53,8 @@ const ProductDetail = () => {
         const data = await response.json();
         if (response.ok) {
           setProduct(data.product);
-          console.log(data.product, data.product._id )
+          setLimitQuantity(data.product.stock_quantity);
           fetchCartItem(data.product._id);
-          console.log(limitQuantity);
         }
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -85,6 +84,7 @@ const ProductDetail = () => {
             adding_quantity: quantity,
             product: {
               _id: product._id,
+              user_id: product.user_id,
               price: product.price,
               stock_quantity: product.stock_quantity,
             },
@@ -93,8 +93,6 @@ const ProductDetail = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        console.log("Add product to card successfully");
-        console.log(data.limit_quantity);
         setLimitQuantity(data.limit_quantity);
         setQuantity(0);
       }
@@ -166,12 +164,20 @@ const ProductDetail = () => {
                     <span className="quantity-number">{quantity}</span>
                     <div
                       className="quantity-btn"
-                      onClick={() =>
-                        setQuantity(
-                          quantity >= (limitQuantity || product.stock_quantity)
-                            ? quantity
-                            : quantity + 1
-                        )
+                      onClick={() =>{
+
+
+                          if(limitQuantity === 0 ){
+                            return;
+                          }
+
+                          return setQuantity(
+                            quantity >= (limitQuantity || product.stock_quantity)
+                              ? quantity
+                              : quantity + 1
+                          
+                          )
+                        }
                       }
                     >
                       <i className="fa-solid fa-plus"></i>
@@ -181,6 +187,7 @@ const ProductDetail = () => {
                     className="add-card-btn"
                     type="button"
                     name="add-to-cart-button"
+                    disabled={!quantity}
                     onClick={() => handleAddToCart()}
                   >
                     Add to Cart

@@ -56,11 +56,8 @@ const AccountInfo = () => {
   }, [user]);
 
   useEffect(() => {
-    if (user && user.token_expired_at) {
-      scheduleTokenRenewal(user.token_expired_at); // Schedule token renewal
-    }
     fetchProfile();
-  }, [user, fetchProfile, scheduleTokenRenewal]);
+  }, [user, fetchProfile]);
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];

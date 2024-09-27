@@ -286,13 +286,16 @@ export const logout = async (req, res) => {
 
     if (deletedToken) {
       // Clear the tokens from the cookie
-      res.clearCookie("refreshToken", {
+      res.clearCookie('refreshToken', {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
+        path: "/api/token/get-access-token",
       });
-      res.clearCookie("accessToken", {
+
+      res.clearCookie('accessToken', {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
+        path: "/api",
       });
 
       return res

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import Cart from "../models/cartModel.js";
 import CartItem from "../models/cartItemModel.js";
 
-//Add product to cart
+//ADD PRODUCT TO CART
 export const addCartItem = async (req, res) => {
   const product = req.body.product;
   const addingQuantity = req.body.adding_quantity;
@@ -14,10 +14,10 @@ export const addCartItem = async (req, res) => {
     });
   }
 
-  if (!addingQuantity) {
+  if (!addingQuantity || addingQuantity <= 0) {
     return res.status(400).json({
       success: false,
-      message: "Adding quantity must be included",
+      message: "Invalid adding quantity",
     });
   }
 
@@ -46,26 +46,35 @@ export const addCartItem = async (req, res) => {
   );
 
   // if the product is already in the cart, adding quantity
-  if (cartItem) {
-    const newQuantity = cartItem.adding_quantity + addingQuantity;
+  if (cartItem) {    
+    if (addingQuantity <= cartItem.limit_quantity) {
+      const newQuantity = cartItem.adding_quantity + addingQuantity;
+      const updatedCartItem = await CartItem.findByIdAndUpdate(
+        cartItem._id,
+        {
+          adding_quantity: newQuantity,
+          limit_quantity: cartItem.limit_quantity - addingQuantity,
+          sub_total: newQuantity * product.price,
+        },
+        { new: true }
+      );
 
-    const updatedCartItem = await CartItem.findByIdAndUpdate(cartItem._id, {
-      adding_quantity: newQuantity,
-      limit_quantity: cartItem.limit_quantity - addingQuantity,
-      sub_total: newQuantity * product.price,
-    }, {new: true});
-
-    if (updatedCartItem) {
-      return res.status(200).json({
-        success: true,
-        message: "Add product to cart successfully",
-        limit_quantity: updatedCartItem.limit_quantity,
-      });
-
+      if (updatedCartItem) {
+        return res.status(200).json({
+          success: true,
+          message: "Add product to cart successfully",
+          limit_quantity: updatedCartItem.limit_quantity,
+        });
+      } else {
+        return res.status(500).json({
+          success: false,
+          message: "Failed to add product to cart",
+        });
+      }
     } else {
-      return res.status(500).json({
+      return res.status(400).json({
         success: false,
-        message: "Failed to add product to cart",
+        message: "Adding number exceeds limit quantity",
       });
     }
   }
@@ -109,73 +118,78 @@ export const addCartItem = async (req, res) => {
   }
 };
 
-// Get card item info
+// GET CART ITEM INFO
 export const getCartItem = async (req, res) => {
   const userId = req.user.id;
   const productId = req.body.product_id;
-  const cardId = req.card_id;
 
-  //if no valid productId or cardId
-  if (
-    (!productId && !cardId) ||
-    (!mongoose.Types.ObjectId.isValid(cardId) &&
-      !mongoose.Types.ObjectId.isValid(productId))
-  ) {
+  //if no valid productId
+  if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
     return res.status(400).json({
       success: false,
       message: "Invalid request",
     });
   }
-
   try {
-    //when cardId is available (cart page)
-    if (cardId) {
-      const cartItem = await CartItem.findById(cardId);
+    //find Cart info with userId
+    const cart = await Cart.findOne({ user_id: userId }).populate({
+      path: "cart_items",
+    });
+
+    if (!cart) {
+      return res.status(404).json({
+        success: false,
+        message: "No valid cart",
+      });
+    }
+    //check if there is any cart item that has productId
+    if (cart) {
+      const cartItem = cart.cart_items.find((item) =>
+        item.product_id.equals(productId)
+      );
       if (cartItem) {
         return res.status(200).json({
           success: true,
           message: "Get cart item info successfully",
           cartItem: cartItem,
         });
-      } else {
-        return res.status(400).json({
-          success: false,
-          message: "Fail to get cart item",
-        });
       }
-    }
-
-    //when no valid cartId, but has productId instead (product detail page)
-    if (!cardId) {
-      const cart = await Cart.findOne({ user_id: userId }).populate({
-        path: "cart_items",
+      return res.status(404).json({
+        success: false,
+        message: "No valid cart item",
       });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
 
-      if (!cart) {
-        return res.status(404).json({
-          success: false,
-          message: "No valid cart",
-        });
+//GET CART AND ALL OF CART ITEM INCLUDED
+export const getCartDetail = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const cartDetail = await Cart.findOne({ user_id: userId })
+    .populate({
+      path: "cart_items",
+      populate: {
+        path: "product_id",
+        select: "name image pickup_point price"
       }
-
-      if (cart) {
-        const cartItem = cart.cart_items.find((item) =>
-          item.product_id.equals(productId)
-        );
-
-        if (cartItem) {
-          return res.status(200).json({
-            success: true,
-            message: "Get cart item info successfully",
-            cartItem: cartItem,
-          });
-        }
-
-        return res.status(404).json({
-          success: false,
-          message: "No valid cart item",
-        });
-      }
+    });
+    if (cartDetail) {
+      return res.status(200).json({
+        success: true,
+        message: "Get cart item info successfully",
+        cart_detail: cartDetail,
+      });
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Fail to get cart item",
+      });
     }
   } catch (error) {
     console.log(error);
