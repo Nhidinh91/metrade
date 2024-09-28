@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 import Cart from "../models/cartModel.js";
 import CartItem from "../models/cartItemModel.js";
+import Order from "../models/orderModel.js";
+import OrderItem from "../models/orderItemModel.js";
+import Product from "../models/productModel.js";
 
 //ADD PRODUCT TO CART
 export const addCartItem = async (req, res) => {
@@ -278,21 +281,114 @@ export const deleteItem = async (req, res) => {
 //CHECKOUT
 
 export const checkout = async (req, res) => {
-  const checkoutItems = body.checkout;
-  const userId = req.user.id;
-  if (!checkoutItems) {
-    return res.status(400).json({
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const checkout = req.body.checkout;
+    const userId = req.user.id;
+
+    if (!checkout) {
+      return res.status(400).json({
+        success: false,
+        message: "Lacking of Checkout Info",
+      });
+    }
+
+    const cart = await Cart.findOne({ user_id: userId })
+      .populate({
+        path: "cart_items",
+        populate: {
+          path: "product_id",
+          model: "Product",
+        },
+      })
+      .session(session);
+      
+    const cartItems = cart.cart_items.filter((item) => {
+      return checkout.order_items.some(orderItem => orderItem._id === item._id.toString());
+    });
+
+    if (!cart || cartItems.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No cart or cart items found for checkout",
+      });
+    }
+
+    // Create the Order document
+    const newOrder = new Order({
+      user_id: userId,
+      total_item_quantity: checkout.total_items,
+      total_price: checkout.total_price,
+    });
+    const savedOrder = await newOrder.save({ session });
+
+    // Create OrderItem documents for each selected cart item
+    const orderItems = cartItems.map((item) => ({
+      order_id: savedOrder._id,
+      product_id: item.product_id._id,
+      product_name: item.product_id.name,
+      image: item.product_id.image,
+      sold_quantity: item.adding_quantity,
+      price: item.product_id.price,
+      pickup_point: item.product_id.pickup_point,
+      sub_total: item.sub_total,
+    }));
+
+    await OrderItem.insertMany(orderItems, { session });
+
+    // Step 5: Update stock quantity of each product
+    for (const item of cartItems) {
+      const product = await Product.findById(item.product_id._id).session(session);
+      if (product) {
+        product.stock_quantity -= item.adding_quantity;
+        if (product.stock_quantity < 0) {
+          // If stock goes negative, rollback the transaction
+          await session.abortTransaction();
+          session.endSession();
+          return res.status(400).json({
+            success: false,
+            message: `Not enough stock for product ${product.name}`,
+          });
+        }
+        await product.save({ session });
+      }
+    }
+
+    //Remove items that are checked out from the cartItem
+    const cartItemIds = cartItems.map((item) => item._id);
+    await CartItem.deleteMany({ _id: { $in: cartItemIds } }, { session });
+
+    // Remove the checked-out cart items from the Cart
+    await Cart.findByIdAndUpdate(
+      cart._id,
+      {
+        $pull: { cart_items: { $in: cartItemIds } },
+      },
+      { session }
+    );
+
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(200).json({
+      success: true,
+      message: "Checkout successful and stock updated",
+      order: savedOrder,
+    });
+  } catch (error) {
+    // If any error, abort the transaction
+    await session.abortTransaction();
+    session.endSession();
+
+    console.error("Error during checkout:", error);
+    res.status(500).json({
       success: false,
-      message: "Lacking of Checkout Items",
+      message: "Checkout failed",
+      error: error.message,
     });
   }
-  
-  const cart = await Cart.findById(id);
-  if (!cart) {
-    return res.status(404).json({
-      success:false,
-      message: "Can't not found the cart"
-    })
-  }
-
 };
+

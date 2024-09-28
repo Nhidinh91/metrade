@@ -6,6 +6,7 @@ import "../Styles/CartDetail.css";
 import coin from "../assets/star.png";
 
 const CartDetail = () => {
+  const [cart, setCart] = useState(null);
   const [cartItems, setCartItems] = useState([]);
   const [updatedCartItem, setUpdatedCartItem] = useState(null);
   const [totalCartItems, setTotalCartItems] = useState(0);
@@ -47,8 +48,8 @@ const CartDetail = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setCartItems(data.cart_detail.cart_items || []);
+        setCart(data.cart_detail);
       }
     } catch (error) {
       console.log("Error fetching product", error);
@@ -88,7 +89,6 @@ const CartDetail = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         const newCartItem = data.cart_item;
         setUpdatedCartItem(newCartItem);
       }
@@ -130,11 +130,10 @@ const CartDetail = () => {
   // Handle checkbox selection for checkout
   const handleSelectChange = useCallback((cartItemId) => {
     setSelectedItems((prevSelectedItems) => {
-      if (prevSelectedItems.includes(cartItemId)) {
-        return prevSelectedItems.filter((id) => id !== cartItemId);
-      } else {
-        return [...prevSelectedItems, cartItemId];
-      }
+      const updatedSelectedItems = prevSelectedItems.includes(cartItemId)
+        ? prevSelectedItems.filter((id) => id !== cartItemId)
+        : [...prevSelectedItems, cartItemId];
+      return updatedSelectedItems;
     });
   }, []);
 
@@ -162,14 +161,18 @@ const CartDetail = () => {
   const checkoutOrder = async (checkoutItems) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/cart/checkout/${checkoutItems}`,
+        `${process.env.REACT_APP_API_URL}/cart/checkout`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            checkout: checkoutItems,
+            checkout: {
+              order_items: checkoutItems,
+              total_items: totalOrderItems,
+              total_price: totalPrice,
+            },
           }),
           credentials: "include",
         }
@@ -177,6 +180,7 @@ const CartDetail = () => {
       if (response.ok) {
         const data = await response.json();
         setUpdatedCartItem(data.deleted_item);
+        fetchCartDetail();
       }
     } catch (error) {
       console.log("Error deleting cart item", error);
@@ -188,11 +192,11 @@ const CartDetail = () => {
     const itemsToCheckout = cartItems.filter((item) =>
       selectedItems.includes(item._id)
     );
-    console.log("Proceeding to checkout with items:", itemsToCheckout);
+    checkoutOrder(itemsToCheckout);
     setShowModal(false); // Close the modal after confirming
   };
 
-  return cartItems.length === 0 ? (
+  return !cart ? (
     <Loading />
   ) : (
     <Container className="cart-detail-page">
@@ -240,35 +244,37 @@ const CartDetail = () => {
           />
         ))}
       </Row>
-      <Row className="cart-footer">
-        <div className="cart-footer-container">
-          <div className="footer-content">
-            <div className="order-total">
-              <span>Order Total</span>
-              <span className="total-item">{`(${totalOrderItems} ${
-                totalOrderItems >= 2 ? "items" : "item"
-              }): `}</span>
+      {cartItems.length !== 0 && (
+        <Row className="cart-footer">
+          <div className="cart-footer-container">
+            <div className="footer-content">
+              <div className="order-total">
+                <span>Order Total</span>
+                <span className="total-item">{`(${totalOrderItems} ${
+                  totalOrderItems >= 2 ? "items" : "item"
+                }): `}</span>
+              </div>
+              <div className="total-price">
+                <span>{totalPrice}</span>
+                <img
+                  src={coin}
+                  alt="coin"
+                  style={{ width: "25px", height: "25px" }}
+                />
+              </div>
             </div>
-            <div className="total-price">
-              <span>{totalPrice}</span>
-              <img
-                src={coin}
-                alt="coin"
-                style={{ width: "25px", height: "25px" }}
-              />
+            <div>
+              <button
+                className="checkout-button"
+                onClick={handleCheckout}
+                disabled={selectedItems.length === 0}
+              >
+                Pay Now
+              </button>
             </div>
           </div>
-          <div>
-            <button
-              className="checkout-button"
-              onClick={handleCheckout}
-              disabled={selectedItems.length === 0}
-            >
-              Pay Now
-            </button>
-          </div>
-        </div>
-      </Row>
+        </Row>
+      )}
       <Modal
         className="order-confirm-container"
         show={showModal}
@@ -304,7 +310,7 @@ const CartDetail = () => {
           <Button
             className="confirm-button"
             variant="primary"
-            onClick={confirmCheckout}
+            onClick={() => confirmCheckout()}
           >
             Confirm
           </Button>
