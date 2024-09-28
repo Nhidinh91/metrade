@@ -21,6 +21,11 @@ const ProfileMenu = () => {
 
                 const data = await response.json();
 
+                if (!response.ok) {
+                    setLoading(false);
+                    return;
+                }
+
                 if (response.ok) {
                     const cartDetail = data.cart_detail.cart_items || [];
 
