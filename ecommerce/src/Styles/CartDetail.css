@@ -33,10 +33,6 @@
     font-weight: 900;
 }
 
-.cart-detail-page .cart-body {
-
-}
-
 .cart-detail-page .cart-footer-container {
     display: flex;
     flex-direction: row;
@@ -47,6 +43,7 @@
     align-items: center;
     padding-top: 1rem;
 }
+
 .cart-detail-page .cart-footer-container .total-item {
     font-weight: 300;
 }
@@ -86,4 +83,65 @@
     color: aliceblue;
     font-weight: 600;
     border: none;
+}
+
+.cart-detail-page .checkout-button:hover {
+    color:black
+}
+
+.order-confirm-container .title {
+    font-weight: 700;
+    font-size: 1.8rem;
+}
+
+.order-confirm-container .ask-confirm {
+    font-size: 1.2rem;
+    padding-bottom: 1rem;
+    color: #c65200;
+}
+
+.order-confirm-container .tag {
+    font-size: 1.2rem;
+    padding-top: 0.5rem;
+}
+
+.order-confirm-container .number {
+    font-weight: 600;
+    font-size: 1.2rem;
+    padding-top: 0.5rem;
+}
+
+.order-confirm-container .order-items {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+
+.order-confirm-container .total-order-price {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.order-confirm-container .cancel-button {
+    border: none;
+    background-color: gray;
+    color: black;
+    padding-top: 0.8rem;
+    padding-bottom: 0.5rem;
+}
+
+.order-confirm-container .cancel-button:hover{
+    color: rgb(255, 255, 255);
+}
+
+.order-confirm-container .confirm-button {
+    padding-top: 0.8rem;
+    padding-bottom: 0.5rem;
+
+}
+
+.order-confirm-container .confirm-button:hover {
+    border-color: #3f9c36;
 }

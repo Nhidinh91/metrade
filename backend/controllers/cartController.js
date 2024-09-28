@@ -203,7 +203,7 @@ export const updateItemQuantity = async (req, res) => {
   const itemId = req.body.cart_item.id;
   const updatedQuantity = req.body.cart_item.quantity;
   if (!itemId || !mongoose.Types.ObjectId.isValid(itemId) || !updatedQuantity) {
-    res.status(400).json({
+    return res.status(400).json({
       message: "Bad request! Invalid Item Id or Lack of quantity",
     });
   }
@@ -226,13 +226,13 @@ export const updateItemQuantity = async (req, res) => {
         },
         { new: true }
       );
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: "Updated quantity successfully",
         cart_item: updatedCartItem,
       });
     } else {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
         message: "Update quantity exceeds the limit",
       });
@@ -248,29 +248,51 @@ export const updateItemQuantity = async (req, res) => {
 export const deleteItem = async (req, res) => {
   const itemId = req.params.id;
   if (!itemId || !mongoose.Types.ObjectId.isValid(itemId)) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: "Invalid Item Id",
     });
   }
   try {
-    const deletedItem = await CartItem.findByIdAndDelete(itemId)
+    const deletedItem = await CartItem.findByIdAndDelete(itemId);
     if (deletedItem) {
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: "Delete cart item successfully",
-        deleted_item: deletedItem
-      })
+        deleted_item: deletedItem,
+      });
     } else {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
-        message: "Fail to delete cart item"
-      })
+        message: "Fail to delete cart item",
+      });
     }
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      message: "Internal Server Error"
+      message: "Internal Server Error",
+    });
+  }
+};
+
+//CHECKOUT
+
+export const checkout = async (req, res) => {
+  const checkoutItems = body.checkout;
+  const userId = req.user.id;
+  if (!checkoutItems) {
+    return res.status(400).json({
+      success: false,
+      message: "Lacking of Checkout Items",
+    });
+  }
+  
+  const cart = await Cart.findById(id);
+  if (!cart) {
+    return res.status(404).json({
+      success:false,
+      message: "Can't not found the cart"
     })
   }
+
 };

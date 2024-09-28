@@ -1,7 +1,7 @@
 import CartItem from "../Components/CartItem";
 import { useState, useEffect, useCallback } from "react";
 import Loading from "../Components/Loading";
-import { Container, Row } from "react-bootstrap";
+import { Container, Row, Modal, Button } from "react-bootstrap";
 import "../Styles/CartDetail.css";
 import coin from "../assets/star.png";
 
@@ -12,6 +12,7 @@ const CartDetail = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [totalOrderItems, setTotalOrderItems] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [showModal, setShowModal] = useState(false);
 
   // Calculate total items in the cart
   const calculateTotalCartItems = useCallback(() => {
@@ -152,11 +153,43 @@ const CartDetail = () => {
     }
   }, [cartItems, selectedItems]);
 
-  // Handle checkout
+  // Handle checkout button click
   const handleCheckout = () => {
-    
+    setShowModal(true); // Show the confirmation modal when "Pay Now" is clicked
+  };
 
+  //Function to checkout
+  const checkoutOrder = async (checkoutItems) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/cart/checkout/${checkoutItems}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            checkout: checkoutItems,
+          }),
+          credentials: "include",
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setUpdatedCartItem(data.deleted_item);
+      }
+    } catch (error) {
+      console.log("Error deleting cart item", error);
+    }
+  };
+
+  // Confirm checkout
+  const confirmCheckout = () => {
+    const itemsToCheckout = cartItems.filter((item) =>
+      selectedItems.includes(item._id)
+    );
     console.log("Proceeding to checkout with items:", itemsToCheckout);
+    setShowModal(false); // Close the modal after confirming
   };
 
   return cartItems.length === 0 ? (
@@ -236,6 +269,47 @@ const CartDetail = () => {
           </div>
         </div>
       </Row>
+      <Modal
+        className="order-confirm-container"
+        show={showModal}
+        onHide={() => setShowModal(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title className="title">Confirm Checkout</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="ask-confirm">Are you ready to checkout?</div>
+          <div className="order-items">
+            <span className="tag">Total Items:</span>
+            <span className="number">{totalOrderItems}</span>
+          </div>
+          <div className="total-order-price">
+            <span className="tag">Total Price:</span>
+            <span className="number">{totalPrice}</span>
+            <img
+              src={coin}
+              alt="coin"
+              style={{ width: "25px", height: "25px" }}
+            />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            className="cancel-button"
+            variant="secondary"
+            onClick={() => setShowModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            className="confirm-button"
+            variant="primary"
+            onClick={confirmCheckout}
+          >
+            Confirm
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
