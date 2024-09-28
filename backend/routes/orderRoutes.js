@@ -2,6 +2,7 @@ import express from "express";
 import {
   getOrderHistory,
   getAllOrderItems,
+  updateOrderItemStatus,
 } from "../controllers/orderController.js";
 import jwtAuthenthicate from "../middlewares/jwtAuthenticate.js";
 
@@ -9,8 +10,10 @@ import jwtAuthenthicate from "../middlewares/jwtAuthenticate.js";
 // const router = express.Router({ mergeParams: true });
 const router = express.Router();
 
-// router.route("/order-history").get(jwtAuthenthicate, getOrderHistory)
+// in normal site
 router.route("/order-history").get(getOrderHistory);
+// in admin site
 router.route("/").get(getAllOrderItems);
+router.route("/:orderItemId").put(updateOrderItemStatus);
 
 export default router;

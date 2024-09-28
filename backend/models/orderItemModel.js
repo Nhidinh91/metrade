@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+const LIMIT = 5;
+
 const orderItemSchema = new mongoose.Schema(
   {
     order_id: {
@@ -53,9 +55,43 @@ const orderItemSchema = new mongoose.Schema(
   }
 );
 
-orderItemSchema.statics.getAllOrderItems = async function () {
-  const orderItems = this.find({});
-  this;
+orderItemSchema.statics.getAllOrderItems = async function (reqQuerry) {
+  let orderItems;
+  const queryObj = { ...reqQuerry };
+
+  // if query have page, exclude it so I can use find
+  const excludingFields = ["page"];
+  excludingFields.forEach((el) => delete queryObj[el]);
+
+  const currentPage = reqQuerry.page * 1 || 1;
+
+  const limit = reqQuerry.page ? LIMIT : 100;
+  const skip = (currentPage - 1) * limit;
+  // console.log("in model");
+  console.log(`${currentPage} - ${limit} - ${skip}`);
+
+
+  orderItems = await this.find(queryObj)
+    .sort({ updated_at: -1 })
+    .skip(skip)
+    .limit(limit);
+
+
+  const totalOrderItemNum = await this.countDocuments();
+  if (reqQuerry.page) {
+    orderItems.skip;
+  }
+
+  return [totalOrderItemNum, orderItems];
+};
+
+orderItemSchema.statics.changeStatus = async function (id, newStatusStr) {
+  const updatedOrderItem = await this.findOneAndUpdate(
+    { _id: id },
+    { $set: { selling_status: `${newStatusStr}` } },
+    { returnDocument: "after" }
+  );
+  return updatedOrderItem;
 };
 
 const OrderItem = mongoose.model("OrderItem", orderItemSchema);

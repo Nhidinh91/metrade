@@ -1,6 +1,7 @@
+import mongoose from "mongoose";
 import Order from "../models/orderModel.js";
 import OrderItem from "../models/orderItemModel.js";
-import mongoose from "mongoose";
+import { isValidId } from "../utils/dbUtils.js";
 
 export const getOrderHistory = async (req, res) => {
   try {
@@ -80,13 +81,64 @@ export const getOrderHistory = async (req, res) => {
 
 export const getAllOrderItems = async (req, res) => {
   try {
-    const orderItems = await orderItemList;
+    // console.log("in controller");
+    // const { orderId, status, pickup, page } = req.query;
+    // console.log(req.query)
+    // const orderItems = await OrderItem.getAllOrderItems(orderId,);
+    const [totalOrderItemNum, orderItems] = await OrderItem.getAllOrderItems(
+      req.query
+    );
+
     res.status(200).json({
-      message: "Getting All Orders",
+      status: "success",
+      totalItems: totalOrderItemNum,
+      count: orderItems.length,
+      data: orderItems,
     });
   } catch (error) {
     res.status(404).json({
       message: "No Order Exists",
+    });
+  }
+};
+
+export const updateOrderItemStatus = async (req, res) => {
+  try {
+    const { orderItemId } = req.params;
+    // console.log("order item id", orderItemId);
+    const { selling_status } = req.body;
+    // console.log(order_status);
+    if (!orderItemId) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Missing id",
+      });
+    }
+    if (!isValidId(orderItemId)) {
+      return res.status(400).json({
+        status: "fail",
+        message: "invalid id",
+      });
+    }
+    if (!selling_status) {
+      console.log("order status", selling_status);
+      return res.status(400).json({
+        status: "fail",
+        message: "Cannot change status",
+      });
+    }
+    const updatedOrderItem = await OrderItem.changeStatus(
+      orderItemId,
+      selling_status
+    );
+    res.status(201).json({
+      status: "success",
+      data: updatedOrderItem,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "fail",
+      message: error.message,
     });
   }
 };
