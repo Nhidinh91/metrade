@@ -2,11 +2,10 @@ import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import "../Styles/MyPage.css";
-import ProductUpload from "../Components/ProductUpload";
 import { useAuthContext } from "../hooks/useAuthContext";
-import SideBar from "../Components/SideBar";
+import AdminSideBar from "../Components/AdminSideBar";
 
-const NewProduct = () => {
+const AdminOrder = () => {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading, user } = useAuthContext();
 
@@ -15,8 +14,8 @@ const NewProduct = () => {
       if (!isAuthenticated()) {
         //if user is not authenticated, navigate to login
         navigate("/login");
-      } else if (user?.role !== "seller") {
-        //if user authenticated but not an seller, navigate to homepage
+      } else if (user?.role !== "admin") {
+        //if user authenticated but not an admin, navigate to homepage
         navigate("/");
       }
     }
@@ -24,11 +23,11 @@ const NewProduct = () => {
 
   return (
     <Container>
-      <SideBar pageName="My Page">
-        <ProductUpload />
-      </SideBar>
+      <AdminSideBar pageName="Admin Dashboard">
+        <div>Admin User</div>
+      </AdminSideBar>
     </Container>
   );
 };
 
-export default NewProduct;
+export default AdminOrder;

@@ -20,7 +20,7 @@ const SearchResults = () => {
         setLoading(true); //set loading when fetching new data
         try {
           const response = await fetch(
-            `http://localhost:3000/api/product/search?query=${query}`,
+            `${process.env.REACT_APP_API_URL}/product/search?query=${query}`,
             {
               method: "GET",
               headers: {

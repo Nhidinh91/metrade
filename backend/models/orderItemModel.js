@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const orderDetailSchema = new mongoose.Schema(
+const orderItemSchema = new mongoose.Schema(
   {
     order_id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -44,7 +44,7 @@ const orderDetailSchema = new mongoose.Schema(
     },
     selling_status: {
       type: String,
-      enum: ["processing", "await pickup", "delivered", "cancelled"],
+      enum: ["processing", "await-pickup", "delivered", "cancelled"],
       default: "processing", // Default status when the order is created
     },
   },
@@ -53,6 +53,6 @@ const orderDetailSchema = new mongoose.Schema(
   }
 );
 
-const OrderDetail = mongoose.model("OrderDetail", orderDetailSchema);
+const OrderItem = mongoose.model("OrderItem", orderItemSchema);
 
-export default OrderDetail;
+export default OrderItem;
