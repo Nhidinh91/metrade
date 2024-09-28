@@ -1,5 +1,3 @@
-import moment from "moment";
-
 import { useState, useEffect } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import {
@@ -12,6 +10,12 @@ import {
 } from "react-bootstrap";
 import "../Styles/OrderHistory.css";
 import Coin from "../assets/star.png";
+import {
+  displayButtonColor,
+  displayPickupColor,
+  diplayDate,
+  convertToQueryString,
+} from "../utils/transactionUtils";
 
 const STATUS_LIST = ["processing", "await-pickup", "delivered", "cancelled"];
 const PICKUP_LIST = ["Myllypuro", "Karamalmi", "Myyrmäki"];
@@ -23,52 +27,13 @@ const displayStatus = (str) => {
   return result;
 };
 
-const displayButtonColor = (str) => {
-  switch (str) {
-    case "processing":
-      return "#ffc41f";
-    case "await-pickup":
-      return "#f37c25";
-    case "delivered":
-      return "#3f9c36";
-    case "cancelled":
-      return "#b43f3f";
-  }
-};
-
-const displayColor = (str) => {
-  // console.log(str);
-  switch (str) {
-    case "Myllypuro":
-      return "#3f9c36";
-    case "Karamalmi":
-      return "#b43f3f";
-    case "Myyrmäki":
-      return "#f37c25";
-  }
-};
-
-const diplayDate = (dateStr) => {
-  const date = moment(dateStr).format("DD-MM-YYYY");
-  // console.log(date);
-  return `${date}`;
-};
-
-const convertToQueryString = (qrArr) => {
-  let result = "";
-  if (qrArr.length > 0) {
-    result = "?" + qrArr.join("&");
-  }
-  return result;
-};
-
 const OrderHistory = () => {
   const { user, updateUser, scheduleTokenRenewal } = useAuthContext();
 
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState("");
   const [queryStrArr, setqueryStrArr] = useState([]);
-  const [orderDetails, setOrderDetails] = useState([]);
+  const [orderItems, setOrderItems] = useState([]);
   const [pickUpPlace, setPickUpPlace] = useState("");
   const [status, setStatus] = useState("");
   const [id, setId] = useState("");
@@ -76,10 +41,10 @@ const OrderHistory = () => {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    setOrderDetails((od) => []);
+    setOrderItems((od) => []);
 
     let isMounted = true;
-    const fetchOrderDetails = async () => {
+    const fetchOrderItems = async () => {
       if (!user) {
         return;
       }
@@ -101,10 +66,10 @@ const OrderHistory = () => {
         );
         if (response.ok) {
           const orderData = await response.json();
-          const { totalOrder, limit, orderDetailList } = orderData.data;
-          console.log(orderDetailList);
+          const { totalOrder, limit, orderItemList } = orderData.data;
+          console.log(orderItemList);
           if (orderData && isMounted) {
-            setOrderDetails((od) => [...od, ...orderDetailList]);
+            setOrderItems((od) => [...od, ...orderItemList]);
             setTotalPages((tp) => Math.ceil(totalOrder / limit));
           }
         } else {
@@ -118,7 +83,7 @@ const OrderHistory = () => {
       }
     };
 
-    fetchOrderDetails();
+    fetchOrderItems();
     return () => {
       isMounted = false;
     };
@@ -294,7 +259,7 @@ const OrderHistory = () => {
         </div>
       ) : (
         <div className="orders-container">
-          {orderDetails.map((detail) => (
+          {orderItems.map((detail) => (
             <div className="order-item" key={detail._id}>
               <div className="order-item-image">
                 <img src={detail.image} alt={detail.name} />
@@ -311,7 +276,11 @@ const OrderHistory = () => {
               </div>
               <div className="order-item-pickup">
                 <h4>Pickup</h4>
-                <p style={{ color: `${displayColor(detail.pickup_point)}` }}>
+                <p
+                  style={{
+                    color: `${displayPickupColor(detail.pickup_point)}`,
+                  }}
+                >
                   {detail.pickup_point}{" "}
                 </p>
               </div>

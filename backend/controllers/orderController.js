@@ -1,4 +1,5 @@
 import Order from "../models/orderModel.js";
+import OrderItem from "../models/orderItemModel.js";
 import mongoose from "mongoose";
 
 export const getOrderHistory = async (req, res) => {
@@ -21,7 +22,7 @@ export const getOrderHistory = async (req, res) => {
       { $match: { user_id: userObjectId } },
       {
         $lookup: {
-          from: "orderdetails",
+          from: "orderitems",
           localField: "_id",
           foreignField: "order_id",
           as: "order_detail_list",
@@ -58,21 +59,34 @@ export const getOrderHistory = async (req, res) => {
       },
     });
 
-    const orderDetailList = await Order.aggregate(pipeline);
-    const { totalCount, data } = orderDetailList[0];
-    // console.log(orderDetailList);
+    const orderItemList = await Order.aggregate(pipeline);
+    const { totalCount, data } = orderItemList[0];
+    // console.log(orderItemList);
     res.status(200).json({
       status: 200,
       data: {
         totalOrder: totalCount[0].totalCount,
         limit: limit,
-        orderDetailList: data,
+        orderItemList: data,
       },
     });
   } catch (err) {
     res.status(404).json({
       status: "fail",
       message: err.message,
+    });
+  }
+};
+
+export const getAllOrderItems = async (req, res) => {
+  try {
+    const orderItems = await orderItemList;
+    res.status(200).json({
+      message: "Getting All Orders",
+    });
+  } catch (error) {
+    res.status(404).json({
+      message: "No Order Exists",
     });
   }
 };

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const orderDetailSchema = new mongoose.Schema(
+const orderItemSchema = new mongoose.Schema(
   {
     order_id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -53,6 +53,11 @@ const orderDetailSchema = new mongoose.Schema(
   }
 );
 
-const OrderDetail = mongoose.model("OrderDetail", orderDetailSchema);
+orderItemSchema.statics.getAllOrderItems = async function () {
+  const orderItems = this.find({});
+  this;
+};
 
-export default OrderDetail;
+const OrderItem = mongoose.model("OrderItem", orderItemSchema);
+
+export default OrderItem;
