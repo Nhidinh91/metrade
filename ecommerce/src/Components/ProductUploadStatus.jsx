@@ -1,4 +1,5 @@
 import { Modal, Button, Spinner } from "react-bootstrap";
+import {Link} from "react-router-dom";
 
 // Success Modal Component
 export const SuccessModal = ({ show, handleClose }) => {
@@ -7,6 +8,7 @@ export const SuccessModal = ({ show, handleClose }) => {
       <Modal.Body className="text-center">
         <div style={{ fontSize: "60px", color: "green" }}>✔️</div>
         <h4>Product uploaded successfully!</h4>
+        <Link to="/selling-history">
         <Button
           variant="warning"
           onClick={handleClose}
@@ -15,10 +17,10 @@ export const SuccessModal = ({ show, handleClose }) => {
             border: "none",
             marginTop: "20px",
           }}
-          href="/selling-history"
         >
           INVENTORY
         </Button>
+        </Link>
       </Modal.Body>
     </Modal>
   );
@@ -31,6 +33,7 @@ export const FailureModal = ({ show, handleClose }) => {
       <Modal.Body className="text-center">
         <div style={{ fontSize: "60px", color: "red" }}>😞</div>
         <h4>Fail to upload product!</h4>
+        <Link to="/new-product">
         <Button
           variant="success"
           onClick={handleClose}
@@ -39,10 +42,10 @@ export const FailureModal = ({ show, handleClose }) => {
             border: "none",
             marginTop: "20px",
           }}
-          href="/new-product"
         >
           RETRY
         </Button>
+        </Link>
       </Modal.Body>
     </Modal>
   );
