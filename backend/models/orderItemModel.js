@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const LIMIT = 5;
+const LIMIT = 8;
 const selling_status_list = [
   "processing",
   "await-pickup",
@@ -62,8 +62,6 @@ const orderItemSchema = new mongoose.Schema(
 );
 
 orderItemSchema.statics.getStats = async function () {
-
-
   const processNum = await this.countDocuments({
     selling_status: selling_status_list[0],
   });
@@ -76,7 +74,6 @@ orderItemSchema.statics.getStats = async function () {
   const cancelledNum = await this.countDocuments({
     selling_status: selling_status_list[3],
   });
-  console.log(processNum);
   return { processNum, awaitNum, deliveredNum, cancelledNum };
 };
 
@@ -89,7 +86,8 @@ orderItemSchema.statics.getAllOrderItems = async function (reqQuerry) {
   excludingFields.forEach((el) => delete queryObj[el]);
 
   const currentPage = reqQuerry.page * 1 || 1;
-  const limit = reqQuerry.page ? LIMIT : 100;
+  // const limit = reqQuerry.page ? LIMIT : 100;
+  const limit = LIMIT;
   const skip = (currentPage - 1) * limit;
   console.log(`${currentPage} - ${limit} - ${skip}`);
 
@@ -98,12 +96,12 @@ orderItemSchema.statics.getAllOrderItems = async function (reqQuerry) {
     .skip(skip)
     .limit(limit);
 
-  const totalOrderItemNum = await this.countDocuments();
+  const totalOrderItemNum = await this.countDocuments(queryObj);
   // if (reqQuerry.page) {
   //   orderItems.skip;
   // }
 
-  return [totalOrderItemNum, orderItems];
+  return [totalOrderItemNum, orderItems, limit];
 };
 
 orderItemSchema.statics.changeStatus = async function (id, newStatusStr) {

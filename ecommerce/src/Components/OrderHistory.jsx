@@ -11,21 +11,23 @@ import {
 import "../Styles/OrderHistory.css";
 import Coin from "../assets/star.png";
 import {
-  displayButtonColor,
+  displaySellingStatusColor,
   displayPickupColor,
   diplayDate,
   convertToQueryString,
+  findTotalPage,
+  capitalizeStatusStr,
 } from "../utils/transactionUtils";
 
 const STATUS_LIST = ["processing", "await-pickup", "delivered", "cancelled"];
 const PICKUP_LIST = ["Myllypuro", "Karamalmi", "Myyrmäki"];
 
-const displayStatus = (str) => {
-  let result = str.trim().split("-");
-  result = result.map((e) => e.charAt(0).toUpperCase() + e.slice(1));
-  result = result.join(" ");
-  return result;
-};
+// const capitalizeStatusStr = (str) => {
+//   let result = str.trim().split("-");
+//   result = result.map((e) => e.charAt(0).toUpperCase() + e.slice(1));
+//   result = result.join(" ");
+//   return result;
+// };
 
 const OrderHistory = () => {
   const { user, updateUser, scheduleTokenRenewal } = useAuthContext();
@@ -70,7 +72,8 @@ const OrderHistory = () => {
           console.log(orderItemList);
           if (orderData && isMounted) {
             setOrderItems((od) => [...od, ...orderItemList]);
-            setTotalPages((tp) => Math.ceil(totalOrder / limit));
+            // setTotalPages((tp) => Math.ceil(totalOrder / limit));
+            setTotalPages((tp) => findTotalPage(totalOrder, limit));
           }
         } else {
           setTotalPages((tp) => 0);
@@ -112,9 +115,6 @@ const OrderHistory = () => {
           newQueryStrArr.push(`status=${status}`);
           setPage((p) => 1);
         }
-        // if (page) {
-        //   newQueryStrArr.push(`page=${page}`);
-        // }
         return newQueryStrArr;
       });
     };
@@ -178,10 +178,7 @@ const OrderHistory = () => {
   };
 
   const handlePageChange = (pageNumber) => {
-    // console.log(pageNumber);
-    // setPage((p) => pageNumber);
-    // setPage(pageNumber);
-    // e.preventDefault();
+
     updateQueryStringArrayWithPage(pageNumber);
   };
 
@@ -242,7 +239,7 @@ const OrderHistory = () => {
             </option>
             {STATUS_LIST.map((status, index) => (
               <option key={index} value={status}>
-                {displayStatus(status)}
+                {capitalizeStatusStr(status)}
               </option>
             ))}
           </select>
@@ -294,10 +291,12 @@ const OrderHistory = () => {
                   id="order-item-status"
                   disabled
                   style={{
-                    background: `${displayButtonColor(detail.selling_status)}`,
+                    background: `${displaySellingStatusColor(
+                      detail.selling_status
+                    )}`,
                   }}
                 >
-                  {displayStatus(detail.selling_status)}
+                  {capitalizeStatusStr(detail.selling_status)}
                 </button>
 
                 <span id="coin">

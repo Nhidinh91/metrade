@@ -1,6 +1,6 @@
 import moment from "moment";
 
-export const displayButtonColor = (str) => {
+export const displaySellingStatusColor = (str) => {
   switch (str) {
     case "processing":
       return "#ffc41f";
@@ -27,7 +27,6 @@ export const displayPickupColor = (str) => {
 
 export const diplayDate = (dateStr) => {
   const date = moment(dateStr).format("DD-MM-YYYY");
-  // console.log(date);
   return `${date}`;
 };
 
@@ -36,5 +35,16 @@ export const convertToQueryString = (qrArr) => {
   if (qrArr.length > 0) {
     result = "?" + qrArr.join("&");
   }
+  return result;
+};
+
+export const findTotalPage = (total, limit) => {
+  return Math.ceil(total / limit);
+};
+
+export const capitalizeStatusStr = (str) => {
+  let result = str.trim().split("-");
+  result = result.map((e) => e.charAt(0).toUpperCase() + e.slice(1));
+  result = result.join(" ");
   return result;
 };

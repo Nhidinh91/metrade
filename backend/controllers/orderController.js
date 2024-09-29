@@ -82,17 +82,13 @@ export const getOrderHistory = async (req, res) => {
 
 export const getAllOrderItems = async (req, res) => {
   try {
-    // console.log("in controller");
-    // const { orderId, status, pickup, page } = req.query;
-    // console.log(req.query)
-    // const orderItems = await OrderItem.getAllOrderItems(orderId,);
-    const [totalOrderItemNum, orderItems] = await OrderItem.getAllOrderItems(
-      req.query
-    );
+    const [totalOrderItemNum, orderItems, limit] =
+      await OrderItem.getAllOrderItems(req.query);
 
     res.status(200).json({
       status: "success",
       totalItems: totalOrderItemNum,
+      limit: limit,
       count: orderItems.length,
       data: orderItems,
     });

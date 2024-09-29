@@ -8,8 +8,18 @@ import {
   Button,
   FormControl,
   InputGroup,
+  Pagination,
 } from "react-bootstrap";
 import AdminOrderStats from "./AdminOrderStats";
+import { useAuthContext } from "../hooks/useAuthContext";
+import {
+  displaySellingStatusColor,
+  capitalizeStatusStr,
+  convertToQueryString,
+  findTotalPage,
+} from "../utils/transactionUtils";
+
+const STATUS_LIST = ["processing", "await-pickup", "delivered", "cancelled"];
 
 const AdminOrderComp = () => {
   // Sample data
@@ -26,117 +36,212 @@ const AdminOrderComp = () => {
     { id: "#5678", status: "Active" },
     { id: "#7890", status: "Active" },
   ];
-  const activeProducts = 7539;
-  const soldProducts = 1663;
-  const processingProducts = 65;
-  const deletedProducts = 4;
 
-  // const stats = {
-  //   activeProducts,
-  //   soldProducts,
-  //   processingProducts,
-  //   deletedProducts,
-  // };
+  const { user, updateUser, scheduleTokenRenewal } = useAuthContext();
 
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({});
   const [products, setProducts] = useState(initialProducts);
+  const [orderItems, setOrderItems] = useState([]);
+  const [pickupPlace, setPickUpPlace] = useState("");
+  const [status, setStatus] = useState("");
+  const [itemId, setItemId] = useState("");
+  const [orderId, setOrderId] = useState("");
+  const [totalPages, setTotalPages] = useState(0);
+  const [page, setPage] = useState(1);
+  const [queryStrArr, setqueryStrArr] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  //get stats
+  //refresh token
   useEffect(() => {
+    if (user && user.token_expired_at) {
+      scheduleTokenRenewal(user.token_expired_at);
+    }
+  }, [user, scheduleTokenRenewal]);
+
+  //fetch stat stats
+  useEffect(() => {
+    const abortcontroller = new AbortController();
     const fetchStats = async () => {
-      const abortcontroller = new AbortController();
       try {
         const response = await fetch(
-          "http://localhost:3000/api/admin/transactions/stats",
-          // `${processingProducts.env.REACT_APP_API_URL}/admin/transactions/stats`,
+          `${process.env.REACT_APP_API_URL}/admin/transactions/stats`,
           {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
             },
             credentials: "include",
+            signal: abortcontroller.signal,
           }
         );
         if (response.ok) {
           const statsData = await response.json();
           setStats((s) => statsData.data);
-          console.log("stat after update", stats);
         }
       } catch (error) {
-        console.log("Error fetching stats", error.message);
+        if (error.name !== "AbortError")
+          console.log("Error fetching stats", error.message);
       } finally {
         setLoading((l) => false);
       }
     };
     fetchStats();
-    return;
-  }, []);
+    return () => {
+      abortcontroller.abort();
+    };
+  }, [orderItems]);
 
-  // Filtering logic
-  const filteredProducts = products.filter((product) =>
-    product.id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // fetch orderItems
+  useEffect(() => {
+    const abortcontroller = new AbortController();
+    setOrderItems((od) => []);
+
+    const fetchOrderItems = async () => {
+      setLoading((l) => true);
+      console.log(queryStrArr);
+      try {
+        const response = await fetch(
+          `${
+            process.env.REACT_APP_API_URL
+          }/admin/transactions${convertToQueryString(queryStrArr)}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            signal: abortcontroller.signal,
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          console.log(findTotalPage(data.totalItems, data.limit));
+          setOrderItems((ot) => data.data);
+          setTotalPages((tp) => findTotalPage(data.totalItems, data.limit));
+        } else {
+          throw new Error("Cannot get data");
+        }
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.log(error.message);
+        }
+      } finally {
+        setLoading((l) => false);
+      }
+    };
+    fetchOrderItems();
+    return () => {
+      abortcontroller.abort();
+    };
+  }, [queryStrArr]);
+
+  //update querystring automatically
+  useEffect(() => {
+    const updateQueryStringArray = () => {
+      // console.log("qryStrArr", queryStrArr);
+      setqueryStrArr((qta) => {
+        let newQueryStrArr = qta.filter((param) => !param.includes("status"));
+        if (status) {
+          newQueryStrArr.push(`selling_status=${status}`);
+          setPage((p) => 1);
+        }
+
+        return newQueryStrArr;
+      });
+    };
+    updateQueryStringArray();
+  }, [status]);
+
+  const changeSellingStatus = (str) => {
+    setStatus((s) => str);
+  };
+
+  const displayAllOrderItem = () => {
+    setqueryStrArr((qta) => []);
+    setStatus((s) => "");
+    setPage((p) => 1);
+  };
+
+  const updateQueryStringArrayWithPage = (pageNumber) => {
+    setPage((p) => pageNumber);
+    setqueryStrArr((qta) => {
+      let updatedQueryStrArr = qta.filter((param) => !param.includes("page"));
+      if (page) {
+        updatedQueryStrArr.push(`page=${pageNumber}`);
+      }
+      return updatedQueryStrArr;
+    });
+  };
+
+  const handlePageChange = (pageNumber) => {
+    updateQueryStringArrayWithPage(pageNumber);
+  };
+
+  const handleItemId = (e) => {
+    setItemId((ii) => e.target.value);
+  };
+
+  const updateQueryStringArrayWithId = () => {
+    setqueryStrArr((qta) => {
+      let updatedQueryStrArr = qta.filter(
+        (param) => !param.includes("_id") && !param.includes("page")
+      );
+      if (itemId) {
+        updatedQueryStrArr.push(`_id=${itemId}`);
+        setPage((p) => 1);
+      }
+      return updatedQueryStrArr;
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("submitting");
+    updateQueryStringArrayWithId();
+  };
+
+  const handleKeyPress = (e) => {
+    e.preventDefault();
+    if (e.key === "Enter") {
+      updateQueryStringArrayWithId();
+    }
+  };
+
+
 
   return (
     <Container fluid className="p-4">
       {/* Statistics Cards */}
-      <AdminOrderStats stats={stats} />
-      {/* <Row className="mb-4">
-        <Col>
-          <Card className="text-center">
-            <Card.Body>
-              <Card.Title>Active products</Card.Title>
-              <Card.Text className="text-success fs-2">
-                {activeProducts}
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col>
-          <Card className="text-center">
-            <Card.Body>
-              <Card.Title>Processing</Card.Title>
-              <Card.Text className="text-warning fs-2">
-                {processingProducts}
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col>
-          <Card className="text-center">
-            <Card.Body>
-              <Card.Title>Sold</Card.Title>
-              <Card.Text className="text-success fs-2">
-                {soldProducts}
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col>
-          <Card className="text-center">
-            <Card.Body>
-              <Card.Title>Deleted</Card.Title>
-              <Card.Text className="text-danger fs-2">
-                {deletedProducts}
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row> */}
+      <AdminOrderStats
+        stats={stats}
+        statusList={STATUS_LIST}
+        changeSellingStatus={changeSellingStatus}
+      />
 
+      {/* {orderId} */}
       {/* Search Bar */}
-      <Row className="mb-3">
-        <Col>
+      <Row className="mb-3 d-flex justify-content-between">
+        <Col className="col-2">
+          <button
+            type="button"
+            class="btn btn-light"
+            onClick={displayAllOrderItem}
+          >
+            All
+          </button>
+        </Col>
+        <Col className="col-9 ">
           <InputGroup>
             <FormControl
-              placeholder="Search product id..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search order item id..."
+              value={itemId}
+              onChange={handleItemId}
+              onKeyUp={handleKeyPress}
             />
-            <Button>
+            <Button onClick={handleSubmit}>
               <i className="fa-solid fa-magnifying-glass" />
             </Button>
           </InputGroup>
@@ -147,23 +252,21 @@ const AdminOrderComp = () => {
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>Product Id</th>
+            <th>Order Item Id</th>
             <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {filteredProducts.map((product, index) => (
-            <tr key={index}>
-              <td>{product.id}</td>
+          {orderItems.map((item) => (
+            <tr key={item._id}>
+              <td>{item._id}</td>
               <td
-                className={
-                  product.status === "Processing"
-                    ? "text-warning"
-                    : "text-success"
-                }
+                style={{
+                  color: `${displaySellingStatusColor(item.selling_status)}`,
+                }}
               >
-                {product.status}
+                {item.selling_status}
               </td>
               <td>
                 <Button variant="primary">Action</Button>
@@ -172,6 +275,20 @@ const AdminOrderComp = () => {
           ))}
         </tbody>
       </Table>
+      <Container className="d-flex justify-content-center">
+        <Pagination className="order-page">
+          {[...Array(totalPages)].map((_, index) => (
+            <Pagination.Item
+              key={index + 1}
+              active={index + 1 === page}
+              onClick={() => handlePageChange(index + 1)}
+              className="order-page-item"
+            >
+              {index + 1}
+            </Pagination.Item>
+          ))}
+        </Pagination>
+      </Container>
     </Container>
   );
 };
