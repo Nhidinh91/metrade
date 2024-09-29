@@ -12,6 +12,7 @@ import {
   Modal,
 } from "react-bootstrap";
 import Loading from "../Components/Loading";
+import "../Styles/AdminProduct.css";
 
 const AdminProductComp = () => {
   const [products, setProducts] = useState([]); // State to hold products fetched from backend
@@ -227,28 +228,34 @@ const AdminProductComp = () => {
   }
 
   return (
-    <Container fluid className="p-4">
+    <Container fluid className="product-dashboard p-4">
       {/* Status Cards */}
       <Row className="mb-4">
         <Col>
           <Card
-            className="text-center"
+            className="status-card text-center"
             onClick={() => handleStatusChange(null)}
           >
             <Card.Body>
-              <Card.Title>All Products</Card.Title>
-              <Card.Text className="text-primary fs-2">{counts.all}</Card.Text>
+              <Card.Title className="status-card-title">
+                All Products
+              </Card.Title>
+              <Card.Text className="status-card-text text-primary fs-2">
+                {counts.all}
+              </Card.Text>
             </Card.Body>
           </Card>
         </Col>
         <Col>
           <Card
-            className="text-center"
+            className="status-card text-center"
             onClick={() => handleStatusChange("active")}
           >
             <Card.Body>
-              <Card.Title>Active Products</Card.Title>
-              <Card.Text className="text-success fs-2">
+              <Card.Title className="status-card-title">
+                Active Products
+              </Card.Title>
+              <Card.Text className="status-card-text text-success fs-2">
                 {counts.active}
               </Card.Text>
             </Card.Body>
@@ -256,12 +263,12 @@ const AdminProductComp = () => {
         </Col>
         <Col>
           <Card
-            className="text-center"
+            className="status-card text-center"
             onClick={() => handleStatusChange("processing")}
           >
             <Card.Body>
-              <Card.Title>Processing</Card.Title>
-              <Card.Text className="text-warning fs-2">
+              <Card.Title className="status-card-title">Processing</Card.Title>
+              <Card.Text className="status-card-text text-warning fs-2">
                 {counts.processing}
               </Card.Text>
             </Card.Body>
@@ -269,28 +276,33 @@ const AdminProductComp = () => {
         </Col>
         <Col>
           <Card
-            className="text-center"
+            className="status-card text-center"
             onClick={() => handleStatusChange("sold")}
           >
             <Card.Body>
-              <Card.Title>Sold</Card.Title>
-              <Card.Text className="text-success fs-2">{counts.sold}</Card.Text>
+              <Card.Title className="status-card-title">Sold</Card.Title>
+              <Card.Text className="status-card-text text-success fs-2">
+                {counts.sold}
+              </Card.Text>
             </Card.Body>
           </Card>
         </Col>
       </Row>
 
+      <Container></Container>
+
       {/* Search Bar */}
-      <Row className="mb-3">
+      <Row>
         <Col>
-          <Container fluid className="d-flex">
+          <Container fluid className="search-bar-container d-flex">
             <FormControl
+              className="search-input"
               placeholder="Search product id..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch(e)}
             />
-            <Button onClick={handleSearch}>
+            <Button className="search-button" onClick={handleSearch}>
               <i className="fa-solid fa-magnifying-glass" />
             </Button>
           </Container>
@@ -299,12 +311,14 @@ const AdminProductComp = () => {
 
       {/* Product Table */}
       {products && products.length > 0 ? (
-        <Table striped bordered hover>
-          <thead>
+        <Table striped bordered hover className="product-table">
+          <thead
+            className="product-table-header"
+          >
             <tr>
               <th>Product Id</th>
-              <th>Status</th>
-              <th>Action</th>
+              <th className="text-center">Status</th>
+              <th className="text-center">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -312,16 +326,19 @@ const AdminProductComp = () => {
               <tr key={product._id}>
                 <td>{product._id}</td>
                 <td
-                  className={
+                  className={`product-status ${
                     product.status === "processing"
                       ? "text-warning"
                       : "text-success"
-                  }
+                  }`}
                 >
                   {product.status}
                 </td>
-                <td>
-                  <Button onClick={() => handleActionClick(product)}>
+                <td className="text-center">
+                  <Button
+                    className="action-button"
+                    onClick={() => handleActionClick(product)}
+                  >
                     Action
                   </Button>
                 </td>
@@ -330,10 +347,10 @@ const AdminProductComp = () => {
           </tbody>
         </Table>
       ) : (
-        <h3>No products found</h3>
+        <h3 className="mt-3">No products found</h3>
       )}
       {totalPages > 1 && (
-        <Container className="d-flex justify-content-center">
+        <Container className=" d-flex justify-content-center">
           <Pagination>
             {[...Array(totalPages)].map((_, index) => (
               <Pagination.Item

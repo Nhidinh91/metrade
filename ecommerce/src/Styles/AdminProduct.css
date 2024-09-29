@@ -1,0 +1,65 @@
+/* Cards */
+.status-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.status-card-title {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.status-card-text {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+/* Search Bar */
+.search-bar-container {
+  background-color: #FFC107;
+  padding: 0.5rem;
+  border-radius: 10px 10px 0 0;
+  align-items: center;
+}
+
+.search-input {
+  border: none;
+  border-radius: 5px;
+  padding: 0.75rem;
+  flex-grow: 1;
+  outline: none;
+}
+
+.search-button {
+  background-color: #F57C00;
+  border: none;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  margin-left: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Product Table */
+.product-table {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.product-table-header {
+  font-weight: bold;
+}
+
+.product-status {
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* Button inside Table */
+.action-button {
+  background-color: #263238;
+  color: #FFFFFF;
+  border-radius: 5px;
+  padding: 0.5rem 2rem;
+  cursor: pointer;
+}
