@@ -6,7 +6,7 @@ import { useAuthContext } from "../hooks/useAuthContext";
 
 const ProfileMenu = () => {
     const [loading, setLoading] = useState(true); 
-    const { cartCount, setCartCount } = useAuthContext();
+    const { cartCount, setCartCount, reloadCartCount } = useAuthContext();
 
     useEffect(() => {
         const getCartDetail = async () => {
@@ -41,7 +41,7 @@ const ProfileMenu = () => {
 
         getCartDetail();
 
-    }, []);
+    }, [reloadCartCount]);
 
     return (
         <Nav.Link href="/cart-detail">

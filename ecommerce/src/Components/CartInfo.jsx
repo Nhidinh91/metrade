@@ -5,6 +5,7 @@ import Loading from "../Components/Loading";
 import { Container, Row, Modal, Button } from "react-bootstrap";
 import "../Styles/CartDetail.css";
 import coin from "../assets/star.png";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const CartDetail = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const CartDetail = () => {
   const [totalOrderItems, setTotalOrderItems] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const [showModal, setShowModal] = useState(false);
+  const { cartCount, setCartCount, setReloadCartCount } = useAuthContext();
 
   // Calculate total items in the cart
   const calculateTotalCartItems = useCallback(() => {
@@ -119,6 +121,7 @@ const CartDetail = () => {
       if (response.ok) {
         const data = await response.json();
         setUpdatedCartItem(data.deleted_item);
+        setReloadCartCount(true);
       }
     } catch (error) {
       console.log("Error deleting cart item", error);
@@ -184,6 +187,7 @@ const CartDetail = () => {
         const data = await response.json();
         setUpdatedCartItem(data.deleted_item);
         fetchCartDetail();
+        setReloadCartCount(true);
       }
     } catch (error) {
       console.log("Error deleting cart item", error);
@@ -195,6 +199,7 @@ const CartDetail = () => {
     const itemsToCheckout = cartItems.filter((item) =>
       selectedItems.includes(item._id)
     );
+
     checkoutOrder(itemsToCheckout);
     setShowModal(false); // Close the modal after confirming
   };
@@ -278,6 +283,7 @@ const CartDetail = () => {
           </div>
         </Row>
       )}
+
       <Modal
         className="order-confirm-container"
         show={showModal}

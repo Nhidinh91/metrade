@@ -12,7 +12,9 @@ export const AuthContext = createContext({
   scheduleTokenRenewal: () => { },
   logout: () => { },
   cartCount: 0,
-  setCartCount: () => { },
+  setCartCount: () => {},
+  reloadCartCount: false,
+  setReloadCartCount: () => {},
 });
 
 export const AuthProvider = ({ children }) => {
@@ -20,6 +22,7 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const { getItem, setItem } = useLocalStorage("user");
   const [cartCount, setCartCount] = useState(0);
+  const [reloadCartCount, setReloadCartCount] = useState(false);
 
   const logout = async () => {
     try {
@@ -122,6 +125,8 @@ export const AuthProvider = ({ children }) => {
         scheduleTokenRenewal,
         cartCount,
         setCartCount,
+        reloadCartCount,
+        setReloadCartCount,
       }}
     >
       {children}
