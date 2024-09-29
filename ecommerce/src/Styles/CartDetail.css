@@ -1,144 +1,154 @@
-.cart-detail-page {
-   
+@media (min-width: 1400px) {
+  .cart-detail-page {
+    padding: 0 10rem;
+  }
 }
 
-@media (min-width: 1400px) {
-    .cart-detail-page {
-      padding: 0 10rem;
-    }
-  }
-
 .cart-detail-page .cart-summary {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .cart-detail-page .cart-total {
-    display: flex;
-    gap: 0.4rem;
-    font-size: 1rem;
-    align-items: center;
+  display: flex;
+  gap: 0.4rem;
+  font-size: 1rem;
+  align-items: center;
 }
 
 .cart-detail-page .go-back-button-container {
-    display: flex;
+  display: flex;
 }
 
 .cart-detail-page .go-back-button span {
-    padding-top: 0.2rem;
-    font-size: 0.8rem;
-    font-weight: 500;
+  padding-top: 0.2rem;
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
 .cart-detail-page .page-name {
-    font-size: 1.7rem;
-    font-weight: 900;
+  font-size: 1.7rem;
+  font-weight: 900;
 }
 
 .cart-detail-page .cart-footer-container {
-    font-size: 1.25rem;
-    font-weight: 600;
-    padding-top: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  padding-top: 1rem;
 }
 
 .cart-detail-page .cart-footer-container .total-item {
-    font-weight: 300;
+  font-weight: 300;
 }
 
-.cart-detail-page .cart-footer-container .footer-content{
+.cart-detail-page .cart-footer-container .footer-content {
+  display: flex;
+  flex-direction: row;
+}
+
+.cart-detail-page .cart-footer-container .checkout-button-container {
     display: flex;
-    flex-direction: row;
+    justify-content: end;
+}
+
+@media (max-width: 768px) {
+  .cart-detail-page .cart-footer-container .footer-content  {
+    justify-content: center;
+  }
+
+  .cart-detail-page .checkout-button-container {
+    
+    justify-content: center!important;
+  }
 }
 
 .cart-detail-page .cart-footer-container .order-total {
-    display: flex;
-    gap: 0.4rem;
-    font-size: 1.5rem;
-    align-items: center;
+  display: flex;
+  gap: 0.4rem;
+  font-size: 1.5rem;
+  align-items: center;
 }
 
 .cart-detail-page .total-price {
-    padding-left: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding-right: 2rem;
-    font-size: 1.5rem;
+  padding-left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding-right: 2rem;
+  font-size: 1.5rem;
 }
 
 .cart-detail-page .total-price span {
-    padding-top: 0.2rem;
+  padding-top: 0.2rem;
 }
 
 .cart-detail-page .checkout-button {
-    padding-top: 0.8rem;
-    padding-bottom: 0.5rem;
-    padding-left: 2.5rem;
-    padding-right: 2.5rem;
-    border-radius: 2rem;
-    background: radial-gradient(ellipse, #32CD32, #006400);
-    color: aliceblue;
-    font-weight: 600;
-    border: none;
+  padding-top: 0.8rem;
+  padding-bottom: 0.5rem;
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+  border-radius: 2rem;
+  background: radial-gradient(ellipse, #32cd32, #006400);
+  color: aliceblue;
+  font-weight: 600;
+  border: none;
 }
 
 .cart-detail-page .checkout-button:hover {
-    color:black
+  color: black;
 }
 
 .order-confirm-container .title {
-    font-weight: 700;
-    font-size: 1.8rem;
+  font-weight: 700;
+  font-size: 1.8rem;
 }
 
 .order-confirm-container .ask-confirm {
-    font-size: 1.2rem;
-    padding-bottom: 1rem;
-    color: #c65200;
+  font-size: 1.2rem;
+  padding-bottom: 1rem;
+  color: #c65200;
 }
 
 .order-confirm-container .tag {
-    font-size: 1.2rem;
-    padding-top: 0.5rem;
+  font-size: 1.2rem;
+  padding-top: 0.5rem;
 }
 
 .order-confirm-container .number {
-    font-weight: 600;
-    font-size: 1.2rem;
-    padding-top: 0.5rem;
+  font-weight: 600;
+  font-size: 1.2rem;
+  padding-top: 0.5rem;
 }
 
 .order-confirm-container .order-items {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
 }
 
-
 .order-confirm-container .total-order-price {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
 }
 
 .order-confirm-container .cancel-button {
-    border: none;
-    background-color: gray;
-    color: black;
-    padding-top: 0.8rem;
-    padding-bottom: 0.5rem;
+  border: none;
+  background-color: gray;
+  color: black;
+  padding-top: 0.8rem;
+  padding-bottom: 0.5rem;
 }
 
-.order-confirm-container .cancel-button:hover{
-    color: rgb(255, 255, 255);
+.order-confirm-container .cancel-button:hover {
+  color: rgb(255, 255, 255);
 }
 
 .order-confirm-container .confirm-button {
-    padding-top: 0.8rem;
-    padding-bottom: 0.5rem;
-
+  padding-top: 0.8rem;
+  padding-bottom: 0.5rem;
 }
 
 .order-confirm-container .confirm-button:hover {
-    border-color: #3f9c36;
+  border-color: #3f9c36;
 }

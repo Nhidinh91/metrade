@@ -280,7 +280,7 @@ const CartDetail = () => {
             </div>
           </Col>
           <Col xs={12} sm={12} md={4} lg={4}>
-            <div>
+            <div className="checkout-button-container">
                 <button
                   className="checkout-button"
                   onClick={handleCheckout}
