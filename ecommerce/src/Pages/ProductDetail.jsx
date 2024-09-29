@@ -129,7 +129,7 @@ const ProductDetail = () => {
                 <button
                   type="button"
                   className="go-back-button"
-                  onClick={() => navigate(-1)}
+                  onClick={() => navigate("/")}
                 >
                   <i className="fa-solid fa-arrow-left"></i>Back to Home
                 </button>

@@ -36,13 +36,8 @@
 }
 
 .cart-detail-page .cart-footer-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 0.25rem;
     font-size: 1.25rem;
     font-weight: 600;
-    align-items: center;
     padding-top: 1rem;
 }
 

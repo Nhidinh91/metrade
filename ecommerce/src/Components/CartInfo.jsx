@@ -2,7 +2,7 @@ import CartItem from "../Components/CartItem";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import Loading from "../Components/Loading";
-import { Container, Row, Modal, Button } from "react-bootstrap";
+import { Container, Row, Col, Modal, Button } from "react-bootstrap";
 import "../Styles/CartDetail.css";
 import coin from "../assets/star.png";
 import { useAuthContext } from "../hooks/useAuthContext";
@@ -260,34 +260,36 @@ const CartDetail = () => {
         ))}
       </Row>
       {cartItems.length !== 0 && (
-        <Row className="cart-footer">
-          <div className="cart-footer-container">
+        <Row className="cart-footer-container align-items-center">
+          <Col xs={12} sm={12} md={8} lg={8}>
             <div className="footer-content">
-              <div className="order-total">
-                <span>Order Total</span>
-                <span className="total-item">{`(${totalOrderItems} ${
-                  totalOrderItems >= 2 ? "items" : "item"
-                }): `}</span>
-              </div>
-              <div className="total-price">
-                <span>{totalPrice}</span>
-                <img
-                  src={coin}
-                  alt="coin"
-                  style={{ width: "25px", height: "25px" }}
-                />
-              </div>
+                <div className="order-total">
+                  <span>Order Total</span>
+                  <span className="total-item">{`(${totalOrderItems} ${
+                    totalOrderItems >= 2 ? "items" : "item"
+                  }): `}</span>
+                </div>
+                <div className="total-price">
+                  <span>{totalPrice}</span>
+                  <img
+                    src={coin}
+                    alt="coin"
+                    style={{ width: "25px", height: "25px" }}
+                  />
+                </div>
             </div>
+          </Col>
+          <Col xs={12} sm={12} md={4} lg={4}>
             <div>
-              <button
-                className="checkout-button"
-                onClick={handleCheckout}
-                disabled={selectedItems.length === 0}
-              >
-                Pay Now
-              </button>
+                <button
+                  className="checkout-button"
+                  onClick={handleCheckout}
+                  disabled={selectedItems.length === 0}
+                >
+                  Pay Now
+                </button>
             </div>
-          </div>
+          </Col>
         </Row>
       )}
 
