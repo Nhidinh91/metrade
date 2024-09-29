@@ -52,8 +52,13 @@ const CartDetail = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        setCartItems(data.cart_detail.cart_items || []);
+        const cartDetailItems = data.cart_detail.cart_items || [];
+        
+        setCartItems(cartDetailItems);
         setCart(data.cart_detail);
+       
+        const cartCount = cartDetailItems.reduce((acc, item) => acc + item.adding_quantity, 0);
+        setCartCount(cartCount);
       }
     } catch (error) {
       console.log("Error fetching product", error);
@@ -95,6 +100,8 @@ const CartDetail = () => {
         const data = await response.json();
         const newCartItem = data.cart_item;
         setUpdatedCartItem(newCartItem);
+
+        setCartCount(cartCount + quantity);
       }
     } catch (error) {
       console.log("Error updating cart item", error);
