@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Order from "../models/orderModel.js";
 import OrderItem from "../models/orderItemModel.js";
 import { isValidId } from "../utils/dbUtils.js";
+import { json } from "express";
 
 export const getOrderHistory = async (req, res) => {
   try {
@@ -98,6 +99,22 @@ export const getAllOrderItems = async (req, res) => {
   } catch (error) {
     res.status(404).json({
       message: "No Order Exists",
+    });
+  }
+};
+
+export const getOrderItemStats = async (req, res) => {
+  try {
+    console.log("getting stat from controller");
+    const stats = await OrderItem.getStats();
+    res.status(200).json({
+      status: "success",
+      data: stats,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "fail",
+      message: error.message,
     });
   }
 };

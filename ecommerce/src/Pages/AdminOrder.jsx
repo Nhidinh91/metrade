@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import "../Styles/MyPage.css";
 import { useAuthContext } from "../hooks/useAuthContext";
 import AdminSideBar from "../Components/AdminSideBar";
+import AdminOrderComp from "../Components/AdminOrderComp";
 
 const AdminOrder = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const AdminOrder = () => {
   return (
     <Container>
       <AdminSideBar pageName="Admin Dashboard">
-        <div>Admin User</div>
+        <AdminOrderComp />
       </AdminSideBar>
     </Container>
   );

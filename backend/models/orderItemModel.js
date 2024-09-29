@@ -1,6 +1,12 @@
 import mongoose from "mongoose";
 
 const LIMIT = 5;
+const selling_status_list = [
+  "processing",
+  "await-pickup",
+  "delivered",
+  "cancelled",
+];
 
 const orderItemSchema = new mongoose.Schema(
   {
@@ -55,32 +61,47 @@ const orderItemSchema = new mongoose.Schema(
   }
 );
 
+orderItemSchema.statics.getStats = async function () {
+
+
+  const processNum = await this.countDocuments({
+    selling_status: selling_status_list[0],
+  });
+  const awaitNum = await this.countDocuments({
+    selling_status: selling_status_list[1],
+  });
+  const deliveredNum = await this.countDocuments({
+    selling_status: selling_status_list[2],
+  });
+  const cancelledNum = await this.countDocuments({
+    selling_status: selling_status_list[3],
+  });
+  console.log(processNum);
+  return { processNum, awaitNum, deliveredNum, cancelledNum };
+};
+
 orderItemSchema.statics.getAllOrderItems = async function (reqQuerry) {
   let orderItems;
   const queryObj = { ...reqQuerry };
 
-  // if query have page, exclude it so I can use find
+  // if query have page, exclude it so can use find
   const excludingFields = ["page"];
   excludingFields.forEach((el) => delete queryObj[el]);
 
   const currentPage = reqQuerry.page * 1 || 1;
-
   const limit = reqQuerry.page ? LIMIT : 100;
   const skip = (currentPage - 1) * limit;
-  // console.log("in model");
   console.log(`${currentPage} - ${limit} - ${skip}`);
-
 
   orderItems = await this.find(queryObj)
     .sort({ updated_at: -1 })
     .skip(skip)
     .limit(limit);
 
-
   const totalOrderItemNum = await this.countDocuments();
-  if (reqQuerry.page) {
-    orderItems.skip;
-  }
+  // if (reqQuerry.page) {
+  //   orderItems.skip;
+  // }
 
   return [totalOrderItemNum, orderItems];
 };

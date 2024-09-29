@@ -23,6 +23,7 @@ import AdminProduct from "./Pages/AdminProduct.jsx";
 import AdminUser from "./Pages/AdminUser.jsx";
 import AdminOrder from "./Pages/AdminOrder.jsx";
 
+
 function App() {
   return (
     <AuthProvider>
@@ -49,7 +50,6 @@ function App() {
             <Route path="/admin-product" element={<AdminProduct />} />
             <Route path="/admin-user" element={<AdminUser />} />
             <Route path="/admin-order" element={<AdminOrder />} />
-            
           </Route>
         </Routes>
       </Router>
