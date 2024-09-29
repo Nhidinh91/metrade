@@ -2,7 +2,7 @@ import { Row, Button, Col } from "react-bootstrap";
 import coin from "../assets/star.png";
 import "../Styles/CartItem.css";
 import { Form } from "react-bootstrap";
-import { useCallback, useState } from "react";
+import { Link } from "react-router-dom";
 
 const CardItem = ({
   cartItemId,
@@ -17,7 +17,8 @@ const CardItem = ({
   updateQuantity,
   deleteItem,
   isSelected,
-  onSelectChange
+  onSelectChange,
+  onImageClick,
 }) => {
   const handdleQuantityButton = (change) => {
     updateQuantity(change);
@@ -25,27 +26,38 @@ const CardItem = ({
 
   const handdleDeleteButton = () => {
     deleteItem();
-  }
+  };
+
   return (
     <Row className="cart-item-container">
-      <Col className="image-name-pickup">
-      <Form.Check 
-        type="checkbox" 
-        checked={isSelected} 
-        onChange={() => onSelectChange(cartItemId)} 
-      />
-        <div className="item-image">
-          <img src={image} alt={productName} />
-        </div>
-        <div className="name-pickup">
-          <div className="item-name">{productName}</div>
-          <div
-            className={`pick-up ${pickup_point}`}
-          >{`Pick-up: ${pickup_point}`}</div>
-          <div className="stock-number">{`Available in stock: ${stock_quantity}`}</div>
-        </div>
+      <Col className="image-name-pickup" xs={12} sm={6} md={6} lg={6}>
+        <Row>
+          <Col className="align-content-center" xs={1} sm={1}>
+            <Form.Check
+              type="checkbox"
+              checked={isSelected}
+              onChange={() => onSelectChange(cartItemId)}
+            />
+          </Col>
+          <Col>
+            <Link to={`/product/detail/${productId}`}>
+              <div className="item-image">
+                <img src={image} alt={productName} />
+              </div>
+            </Link>
+          </Col>
+          <Col>
+            <div className="name-pickup">
+              <div className="item-name">{productName}</div>
+              <div
+                className={`pick-up ${pickup_point}`}
+              >{`Pick-up: ${pickup_point}`}</div>
+              <div className="stock-number">{`Available in stock: ${stock_quantity}`}</div>
+            </div>
+          </Col>
+        </Row>
       </Col>
-      <Col className="price-and-quantity">
+      <Col className="price-and-quantity" xs={12} sm={6} md={6} lg={6}>
         <div className="item-price">
           <span>{price}</span>
           <img
@@ -77,7 +89,10 @@ const CardItem = ({
             style={{ width: "20px", height: "20px" }}
           />
         </div>
-        <div className="delete-item-button" onClick={() => handdleDeleteButton()}>
+        <div
+          className="delete-item-button"
+          onClick={() => handdleDeleteButton()}
+        >
           <i className="fa-regular fa-trash-can"></i>
         </div>
       </Col>

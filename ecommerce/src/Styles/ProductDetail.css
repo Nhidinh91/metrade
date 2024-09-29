@@ -73,6 +73,10 @@
   font-size: 0.8rem;
   font-weight: 520;
 }
+.product-detail-container .sold-out {
+  font-weight: 600;
+  color: brown;
+}
 
 .product-detail-container .product-description {
     padding-top: 1rem;

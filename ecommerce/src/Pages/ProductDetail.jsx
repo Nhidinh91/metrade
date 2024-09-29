@@ -18,7 +18,8 @@ const ProductDetail = () => {
   const [cartItem, setCartItem] = useState(null);
   const [limitQuantity, setLimitQuantity] = useState(0);
   const [bigPhotoIndex, setBigPhotoIndex] = useState(0);
-  const {cartCount, setCartCount, isAuthenticated, isLoading} = useAuthContext();
+  const { cartCount, setCartCount, isAuthenticated, isLoading } =
+    useAuthContext();
 
   useEffect(() => {
     // Fetch cart item info to get limit quantity
@@ -67,7 +68,7 @@ const ProductDetail = () => {
     };
 
     fetchProduct();
-  }, [id]); // 'id' is used as a dependency to refetch if the id changes
+  }, [id, cartCount]);
 
   const daysCreation = (dayCreated) => {
     return Math.floor(
@@ -79,7 +80,7 @@ const ProductDetail = () => {
     if (!isLoading && !isAuthenticated()) {
       navigate("/login");
       return;
-    };
+    }
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/cart/add-cart-item`,
@@ -113,7 +114,7 @@ const ProductDetail = () => {
 
   const handleBreadcrum = (category_id) => {
     navigate(`/category?query=${category_id}`);
-  }
+  };
 
   // If the product data is still being fetched, display a Bootstrap spinner
   return (
@@ -139,7 +140,7 @@ const ProductDetail = () => {
                     {product.category_id.ancestors.map((ancestor) => (
                       <Breadcrumb.Item
                         key={ancestor._id}
-                        onClick={()=> handleBreadcrum(ancestor._id)}
+                        onClick={() => handleBreadcrum(ancestor._id)}
                       >
                         {ancestor.name}
                       </Breadcrumb.Item>
@@ -162,12 +163,22 @@ const ProductDetail = () => {
                   <img src={locImg} alt="location" />
                   <div>{product.pickup_point}</div>
                 </div>
-                <div className="number-info">
-                  {`Number in stock: ${product.stock_quantity}`}
-                </div >
-                {cartItem && (<div className="number-info">
-                  {`Number in cart: ${cartItem.adding_quantity}`}
-                </div>)}                
+                {product.stock_quantity > 0 && (
+                  <div className="number-info">
+                    {`Number in stock: ${product.stock_quantity}`}
+                  </div>
+                )}
+                {product.stock_quantity === 0 && (
+                  <div className="sold-out">
+                    Sold out
+                  </div>
+                )}
+
+                {cartItem && (
+                  <div className="number-info">
+                    {`Number in cart: ${cartItem.adding_quantity}`}
+                  </div>
+                )}
                 <p className="product-description">{product.description}</p>
                 <div className="add-product-container">
                   <div className="quantity-container">
@@ -182,21 +193,17 @@ const ProductDetail = () => {
                     <span className="quantity-number">{quantity}</span>
                     <div
                       className="quantity-btn"
-                      onClick={() =>{
-
-
-                          if(limitQuantity === 0 ){
-                            return;
-                          }
-
-                          return setQuantity(
-                            quantity >= (limitQuantity || product.stock_quantity)
-                              ? quantity
-                              : quantity + 1
-                          
-                          )
+                      onClick={() => {
+                        if (limitQuantity === 0) {
+                          return;
                         }
-                      }
+
+                        return setQuantity(
+                          quantity >= (limitQuantity || product.stock_quantity)
+                            ? quantity
+                            : quantity + 1
+                        );
+                      }}
                     >
                       <i className="fa-solid fa-plus"></i>
                     </div>
