@@ -15,9 +15,10 @@ const ProductDetail = () => {
   // States to store product data, change quantity, and big photo
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(0);
+  const [cartItem, setCartItem] = useState(null);
   const [limitQuantity, setLimitQuantity] = useState(0);
   const [bigPhotoIndex, setBigPhotoIndex] = useState(0);
-  const { cartCount, setCartCount } = useAuthContext();
+  const {cartCount, setCartCount, isAuthenticated, isLoading} = useAuthContext();
 
   useEffect(() => {
     // Fetch cart item info to get limit quantity
@@ -38,6 +39,7 @@ const ProductDetail = () => {
         );
         if (response.ok) {
           const data = await response.json();
+          setCartItem(data.cartItem);
           setLimitQuantity(data.cartItem.limit_quantity);
         }
       } catch (error) {
@@ -55,6 +57,7 @@ const ProductDetail = () => {
         const data = await response.json();
         if (response.ok) {
           setProduct(data.product);
+          console.log(data.product);
           setLimitQuantity(data.product.stock_quantity);
           fetchCartItem(data.product._id);
         }
@@ -73,6 +76,10 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = async () => {
+    if (!isLoading && !isAuthenticated()) {
+      navigate("/login");
+      return;
+    };
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/cart/add-cart-item`,
@@ -104,10 +111,13 @@ const ProductDetail = () => {
     }
   };
 
+  const handleBreadcrum = (category_id) => {
+    navigate(`/category?query=${category_id}`);
+  }
+
   // If the product data is still being fetched, display a Bootstrap spinner
   return (
     <>
-      {/* Conditionally render either the spinner or the product details */}
       {!product ? (
         <Loading />
       ) : (
@@ -129,8 +139,7 @@ const ProductDetail = () => {
                     {product.category_id.ancestors.map((ancestor) => (
                       <Breadcrumb.Item
                         key={ancestor._id}
-                        // linkAs={Link}
-                        // linkProps={{ to: `/category/${ancestor._id}` }}
+                        onClick={()=> handleBreadcrum(ancestor._id)}
                       >
                         {ancestor.name}
                       </Breadcrumb.Item>
@@ -153,6 +162,12 @@ const ProductDetail = () => {
                   <img src={locImg} alt="location" />
                   <div>{product.pickup_point}</div>
                 </div>
+                <div className="number-info">
+                  {`Number in stock: ${product.stock_quantity}`}
+                </div >
+                {cartItem && (<div className="number-info">
+                  {`Number in cart: ${cartItem.adding_quantity}`}
+                </div>)}                
                 <p className="product-description">{product.description}</p>
                 <div className="add-product-container">
                   <div className="quantity-container">

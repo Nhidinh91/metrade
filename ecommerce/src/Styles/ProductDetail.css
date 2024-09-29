@@ -69,6 +69,11 @@
   height: 1rem;
 }
 
+.product-detail-container .number-info {
+  font-size: 0.8rem;
+  font-weight: 520;
+}
+
 .product-detail-container .product-description {
     padding-top: 1rem;
     font-size: 0.9rem;
