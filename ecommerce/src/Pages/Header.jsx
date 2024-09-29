@@ -1,15 +1,31 @@
 import React from "react";
 import logo2 from "../assets/logo-2-removebg.png";
 import PageLinks from "../Components/PageLinks";
-import { Navbar, Nav, NavDropdown, Container, Row, Col, Form, Button } from "react-bootstrap";
+import { Navbar, Nav, NavDropdown, Container, Row, Col, Form, Button, Modal } from "react-bootstrap";
 import style from '../Styles/Navbar.module.css';
 import SearchBar from "../Components/SearchBar";
 import { useAuthContext } from '../hooks/useAuthContext';
 import ProfileMenu from "../Components/ProfileMenu";
 import AdminDropdown from "../Components/AdminDropdown";
+import { useNavigate, Link } from "react-router-dom";
+import { useState } from "react";
 
 const Header = () => {
   const { user } = useAuthContext();
+  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
+
+    const handleSellNowClick = () => {
+      if (!user || user.role !== "seller") {
+        setShowModal(true);
+      } else {
+        navigate("/new-product");
+      }
+    };
+
+    const handleCloseModal = () => {
+      setShowModal(false);
+    };
 
   return (
     <>
@@ -21,7 +37,10 @@ const Header = () => {
             </Navbar.Brand>
             <SearchBar />
             <div className={`${style.rightContainer}`}>
-              <Button className={`${style.btnSellNow}`} href="/new-product">
+              <Button
+                className={`${style.btnSellNow}`}
+                onClick={handleSellNowClick}
+              >
                 Sell Now
               </Button>
               {!user ? (
@@ -51,6 +70,18 @@ const Header = () => {
           />
         </Row>
       </Navbar>
+
+      {/* Modal */}
+      <Modal show={showModal} onHide={handleCloseModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Access Restricted</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Please register or verify your email to access this feature.</p>
+          <Link to="/signup"><Button>Signup Now</Button></Link>
+          
+        </Modal.Body>
+      </Modal>
     </>
   );
 };
