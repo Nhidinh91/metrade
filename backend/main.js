@@ -38,6 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use("/api/user", jwtAuthenticate);
 app.use("/api/seller", jwtAuthenticate);
+app.use("/api/admin", jwtAuthenticate);
 
 
 // Routes
