@@ -50,6 +50,11 @@
   font-weight: bold;
 }
 
+.product-image {
+  border-radius: 5px;
+  object-fit: cover;
+}
+
 .product-status {
   vertical-align: middle;
   text-align: center;
