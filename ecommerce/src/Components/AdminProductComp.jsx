@@ -13,6 +13,7 @@ import {
 } from "react-bootstrap";
 import Loading from "../Components/Loading";
 import "../Styles/AdminProduct.css";
+import { Link } from "react-router-dom";
 
 const AdminProductComp = () => {
   const [products, setProducts] = useState([]); // State to hold products fetched from backend
@@ -117,12 +118,14 @@ const AdminProductComp = () => {
   const handleStatusChange = (newStatus) => {
     setStatus(newStatus);
     setPage(1); // Reset to first page when status changes
+    setSearchQuery(""); //clear the search query to reset the previous search
   };
 
   // Handle search
   const handleSearch = (e) => {
     if (e.key === "Enter" || e.type === "click") {
       setSearchQuery(searchTerm);
+      setSearchTerm(""); //clear search term
     }
   };
 
@@ -324,12 +327,14 @@ const AdminProductComp = () => {
             {products.map((product) => (
               <tr key={product._id}>
                 <td>
+                  <Link to={`/product/detail/${product._id}`}>
                   <img
                     src={product.image}
                     alt={product.name}
                     className="product-image"
                     style={{ width: "100px", height: "100px" }}
                   />
+                  </Link>
                 </td>
                 <td className="align-middle">
                   <div>
