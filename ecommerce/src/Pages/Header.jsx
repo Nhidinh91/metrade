@@ -13,10 +13,27 @@ import { useState } from "react";
 const Header = () => {
   const { user } = useAuthContext();
   const [showModal, setShowModal] = useState(false);
+  const [modalContent, setModalContent] = useState({
+    message: "",
+    buttonText: "",
+    buttonLink: "",
+  });
   const navigate = useNavigate();
 
     const handleSellNowClick = () => {
-      if (!user || user.role !== "seller") {
+      if (!user) {
+        setModalContent({
+          message: "Please signup to access this feature.",
+          buttonText: "Signup Now",
+          buttonLink: "/signup",
+        });
+        setShowModal(true);
+      } else if (user.role !== "seller" && user.role !== "admin") {
+        setModalContent({
+          message: "Please verify your email to access this feature.",
+          buttonText: "To My Page",
+          buttonLink: "/my-page",
+        });
         setShowModal(true);
       } else {
         navigate("/new-product");
@@ -77,9 +94,10 @@ const Header = () => {
           <Modal.Title>Access Restricted</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Please register or verify your email to access this feature.</p>
-          <Link to="/signup"><Button>Signup Now</Button></Link>
-          
+          <p>{modalContent.message}</p>
+          <Link to={modalContent.buttonLink}>
+            <Button>{modalContent.buttonText}</Button>
+          </Link>
         </Modal.Body>
       </Modal>
     </>
