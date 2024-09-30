@@ -48,7 +48,7 @@ app.use("/api/product", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/orders", jwtAuthenticate, orderRoutes);
 app.use("/api/seller", sellerRoutes);
-app.use("/api/admin", adminRoutes);
+app.use("/api/admin", jwtAuthenticate, adminRoutes);
 
 
 const PORT = process.env.PORT || 3000;
