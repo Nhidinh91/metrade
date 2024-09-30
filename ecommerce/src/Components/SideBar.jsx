@@ -1,11 +1,13 @@
 import { Container, Col, Row, Button } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState , useEffect } from "react";
+import {useAuthContext} from "../hooks/useAuthContext";
 import "../Styles/SideBar.css";
 
 const SideBar = ({ pageName, children }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuthContext();
   const [showSubOptions, setShowSubOptions] = useState(false);
 
   useEffect(() => {
@@ -30,38 +32,46 @@ const SideBar = ({ pageName, children }) => {
           >
             My Profile
           </Button>
-          <Button
-            className="menu-item-btn"
-            onClick={() => setShowSubOptions(!showSubOptions)}
-            disabled={location.pathname === "/selling-history" || location.pathname === "/new-product"}
-          >
-            My Selling Page
-          </Button>
-          {showSubOptions && (
-            <Container>
+
+          {user && user.role === "seller" && (
+            <>
               <Button
-                className="submenu-item-btn"
-                onClick={() => navigate("/selling-history")}
-                disabled={location.pathname === "/selling-history"}
+                className="menu-item-btn"
+                onClick={() => setShowSubOptions(!showSubOptions)}
+                disabled={
+                  location.pathname === "/selling-history" ||
+                  location.pathname === "/new-product"
+                }
               >
-                Inventory
+                My Selling Page
               </Button>
+              {showSubOptions && (
+                <Container>
+                  <Button
+                    className="submenu-item-btn"
+                    onClick={() => navigate("/selling-history")}
+                    disabled={location.pathname === "/selling-history"}
+                  >
+                    Inventory
+                  </Button>
+                  <Button
+                    className="submenu-item-btn"
+                    onClick={() => navigate("/new-product")}
+                    disabled={location.pathname === "/new-product"}
+                  >
+                    New Product
+                  </Button>
+                </Container>
+              )}
               <Button
-                className="submenu-item-btn"
-                onClick={() => navigate("/new-product")}
-                disabled={location.pathname === "/new-product"}
+                className="menu-item-btn"
+                disabled={location.pathname === "/purchase-history"}
+                onClick={() => navigate("/purchase-history")}
               >
-                New Product
+                My Purchase History
               </Button>
-            </Container>
+            </>
           )}
-          <Button
-            className="menu-item-btn"
-            disabled={location.pathname === "/purchase-history"}
-            onClick={() => navigate("/purchase-history")}
-          >
-            My Purchase History
-          </Button>
         </Col>
         <Col sm={12} md={10} lg={10} className="right-container">
           {children}

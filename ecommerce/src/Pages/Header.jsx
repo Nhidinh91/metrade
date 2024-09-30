@@ -95,9 +95,7 @@ const Header = () => {
         </Modal.Header>
         <Modal.Body>
           <p>{modalContent.message}</p>
-          <Link to={modalContent.buttonLink}>
-            <Button>{modalContent.buttonText}</Button>
-          </Link>
+            <Button href={modalContent.buttonLink}>{modalContent.buttonText}</Button>
         </Modal.Body>
       </Modal>
     </>
