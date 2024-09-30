@@ -17,8 +17,7 @@ const CardItem = ({
   updateQuantity,
   deleteItem,
   isSelected,
-  onSelectChange,
-  onImageClick,
+  onSelectChange
 }) => {
   const handdleQuantityButton = (change) => {
     updateQuantity(change);

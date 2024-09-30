@@ -211,12 +211,10 @@ export const updateItemQuantity = async (req, res) => {
     });
   }
   try {
-    const cartItem = await CartItem.findById(itemId);
-    console.log(updatedQuantity);
-    console.log(
-      updatedQuantity === -1 && cartItem.adding_quantity >= 2,
-      updatedQuantity === 1 && cartItem.limit_quantity >= 1
-    );
+    const cartItem = await CartItem.findById(itemId).populate({
+      path: "product_id",
+      model: "Product"
+    });
     if (
       (updatedQuantity === -1 && cartItem.adding_quantity >= 2) ||
       (updatedQuantity === 1 && cartItem.limit_quantity >= 1)
@@ -226,6 +224,7 @@ export const updateItemQuantity = async (req, res) => {
         {
           adding_quantity: cartItem.adding_quantity + updatedQuantity,
           limit_quantity: cartItem.limit_quantity - updatedQuantity,
+          sub_total: (cartItem.adding_quantity + updatedQuantity) * cartItem.product_id.price
         },
         { new: true }
       );
@@ -343,6 +342,9 @@ export const checkout = async (req, res) => {
       const product = await Product.findById(item.product_id._id).session(session);
       if (product) {
         product.stock_quantity -= item.adding_quantity;
+        if (product.stock_quantity === 0) {
+          product.status = "sold";
+        }
         if (product.stock_quantity < 0) {
           // If stock goes negative, rollback the transaction
           await session.abortTransaction();

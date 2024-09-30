@@ -16,8 +16,10 @@ const CartDetail = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [totalOrderItems, setTotalOrderItems] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
-  const [showModal, setShowModal] = useState(false);
-  const { cartCount, setCartCount, setReloadCartCount } = useAuthContext();
+  const [showCheckoutModal, setshowCheckoutModal] = useState(false);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const { cartCount, setCartCount, setReloadCartCount, user } =
+    useAuthContext();
 
   // Calculate total items in the cart
   const calculateTotalCartItems = useCallback(() => {
@@ -53,11 +55,14 @@ const CartDetail = () => {
       if (response.ok) {
         const data = await response.json();
         const cartDetailItems = data.cart_detail.cart_items || [];
-        
+
         setCartItems(cartDetailItems);
         setCart(data.cart_detail);
-       
-        const cartCount = cartDetailItems.reduce((acc, item) => acc + item.adding_quantity, 0);
+
+        const cartCount = cartDetailItems.reduce(
+          (acc, item) => acc + item.adding_quantity,
+          0
+        );
         setCartCount(cartCount);
       }
     } catch (error) {
@@ -67,10 +72,8 @@ const CartDetail = () => {
 
   // Recalculate total cart items whenever cartItems change
   useEffect(() => {
-    if (cartItems.length > 0) {
-      setTotalCartItems(calculateTotalCartItems());
-    }
-  }, [cartItems, calculateTotalCartItems]);
+    setTotalCartItems(calculateTotalCartItems());
+  }, [cartItems, calculateTotalCartItems, updatedCartItem]);
 
   // Call fetchCartDetail on component mount or when the cart is updated
   useEffect(() => {
@@ -127,8 +130,17 @@ const CartDetail = () => {
       );
       if (response.ok) {
         const data = await response.json();
+        const newCartItems = cartItems.filter(
+          (item) => item._id.toString() != data.deleted_item._id.toString()
+        );
+        const newSelectedItems = selectedItems.filter(
+          (id) => id !== data.deleted_item._id
+        );
         setUpdatedCartItem(data.deleted_item);
         setReloadCartCount(true);
+        setCartItems(newCartItems);
+        setSelectedItems(newSelectedItems);
+        console.log(selectedItems);
       }
     } catch (error) {
       console.log("Error deleting cart item", error);
@@ -167,7 +179,12 @@ const CartDetail = () => {
 
   // Handle checkout button click
   const handleCheckout = () => {
-    setShowModal(true); // Show the confirmation modal when "Pay Now" is clicked
+    if (!user.is_verified) {
+      setshowCheckoutModal(false);
+      setShowVerifyModal(true);
+      return;
+    }
+    setshowCheckoutModal(true);
   };
 
   //Function to checkout
@@ -208,10 +225,10 @@ const CartDetail = () => {
     );
 
     checkoutOrder(itemsToCheckout);
-    setShowModal(false); // Close the modal after confirming
+    setshowCheckoutModal(false); // Close the modal after confirming
   };
 
-  return !cart ? (
+  return !cart || !user ? (
     <Loading />
   ) : (
     <Container className="cart-detail-page">
@@ -263,31 +280,31 @@ const CartDetail = () => {
         <Row className="cart-footer-container align-items-center">
           <Col xs={12} sm={12} md={8} lg={8}>
             <div className="footer-content">
-                <div className="order-total">
-                  <span>Order Total</span>
-                  <span className="total-item">{`(${totalOrderItems} ${
-                    totalOrderItems >= 2 ? "items" : "item"
-                  }): `}</span>
-                </div>
-                <div className="total-price">
-                  <span>{totalPrice}</span>
-                  <img
-                    src={coin}
-                    alt="coin"
-                    style={{ width: "25px", height: "25px" }}
-                  />
-                </div>
+              <div className="order-total">
+                <span>Order Total</span>
+                <span className="total-item">{`(${totalOrderItems} ${
+                  totalOrderItems >= 2 ? "items" : "item"
+                }): `}</span>
+              </div>
+              <div className="total-price">
+                <span>{totalPrice}</span>
+                <img
+                  src={coin}
+                  alt="coin"
+                  style={{ width: "25px", height: "25px" }}
+                />
+              </div>
             </div>
           </Col>
           <Col xs={12} sm={12} md={4} lg={4}>
             <div className="checkout-button-container">
-                <button
-                  className="checkout-button"
-                  onClick={handleCheckout}
-                  disabled={selectedItems.length === 0}
-                >
-                  Pay Now
-                </button>
+              <button
+                className="checkout-button"
+                onClick={handleCheckout}
+                disabled={selectedItems.length === 0}
+              >
+                Pay Now
+              </button>
             </div>
           </Col>
         </Row>
@@ -295,8 +312,8 @@ const CartDetail = () => {
 
       <Modal
         className="order-confirm-container"
-        show={showModal}
-        onHide={() => setShowModal(false)}
+        show={showCheckoutModal}
+        onHide={() => setshowCheckoutModal(false)}
       >
         <Modal.Header closeButton>
           <Modal.Title className="title">Confirm Checkout</Modal.Title>
@@ -321,7 +338,7 @@ const CartDetail = () => {
           <Button
             className="cancel-button"
             variant="secondary"
-            onClick={() => setShowModal(false)}
+            onClick={() => setshowCheckoutModal(false)}
           >
             Cancel
           </Button>
@@ -334,6 +351,41 @@ const CartDetail = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+      {user.is_verified === false && (
+        <Modal
+          className="email-verification-container"
+          show={showVerifyModal}
+          onHide={() => setShowVerifyModal(false)}
+        >
+          <Modal.Header>
+            <Modal.Title className="title">Verify Your Email</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <div className="notification-container">
+              <div className="ask-verify">
+                You must verify your email before proceeding to checkout.
+              </div>
+              <div></div>
+            </div>
+          </Modal.Body>
+          <Modal.Footer className="button-container">
+              <Button
+                className="cancel-button"
+                variant="secondary"
+                onClick={() => setShowVerifyModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="navigate-button"
+                variant="primary"
+                onClick={() => navigate("/my-page")}
+              >
+                Go to My profile
+              </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
     </Container>
   );
 };
