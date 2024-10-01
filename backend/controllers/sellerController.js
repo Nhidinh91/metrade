@@ -89,6 +89,7 @@ export const updateProduct = async (req, res) => {
     category_id,
     keywords,
     stock_quantity,
+    status,
   } = req.body;
 
   const { id } = req.params;
@@ -103,7 +104,7 @@ export const updateProduct = async (req, res) => {
     });
   }
 
-  const updatedProduct = await Product.findByIdAndUpdate(id, { name, image, photos, description, price, pickup_point, category_id: categoryId, keywords, stock_quantity });
+  const updatedProduct = await Product.findByIdAndUpdate(id, { name, image, photos, description, price, pickup_point, category_id: categoryId, keywords, stock_quantity, status });
 
   res.status(200).json({
     success: true,

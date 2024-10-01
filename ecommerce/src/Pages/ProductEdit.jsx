@@ -319,6 +319,7 @@ const ProductEdit = () => {
         category_id: categoryId,
         stock_quantity: form.quantity,
         keywords: form.keywords.split(","),
+        status: "processing",
       };
 
       const productResponse = await fetch(
