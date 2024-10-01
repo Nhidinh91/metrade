@@ -58,11 +58,11 @@ const AdminOrderComp = () => {
   const [successMessage, setSuccessMessage] = useState(""); // State to store success message
 
   //refresh token
-  useEffect(() => {
-    if (user && user.token_expired_at) {
-      scheduleTokenRenewal(user.token_expired_at);
-    }
-  }, [user, scheduleTokenRenewal]);
+  // useEffect(() => {
+  //   if (user && user.token_expired_at) {
+  //     scheduleTokenRenewal(user.token_expired_at);
+  //   }
+  // }, [user, scheduleTokenRenewal]);
 
   //fetch stat stats
   useEffect(() => {
@@ -96,7 +96,7 @@ const AdminOrderComp = () => {
     return () => {
       abortcontroller.abort();
     };
-  }, [orderItems, selectedOrderItem]);
+  }, [orderItems]);
 
   // fetch orderItems
   useEffect(() => {
@@ -104,9 +104,9 @@ const AdminOrderComp = () => {
     setOrderItems((od) => []);
 
     const fetchOrderItems = async () => {
-      console.log(queryStrArr);
+      // console.log(queryStrArr);
       try {
-        setLoading((l) => true);
+        // setLoading((l) => true);
         const response = await fetch(
           `${
             process.env.REACT_APP_API_URL
@@ -122,11 +122,11 @@ const AdminOrderComp = () => {
         );
         if (response.ok) {
           const data = await response.json();
-          console.log(findTotalPage(data.totalItems, data.limit));
+          // console.log(findTotalPage(data.totalItems, data.limit));
           setOrderItems((ot) => data.data);
           setTotalPages((tp) => findTotalPage(data.totalItems, data.limit));
           // setStats((s) => ({ ...s, ...data.totalItems }));
-          console.log("stats", stats);
+          // console.log("stats", stats);
         } else {
           setTotalPages((tp) => 0);
           throw new Error("Cannot get data");
@@ -136,7 +136,7 @@ const AdminOrderComp = () => {
           console.log(error.message);
         }
       } finally {
-        setLoading((l) => false);
+        // setLoading((l) => false);
       }
     };
     fetchOrderItems();
@@ -150,7 +150,9 @@ const AdminOrderComp = () => {
     const updateQueryStringArray = () => {
       // console.log("qryStrArr", queryStrArr);
       setqueryStrArr((qta) => {
-        let newQueryStrArr = qta.filter((param) => !param.includes("status"));
+        let newQueryStrArr = qta.filter(
+          (param) => !param.includes("status") && !param.includes("page")
+        );
         if (status) {
           newQueryStrArr.push(`selling_status=${status}`);
           setPage((p) => 1);
@@ -164,6 +166,7 @@ const AdminOrderComp = () => {
 
   const changeSellingStatus = (str) => {
     setStatus((s) => str);
+    setPage((p) => 1);
   };
 
   const displayAllOrderItem = () => {
@@ -238,10 +241,10 @@ const AdminOrderComp = () => {
 
   //handle Button inside Modal
   const handleStatusChange = async (item) => {
-    console.log("handle status change");
+    // console.log("handle status change");
     try {
       const newSellingStatus = getNewSellingStatus(item.selling_status);
-      console.log(newSellingStatus);
+      // console.log(newSellingStatus);
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/admin/transactions/${item._id}`,
         {

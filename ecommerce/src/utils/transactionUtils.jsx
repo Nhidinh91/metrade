@@ -17,11 +17,11 @@ export const displayPickupColor = (str) => {
   // console.log(str);
   switch (str) {
     case "Myllypuro":
-      return "#3f9c36";
+      return "#ee0017";
     case "Karamalmi":
-      return "#b43f3f";
+      return "#e67300";
     case "Myyrmäki":
-      return "#f37c25";
+      return "#009e54";
   }
 };
 

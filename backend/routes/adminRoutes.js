@@ -1,5 +1,6 @@
 import express from "express";
 import orderRouter from "./orderRoutes.js";
+import jwtAuthenticate from "../middlewares/jwtAuthenticate.js";
 
 const router = express.Router();
 
@@ -8,6 +9,6 @@ const router = express.Router();
 //Product Management Routes
 
 //Order Management Routes
-router.use("/transactions", orderRouter);
+router.use("/transactions", jwtAuthenticate, orderRouter);
 
 export default router;
