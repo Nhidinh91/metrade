@@ -40,9 +40,7 @@ const AdminOrderStats = ({
           onClick={() => changeSellingStatus(statusList[2])}
         >
           <Card.Body>
-            <Card.Title className="status-card-title">
-              Successfully delivered
-            </Card.Title>
+            <Card.Title className="status-card-title">Delivered</Card.Title>
             <Card.Text
               className="fs-2 status-card-text"
               style={{ color: `${displaySellingStatusColor(statusList[2])}` }}

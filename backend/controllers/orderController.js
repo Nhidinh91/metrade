@@ -80,78 +80,78 @@ export const getOrderHistory = async (req, res) => {
   }
 };
 
-export const getAllOrderItems = async (req, res) => {
-  try {
-    const [totalOrderItemNum, orderItems, limit] =
-      await OrderItem.getAllOrderItems(req.query);
+// export const getAllOrderItems = async (req, res) => {
+//   try {
+//     const [totalOrderItemNum, orderItems, limit] =
+//       await OrderItem.getAllOrderItems(req.query);
 
-    res.status(200).json({
-      status: "success",
-      totalItems: totalOrderItemNum,
-      limit: limit,
-      count: orderItems.length,
-      data: orderItems,
-    });
-  } catch (error) {
-    res.status(404).json({
-      message: "No Order Exists",
-    });
-  }
-};
+//     res.status(200).json({
+//       status: "success",
+//       totalItems: totalOrderItemNum,
+//       limit: limit,
+//       count: orderItems.length,
+//       data: orderItems,
+//     });
+//   } catch (error) {
+//     res.status(404).json({
+//       message: "No Order Exists",
+//     });
+//   }
+// };
 
-export const getOrderItemStats = async (req, res) => {
-  try {
-    console.log("getting stat from controller");
-    const stats = await OrderItem.getStats();
-    res.status(200).json({
-      status: "success",
-      data: stats,
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: "fail",
-      message: error.message,
-    });
-  }
-};
+// export const getOrderItemStats = async (req, res) => {
+//   try {
+//     console.log("getting stat from controller");
+//     const stats = await OrderItem.getStats();
+//     res.status(200).json({
+//       status: "success",
+//       data: stats,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       status: "fail",
+//       message: error.message,
+//     });
+//   }
+// };
 
-export const updateOrderItemStatus = async (req, res) => {
-  try {
-    const { orderItemId } = req.params;
-    // console.log("order item id", orderItemId);
-    const { selling_status } = req.body;
-    console.log(selling_status);
-    if (!orderItemId) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Missing id",
-      });
-    }
-    if (!isValidId(orderItemId)) {
-      return res.status(400).json({
-        status: "fail",
-        message: "invalid id",
-      });
-    }
-    if (!selling_status) {
-      console.log("order status", selling_status);
-      return res.status(400).json({
-        status: "fail",
-        message: "Cannot change status",
-      });
-    }
-    const updatedOrderItem = await OrderItem.changeStatus(
-      orderItemId,
-      selling_status
-    );
-    res.status(201).json({
-      status: "success",
-      data: updatedOrderItem,
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: "fail",
-      message: error.message,
-    });
-  }
-};
+// export const updateOrderItemStatus = async (req, res) => {
+//   try {
+//     const { orderItemId } = req.params;
+//     // console.log("order item id", orderItemId);
+//     const { selling_status } = req.body;
+//     console.log(selling_status);
+//     if (!orderItemId) {
+//       return res.status(400).json({
+//         status: "fail",
+//         message: "Missing id",
+//       });
+//     }
+//     if (!isValidId(orderItemId)) {
+//       return res.status(400).json({
+//         status: "fail",
+//         message: "invalid id",
+//       });
+//     }
+//     if (!selling_status) {
+//       console.log("order status", selling_status);
+//       return res.status(400).json({
+//         status: "fail",
+//         message: "Cannot change status",
+//       });
+//     }
+//     const updatedOrderItem = await OrderItem.changeStatus(
+//       orderItemId,
+//       selling_status
+//     );
+//     res.status(201).json({
+//       status: "success",
+//       data: updatedOrderItem,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       status: "fail",
+//       message: error.message,
+//     });
+//   }
+// };

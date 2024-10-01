@@ -3,13 +3,13 @@ import moment from "moment";
 export const displaySellingStatusColor = (str) => {
   switch (str) {
     case "processing":
-      return "#ffc41f";
+      return "#009e54";
     case "await-pickup":
-      return "#f37c25";
+      return "#e67300";
     case "delivered":
-      return "#3f9c36";
+      return "rgb(2,50,209)";
     case "cancelled":
-      return "#b43f3f";
+      return "#ee0017";
   }
 };
 

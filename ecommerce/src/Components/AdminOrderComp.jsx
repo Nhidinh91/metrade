@@ -20,7 +20,6 @@ import {
   findTotalPage,
 } from "../utils/transactionUtils";
 import "../Styles/AdminOrder.css";
-import AdminOrderModal from "./AdminOrderModal";
 import Loading from "./Loading";
 
 const STATUS_LIST = ["processing", "await-pickup", "delivered", "cancelled"];
@@ -71,7 +70,7 @@ const AdminOrderComp = () => {
       try {
         setLoading((l) => true);
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/admin/transactions/stats`,
+          `${process.env.REACT_APP_API_URL}/admin/orders/stats`,
           {
             method: "GET",
             headers: {
@@ -108,9 +107,9 @@ const AdminOrderComp = () => {
       try {
         // setLoading((l) => true);
         const response = await fetch(
-          `${
-            process.env.REACT_APP_API_URL
-          }/admin/transactions${convertToQueryString(queryStrArr)}`,
+          `${process.env.REACT_APP_API_URL}/admin/orders${convertToQueryString(
+            queryStrArr
+          )}`,
           {
             method: "GET",
             headers: {
@@ -123,6 +122,7 @@ const AdminOrderComp = () => {
         if (response.ok) {
           const data = await response.json();
           // console.log(findTotalPage(data.totalItems, data.limit));
+          console.log(data.data);
           setOrderItems((ot) => data.data);
           setTotalPages((tp) => findTotalPage(data.totalItems, data.limit));
           // setStats((s) => ({ ...s, ...data.totalItems }));
@@ -143,7 +143,8 @@ const AdminOrderComp = () => {
     return () => {
       abortcontroller.abort();
     };
-  }, [queryStrArr, selectedOrderItem, status]);
+    // }, [queryStrArr, selectedOrderItem, status]);
+  }, [queryStrArr, selectedOrderItem]);
 
   //update querystring automatically
   useEffect(() => {
@@ -151,7 +152,8 @@ const AdminOrderComp = () => {
       // console.log("qryStrArr", queryStrArr);
       setqueryStrArr((qta) => {
         let newQueryStrArr = qta.filter(
-          (param) => !param.includes("status") && !param.includes("page")
+          (param) =>
+            !param.includes("selling_status") && !param.includes("page")
         );
         if (status) {
           newQueryStrArr.push(`selling_status=${status}`);
@@ -198,7 +200,10 @@ const AdminOrderComp = () => {
   const updateQueryStringArrayWithId = () => {
     setqueryStrArr((qta) => {
       let updatedQueryStrArr = qta.filter(
-        (param) => !param.includes("_id") && !param.includes("page")
+        (param) =>
+          !param.includes("_id") &&
+          !param.includes("page") &&
+          !param.includes("selling_status")
       );
       if (itemId) {
         updatedQueryStrArr.push(`_id=${itemId}`);
@@ -246,7 +251,7 @@ const AdminOrderComp = () => {
       const newSellingStatus = getNewSellingStatus(item.selling_status);
       // console.log(newSellingStatus);
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/admin/transactions/${item._id}`,
+        `${process.env.REACT_APP_API_URL}/admin/orders/${item._id}`,
         {
           method: "PUT",
           headers: {
@@ -276,7 +281,7 @@ const AdminOrderComp = () => {
       // const newSellingStatus = getNewSellingStatus(str);
       console.log("handle cancel status");
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/admin/transactions/${item._id}`,
+        `${process.env.REACT_APP_API_URL}/admin/orders/${item._id}`,
         {
           method: "PUT",
           headers: {
@@ -336,6 +341,7 @@ const AdminOrderComp = () => {
           <Table striped bordered hover>
             <thead>
               <tr>
+                <th>Order Item Picture</th>
                 <th>Order Item Id</th>
                 <th>Status</th>
                 <th>Action</th>
@@ -344,6 +350,18 @@ const AdminOrderComp = () => {
             <tbody>
               {orderItems.map((item) => (
                 <tr key={item._id}>
+                  <td>
+                    <img
+                      src={item.image}
+                      alt={item.product_name}
+                      className="order-image"
+                      style={{
+                        width: "100px",
+                        height: "auto",
+                        objectFit: "contain",
+                      }}
+                    />
+                  </td>
                   <td>{item._id}</td>
                   <td
                     style={{
@@ -355,10 +373,18 @@ const AdminOrderComp = () => {
                     {item.selling_status}
                   </td>
                   <td className="text-center align-middle">
-                    {item.selling_status !== STATUS_LIST[3] && (
+                    {item.selling_status !== STATUS_LIST[3] ? (
                       <Button
                         className="action-button"
                         onClick={() => handleActionClick(item)}
+                      >
+                        Action
+                      </Button>
+                    ) : (
+                      <Button
+                        className="action-button"
+                        onClick={() => handleActionClick(item)}
+                        disabled
                       >
                         Action
                       </Button>

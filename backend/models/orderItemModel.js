@@ -61,59 +61,6 @@ const orderItemSchema = new mongoose.Schema(
   }
 );
 
-orderItemSchema.statics.getStats = async function () {
-  const allOrderNum = await this.countDocuments();
-  const processNum = await this.countDocuments({
-    selling_status: selling_status_list[0],
-  });
-  const awaitNum = await this.countDocuments({
-    selling_status: selling_status_list[1],
-  });
-  const deliveredNum = await this.countDocuments({
-    selling_status: selling_status_list[2],
-  });
-  const cancelledNum = await this.countDocuments({
-    selling_status: selling_status_list[3],
-  });
-  return { allOrderNum, processNum, awaitNum, deliveredNum, cancelledNum };
-};
-
-orderItemSchema.statics.getAllOrderItems = async function (reqQuerry) {
-  let orderItems;
-  const queryObj = { ...reqQuerry };
-
-  // if query have page, exclude it so can use find
-  const excludingFields = ["page"];
-  excludingFields.forEach((el) => delete queryObj[el]);
-
-  const currentPage = reqQuerry.page * 1 || 1;
-  // const limit = reqQuerry.page ? LIMIT : 100;
-  const limit = LIMIT;
-  const skip = (currentPage - 1) * limit;
-  console.log(`${currentPage} - ${limit} - ${skip}`);
-
-  orderItems = await this.find(queryObj)
-    .sort({ updated_at: -1 })
-    .skip(skip)
-    .limit(limit);
-
-  const totalOrderItemNum = await this.countDocuments(queryObj);
-  // if (reqQuerry.page) {
-  //   orderItems.skip;
-  // }
-
-  return [totalOrderItemNum, orderItems, limit];
-};
-
-orderItemSchema.statics.changeStatus = async function (id, newStatusStr) {
-  const updatedOrderItem = await this.findOneAndUpdate(
-    { _id: id },
-    { $set: { selling_status: `${newStatusStr}` } },
-    { returnDocument: "after" }
-  );
-  return updatedOrderItem;
-};
-
 const OrderItem = mongoose.model("OrderItem", orderItemSchema);
 
 export default OrderItem;
