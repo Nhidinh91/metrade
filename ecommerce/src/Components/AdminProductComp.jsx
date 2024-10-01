@@ -126,6 +126,7 @@ const AdminProductComp = () => {
     if (e.key === "Enter" || e.type === "click") {
       setSearchQuery(searchTerm);
       setSearchTerm(""); //clear search term
+      setStatus(null); // Reset status filter
     }
   };
 
