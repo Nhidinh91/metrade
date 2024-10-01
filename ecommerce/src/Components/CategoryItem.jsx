@@ -14,7 +14,7 @@ const CategoryItem = ({ category, level }) => {
   };
 
   return (
-    <li className={`nav-item dropdown ${level > 1 ? 'dropdown-submenu' : ''}`} 
+    <li className={`nav-item dropdown ${level > 1 ? 'dropdown-submenu d-none d-lg-block' : ''}`} 
         onMouseEnter={handleMouseEnter} 
         onMouseLeave={handleMouseLeave}
     >

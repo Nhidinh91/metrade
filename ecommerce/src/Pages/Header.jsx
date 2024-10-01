@@ -13,11 +13,11 @@ const Header = () => {
 
   return (
     <>
-      <Navbar sticky="top" className={style.navBar}>
+      <Container fluid className="header-container">
         <Row className={`${style.navUpper} w-100`}>
           <Container className={`${style.navContainer}`}>
             <Navbar.Brand href="/">
-              <img src={logo2} alt="" height="100" />
+              <img src={logo2} alt="" className="nav-logo" />
             </Navbar.Brand>
             <SearchBar />
             <div className={`${style.rightContainer}`}>
@@ -44,13 +44,11 @@ const Header = () => {
             </div>
           </Container>
         </Row>
-        <Row className="d-flex justify-content-center align-items-center vh=100">
-          <PageLinks
-            parentClass={`${style.navLinks}`}
-            itemClass={`${style.navLink}`}
-          />
+        {/* <Row className="d-flex justify-content-center align-items-center vh=100"> */}
+        <Row>
+          <PageLinks/>
         </Row>
-      </Navbar>
+      </Container>
     </>
   );
 };
