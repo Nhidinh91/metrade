@@ -550,14 +550,14 @@ const ProductEdit = () => {
         <Form.Label>Quantity</Form.Label>
         <InputGroup className="quantityInput">
           <Button
-            className="quantity-btn"
+            className="quantityBtn"
             onClick={() => handleQuantityChange("decrease")}
           >
             -
           </Button>
           <Form.Control type="text" value={form.quantity} readOnly />
           <Button
-            className="quantity-btn"
+            className="quantityBtn"
             onClick={() => handleQuantityChange("increase")}
           >
             +

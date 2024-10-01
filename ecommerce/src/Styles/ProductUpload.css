@@ -31,3 +31,8 @@ button.sellBtn {
 .quantityInput {
     width: 100px;
 }
+
+button.quantityBtn {
+    width: 10px;
+    padding: 1rem;
+}
