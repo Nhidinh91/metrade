@@ -5,6 +5,7 @@ import {SuccessModal, FailureModal, LoadingModal} from "./ProductUploadStatus";
 import { Form, Button, InputGroup, Dropdown, DropdownButton, Alert, } from "react-bootstrap";
 import "../Styles/ProductUpload.css";
 import Pica from "pica";
+import coin from "../assets/star.png";
 
 const ProductUpload = () => {
   const { user } = useAuthContext();
@@ -299,7 +300,7 @@ const ProductUpload = () => {
                 <img
                   src={url}
                   alt={`Preview ${index}`}
-                  style={{ width: "100px", height: "100px" }}
+                  style={{ width: "100px", height: "100px", objectFit: "cover", }}
                 />
                 <button
                   type="button"
@@ -434,7 +435,9 @@ const ProductUpload = () => {
       <Form.Group className="mb-3" controlId="price">
         <Form.Label>Price</Form.Label>
         <InputGroup>
-          <InputGroup.Text>€</InputGroup.Text>
+          <InputGroup.Text>
+            <img src={coin} style={{ height: "20px" }} />
+          </InputGroup.Text>
           <Form.Control
             type="number"
             placeholder="0,00"

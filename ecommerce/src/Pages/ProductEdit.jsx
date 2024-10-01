@@ -17,6 +17,7 @@ import {
 } from "react-bootstrap";
 import "../Styles/ProductEdit.css";
 import Pica from "pica";
+import coin from "../assets/star.png"
 
 const ProductEdit = () => {
   const { user } = useAuthContext();
@@ -383,7 +384,11 @@ const ProductEdit = () => {
                 <img
                   src={url}
                   alt={`Preview ${index}`}
-                  style={{ width: "100px", height: "100px" }}
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    objectFit: "cover",
+                  }}
                 />
                 <button
                   type="button"
@@ -513,7 +518,9 @@ const ProductEdit = () => {
       <Form.Group className="mb-3" controlId="price">
         <Form.Label>Price</Form.Label>
         <InputGroup>
-          <InputGroup.Text>€</InputGroup.Text>
+          <InputGroup.Text>
+            <img src={coin} style={{ height: "20px" }} />
+          </InputGroup.Text>
           <Form.Control
             type="number"
             placeholder="0,00"
