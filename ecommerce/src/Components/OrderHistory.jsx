@@ -18,6 +18,7 @@ import {
   findTotalPage,
   capitalizeStatusStr,
 } from "../utils/transactionUtils";
+import { useNavigate } from "react-router-dom";
 
 const STATUS_LIST = ["processing", "await-pickup", "delivered", "cancelled"];
 const PICKUP_LIST = ["Myllypuro", "Karamalmi", "Myyrmäki"];
@@ -32,6 +33,7 @@ const PICKUP_LIST = ["Myllypuro", "Karamalmi", "Myyrmäki"];
 const OrderHistory = () => {
   const { user, updateUser, scheduleTokenRenewal } = useAuthContext();
 
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState("");
   const [queryStrArr, setqueryStrArr] = useState([]);
@@ -42,13 +44,16 @@ const OrderHistory = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(1);
 
+  const SELLER = "seller";
+
   useEffect(() => {
     setOrderItems((od) => []);
 
     let isMounted = true;
     const fetchOrderItems = async () => {
-      if (!user) {
-        return;
+      console.log(user);
+      if (user.role !== SELLER) {
+        navigate("/");
       }
       // console.log("fetch detail", queryStrArr);
       try {
@@ -69,7 +74,7 @@ const OrderHistory = () => {
         if (response.ok) {
           const orderData = await response.json();
           const { totalOrder, limit, orderItemList } = orderData.data;
-          console.log(orderItemList);
+          // console.log(orderItemList);
           if (orderData && isMounted) {
             setOrderItems((od) => [...od, ...orderItemList]);
             // setTotalPages((tp) => Math.ceil(totalOrder / limit));
@@ -79,6 +84,7 @@ const OrderHistory = () => {
           setTotalPages((tp) => 0);
           // setPage(tp)
         }
+        console.log("Finish Fetching order history");
       } catch (err) {
         console.error("Error fetching orders", err);
       } finally {
@@ -160,7 +166,7 @@ const OrderHistory = () => {
       if (page) {
         updatedQueryStrArr.push(`page=${pageNumber}`);
       }
-      console.log(updatedQueryStrArr);
+      // console.log(updatedQueryStrArr);
       // console.log(updateQueryStringArrayWithId);
       return updatedQueryStrArr;
     });
@@ -178,7 +184,6 @@ const OrderHistory = () => {
   };
 
   const handlePageChange = (pageNumber) => {
-
     updateQueryStringArrayWithPage(pageNumber);
   };
 

@@ -122,7 +122,7 @@ const AdminOrderComp = () => {
         if (response.ok) {
           const data = await response.json();
           // console.log(findTotalPage(data.totalItems, data.limit));
-          console.log(data.data);
+          // console.log(data.data);
           setOrderItems((ot) => data.data);
           setTotalPages((tp) => findTotalPage(data.totalItems, data.limit));
           // setStats((s) => ({ ...s, ...data.totalItems }));
@@ -336,6 +336,10 @@ const AdminOrderComp = () => {
       {/* Product Table */}
       {loading ? (
         <Loading />
+      ) : orderItems.length === 0 ? (
+        <div>
+          <p>Cannot find any order.</p>
+        </div>
       ) : (
         <>
           <Table striped bordered hover>
