@@ -70,18 +70,72 @@ const ProductEdit = () => {
           price: product.price,
           quantity: product.stock_quantity,
           pickUpPoint: product.pickup_point,
-          keywords: Array.isArray(product.keywords) ? product.keywords.join(", ") : "",
+          keywords: Array.isArray(product.keywords)
+            ? product.keywords.join(", ")
+            : "",
         });
 
         setSelectedFiles(product.photos);
         setPreviewUrls(product.photos);
+
+        // Set category based on product's category_id
+        const categoryId = product.category_id._id;
+
+        // Find the corresponding sub-category or sub-sub-category from the categories context
+        let category = null;
+        let subCategory = null;
+        let subSubCategory = null;
+
+        console.log("Looking for categoryId:", categoryId);
+
+        for (let cat of categories) {
+          console.log("Checking top-level category:", cat.children);
+
+          // Check if category_id is a sub-category
+          const subCat = cat.children.find(
+            (child) => child._id === categoryId
+          );
+          if (subCat) {
+            console.log("Found as sub-category:", subCat);
+            category = cat;
+            subCategory = subCat;
+            break;
+          }
+
+          // Check if category_id is a sub-sub-category
+          for (let child of cat.children) {
+            const subSubCat = child.children?.find(
+              (subChild) => subChild._id === categoryId
+            );
+            if (subSubCat) {
+              console.log("Found as sub-sub-category:", subSubCat);
+              category = cat;
+              subCategory = child;
+              subSubCategory = subSubCat;
+              break;
+            }
+          }
+          if (subSubCategory) break;
+        }
+
+        // Update selected category states
+        setSelectedCategory(category);
+        setSelectedSubCategory(subCategory);
+        setSelectedSubSubCategory(subSubCategory);
+
+        console.log(
+          "Selected category:",
+          category,
+          subCategory,
+          subSubCategory
+        );
       } catch (error) {
         console.error("Error fetching product data:", error);
       }
     };
 
     fetchProduct();
-  }, [id]);
+  }, [id, categories]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
