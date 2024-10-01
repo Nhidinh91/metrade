@@ -169,11 +169,15 @@ const AdminUserComp = () => {
   //Search when search button is clicked
   const handleSearch = () => {
     setSearchQuery(searchTerm);
+    setStatus("");
+    setSearchTerm("");
   }
 
   //Handle status button click
   const handleStatusClick = (status) => {
     setStatus(status);
+    setSearchQuery("");
+    setCurrentPage(1);
   };
 
     const getTextVariant = (status) => {
@@ -235,7 +239,7 @@ const AdminUserComp = () => {
       </Row>
 
       {/* Search Bar */}
-      <Row className="mb-3">
+      <Row>
         <Col>
           <Container fluid className=" search-bar-container d-flex">
             <FormControl
@@ -256,7 +260,7 @@ const AdminUserComp = () => {
       <Table striped bordered hover className="user-table">
         <thead className="user-table-header">
           <tr>
-            <th>Username</th>
+            <th>User email</th>
             <th>Status</th>
             <th></th>
           </tr>

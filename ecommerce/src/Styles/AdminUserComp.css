@@ -17,7 +17,7 @@
 
 /* Search Bar */
 .search-bar-container {
-    background-color: #FFC107;
+    background-color: rgb(250 175 5);
     padding: 0.5rem;
     border-radius: 10px 10px 0 0;
     align-items: center;
@@ -27,17 +27,17 @@
     border: none;
     border-radius: 5px;
     padding: 0.75rem;
-    flex-grow: 1;
     outline: none;
 }
 
 .search-button {
-    background-color: #F57C00;
+    background-color: transparent;
     border: none;
     color: white;
     padding: 0.75rem 1.5rem;
     margin-left: 10px;
     border-radius: 5px;
+    box-shadow: none;
     cursor: pointer;
 }
 
@@ -52,9 +52,10 @@
 
 /* Button inside Table */
 .action-button {
-    background-color: var(--clr-navy);
+    background-color: var(--clr-navy) !important;
     color: #FFFFFF;
     border-radius: 5px;
+    border: none;
     padding: 0.5rem 2rem;
     cursor: pointer;
 }
