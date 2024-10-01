@@ -21,7 +21,7 @@ const Header = () => {
             </Navbar.Brand>
             <SearchBar />
             <div className={`${style.rightContainer}`}>
-              <Button className={`${style.btnSellNow}`} href="/new-product">
+              <Button className={`${style.btnSellNow} d-none d-md-block`} href="/new-product">
                 Sell Now
               </Button>
               {!user ? (
@@ -33,7 +33,7 @@ const Header = () => {
               ) : (
                 <ProfileMenu />
               )}
-              <NavDropdown
+              <NavDropdown className="d-none d-md-block"
                 title={
                   <i
                     className={`${style.basketIcon} fa-solid fa-cart-shopping`}
