@@ -285,7 +285,10 @@ const AdminProductComp = () => {
           >
             <Card.Body>
               <Card.Title className="status-card-title">Sold</Card.Title>
-              <Card.Text className="status-card-text fs-2">
+              <Card.Text
+                className="status-card-text fs-2"
+                style={{ color: "#F57C00" }}
+              >
                 {counts.sold}
               </Card.Text>
             </Card.Body>
@@ -329,12 +332,12 @@ const AdminProductComp = () => {
               <tr key={product._id}>
                 <td>
                   <Link to={`/product/detail/${product._id}`}>
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="product-image"
-                    style={{ width: "100px", height: "100px" }}
-                  />
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="product-image"
+                      style={{ width: "100px", height: "100px" }}
+                    />
                   </Link>
                 </td>
                 <td className="align-middle">
@@ -349,8 +352,11 @@ const AdminProductComp = () => {
                   className={`product-status ${
                     product.status === "processing"
                       ? "text-success"
-                      : "text-primary"
+                      : product.status === "active"
+                      ? "text-primary"
+                      : ""
                   }`}
+                  style={product.status === "sold" ? { color: "#F57C00" } : {}}
                 >
                   {product.status}
                 </td>
