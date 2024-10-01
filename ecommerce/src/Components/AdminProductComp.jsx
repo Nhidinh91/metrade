@@ -244,7 +244,7 @@ const AdminProductComp = () => {
               <Card.Title className="status-card-title">
                 All Products
               </Card.Title>
-              <Card.Text className="status-card-text text-primary fs-2">
+              <Card.Text className="status-card-text fs-2">
                 {counts.all}
               </Card.Text>
             </Card.Body>
@@ -259,7 +259,7 @@ const AdminProductComp = () => {
               <Card.Title className="status-card-title">
                 Active Products
               </Card.Title>
-              <Card.Text className="status-card-text text-success fs-2">
+              <Card.Text className="status-card-text text-primary fs-2">
                 {counts.active}
               </Card.Text>
             </Card.Body>
@@ -272,7 +272,7 @@ const AdminProductComp = () => {
           >
             <Card.Body>
               <Card.Title className="status-card-title">Processing</Card.Title>
-              <Card.Text className="status-card-text text-warning fs-2">
+              <Card.Text className="status-card-text text-success fs-2">
                 {counts.processing}
               </Card.Text>
             </Card.Body>
@@ -285,7 +285,7 @@ const AdminProductComp = () => {
           >
             <Card.Body>
               <Card.Title className="status-card-title">Sold</Card.Title>
-              <Card.Text className="status-card-text text-success fs-2">
+              <Card.Text className="status-card-text fs-2">
                 {counts.sold}
               </Card.Text>
             </Card.Body>
@@ -348,8 +348,8 @@ const AdminProductComp = () => {
                 <td
                   className={`product-status ${
                     product.status === "processing"
-                      ? "text-warning"
-                      : "text-success"
+                      ? "text-success"
+                      : "text-primary"
                   }`}
                 >
                   {product.status}
