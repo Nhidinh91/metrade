@@ -1,31 +1,31 @@
-import { useAuthContext } from '../hooks/useAuthContext';
-import { useNavigate } from 'react-router-dom';
-import { Dropdown, } from 'react-bootstrap';
-import ProfileImage from '../assets/profile-default-image.png'
-import style from '../Styles/ProfileMenu.module.css';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
-import Coin from '../assets/star.png';
+import { useAuthContext } from "../hooks/useAuthContext";
+import { useNavigate } from "react-router-dom";
+import { Dropdown } from "react-bootstrap";
+import ProfileImage from "../assets/profile-default-image.png";
+import style from "../Styles/ProfileMenu.module.css";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Coin from "../assets/star.png";
 
 const ProfileMenu = () => {
-    const { user, logout } = useAuthContext();
+  const { user, logout } = useAuthContext();
 
-    const navigate = useNavigate()
+  const navigate = useNavigate();
 
-    const handleMyPageClick = () => {
-        navigate('/my-page');
-    };
+  const handleMyPageClick = () => {
+    navigate("/my-page");
+  };
 
-    const handleSellingHistoryClick = () => {
-        navigate('/selling-history');
-    }
+  const handleSellingHistoryClick = () => {
+    navigate("/selling-history");
+  };
 
-    const handlePurchaseHistoryClick = () => {
-        navigate('/purchase-history');
-    }
+  const handlePurchaseHistoryClick = () => {
+    navigate("/purchase-history");
+  };
 
-    const handleLogoutClick = () => {
-        logout();
-    };
+  const handleLogoutClick = () => {
+    logout();
+  };
 
     return (
       <Dropdown className={`${style.profileMenu}`}>
@@ -34,6 +34,7 @@ const ProfileMenu = () => {
           className={`${style.profileButton}`}
           id="dropdown-profile-button"
         >
+          <i className="fa-solid fa-caret-down"></i>
           <img
             src={
               user.photo_url

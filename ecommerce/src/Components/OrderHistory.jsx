@@ -68,7 +68,7 @@ const OrderHistory = () => {
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState("");
   const [queryStrArr, setqueryStrArr] = useState([]);
-  const [orderDetails, setOrderDetails] = useState([]);
+  const [orderItems, setOrderItems] = useState([]);
   const [pickUpPlace, setPickUpPlace] = useState("");
   const [status, setStatus] = useState("");
   const [id, setId] = useState("");
@@ -76,10 +76,10 @@ const OrderHistory = () => {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    setOrderDetails((od) => []);
+    setOrderItems((od) => []);
 
     let isMounted = true;
-    const fetchOrderDetails = async () => {
+    const fetchOrderItems = async () => {
       setLoading((l) => true);
       console.log("fetch detail", queryStrArr);
       try {
@@ -97,9 +97,9 @@ const OrderHistory = () => {
         );
         if (response.ok) {
           const orderData = await response.json();
-          const { totalOrder, limit, orderDetailList } = orderData.data;
+          const { totalOrder, limit, orderItemList } = orderData.data;
           if (orderData && isMounted) {
-            setOrderDetails((od) => [...od, ...orderDetailList]);
+            setOrderItems((od) => [...od, ...orderItemList]);
             setTotalPages((tp) => Math.ceil(totalOrder / limit));
           }
         } else {
@@ -113,11 +113,11 @@ const OrderHistory = () => {
       }
     };
 
-    fetchOrderDetails();
+    fetchOrderItems();
     return () => {
       isMounted = false;
     };
-  }, [ queryStrArr]);
+  }, [queryStrArr]);
 
   useEffect(() => {
     if (user && user.token_expired_at) {
@@ -290,12 +290,8 @@ const OrderHistory = () => {
         </div>
       ) : (
         <div className="orders-container">
-          {orderDetails.map((detail) => (
-            <div
-              className="order-item"
-              key={detail._id}
-
-            >
+          {orderItems.map((detail) => (
+            <div className="order-item" key={detail._id}>
               <div className="order-item-image">
                 <img src={detail.image} alt={detail.name} />
               </div>
