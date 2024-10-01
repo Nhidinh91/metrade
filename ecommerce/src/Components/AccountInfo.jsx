@@ -30,7 +30,7 @@ const AccountInfo = () => {
     }
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/user/profile/detail/${user._id}`,
+        `${process.env.REACT_APP_API_URL}/user/profile/detail`,
         {
           method: "GET",
           headers: {
@@ -56,11 +56,8 @@ const AccountInfo = () => {
   }, [user]);
 
   useEffect(() => {
-    if (user && user.token_expired_at) {
-      scheduleTokenRenewal(user.token_expired_at); // Schedule token renewal
-    }
     fetchProfile();
-  }, [user, fetchProfile, scheduleTokenRenewal]);
+  }, [user, fetchProfile]);
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
@@ -137,7 +134,7 @@ const AccountInfo = () => {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/user/profile/update/${user._id}`,
+        `${process.env.REACT_APP_API_URL}/user/profile/update`,
         {
           method: "PATCH",
           body: formData,
