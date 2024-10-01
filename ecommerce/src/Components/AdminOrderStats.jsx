@@ -12,25 +12,39 @@ import {
 
 import { displaySellingStatusColor } from "../utils/transactionUtils";
 
-// activeProducts: 7539
-// ​​
-// deletedProducts: 4
-// ​​
-// processingProducts: 65
-// ​​
-// soldProducts: 1663
-const AdminOrderStats = ({ stats, statusList, changeSellingStatus }) => {
+const AdminOrderStats = ({
+  stats,
+  statusList,
+  changeSellingStatus,
+  totalItmes,
+  displayAllOrderItem,
+}) => {
   return (
     <Row className="mb-4">
       <Col>
+        <Card className="text-center status-card" onClick={displayAllOrderItem}>
+          <Card.Body>
+            <Card.Title className="status-card-title">All</Card.Title>
+            <Card.Text
+              className="fs-2 status-card-text text-primary"
+              style={{ color: `${displaySellingStatusColor(statusList[2])}` }}
+            >
+              {stats.allOrderNum}
+            </Card.Text>
+          </Card.Body>
+        </Card>
+      </Col>
+      <Col>
         <Card
-          className="text-center card-order-item"
+          className="text-center status-card"
           onClick={() => changeSellingStatus(statusList[2])}
         >
           <Card.Body>
-            <Card.Title>Successfully delivered</Card.Title>
+            <Card.Title className="status-card-title">
+              Successfully delivered
+            </Card.Title>
             <Card.Text
-              className="fs-2"
+              className="fs-2 status-card-text"
               style={{ color: `${displaySellingStatusColor(statusList[2])}` }}
             >
               {stats.deliveredNum}
@@ -40,13 +54,13 @@ const AdminOrderStats = ({ stats, statusList, changeSellingStatus }) => {
       </Col>
       <Col>
         <Card
-          className="text-center card-order-item"
+          className="text-center status-card"
           onClick={() => changeSellingStatus(statusList[0])}
         >
           <Card.Body>
-            <Card.Title>Processing</Card.Title>
+            <Card.Title className="status-card-title">Processing</Card.Title>
             <Card.Text
-              className="fs-2"
+              className="fs-2 status-card-text"
               style={{ color: `${displaySellingStatusColor(statusList[0])}` }}
             >
               {stats.processNum}
@@ -56,13 +70,13 @@ const AdminOrderStats = ({ stats, statusList, changeSellingStatus }) => {
       </Col>
       <Col>
         <Card
-          className="text-center card-order-item"
+          className="text-center status-card"
           onClick={() => changeSellingStatus(statusList[1])}
         >
           <Card.Body>
-            <Card.Title>Await Pickup</Card.Title>
+            <Card.Title className="status-card-title">Await Pickup</Card.Title>
             <Card.Text
-              className="fs-2 "
+              className="fs-2 status-card-text"
               style={{ color: `${displaySellingStatusColor(statusList[1])}` }}
             >
               {stats.awaitNum}
@@ -72,13 +86,13 @@ const AdminOrderStats = ({ stats, statusList, changeSellingStatus }) => {
       </Col>
       <Col>
         <Card
-          className="text-center card-order-item"
+          className="text-center status-card"
           onClick={() => changeSellingStatus(statusList[3])}
         >
           <Card.Body>
-            <Card.Title>Cancelled</Card.Title>
+            <Card.Title className="status-card-title">Cancelled</Card.Title>
             <Card.Text
-              className="fs-2"
+              className="fs-2 status-card-text"
               style={{ color: `${displaySellingStatusColor(statusList[3])}` }}
             >
               {stats.cancelledNum}

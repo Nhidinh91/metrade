@@ -62,6 +62,7 @@ const orderItemSchema = new mongoose.Schema(
 );
 
 orderItemSchema.statics.getStats = async function () {
+  const allOrderNum = await this.countDocuments();
   const processNum = await this.countDocuments({
     selling_status: selling_status_list[0],
   });
@@ -74,7 +75,7 @@ orderItemSchema.statics.getStats = async function () {
   const cancelledNum = await this.countDocuments({
     selling_status: selling_status_list[3],
   });
-  return { processNum, awaitNum, deliveredNum, cancelledNum };
+  return { allOrderNum, processNum, awaitNum, deliveredNum, cancelledNum };
 };
 
 orderItemSchema.statics.getAllOrderItems = async function (reqQuerry) {

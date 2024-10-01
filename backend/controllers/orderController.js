@@ -120,7 +120,7 @@ export const updateOrderItemStatus = async (req, res) => {
     const { orderItemId } = req.params;
     // console.log("order item id", orderItemId);
     const { selling_status } = req.body;
-    // console.log(order_status);
+    console.log(selling_status);
     if (!orderItemId) {
       return res.status(400).json({
         status: "fail",

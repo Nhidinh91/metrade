@@ -9,6 +9,7 @@ import {
   FormControl,
   InputGroup,
   Pagination,
+  Modal,
 } from "react-bootstrap";
 import AdminOrderStats from "./AdminOrderStats";
 import { useAuthContext } from "../hooks/useAuthContext";
@@ -18,30 +19,30 @@ import {
   convertToQueryString,
   findTotalPage,
 } from "../utils/transactionUtils";
+import "../Styles/AdminOrder.css";
+import AdminOrderModal from "./AdminOrderModal";
+import Loading from "./Loading";
 
 const STATUS_LIST = ["processing", "await-pickup", "delivered", "cancelled"];
 
+const getNewSellingStatus = (str) => {
+  switch (str) {
+    case STATUS_LIST[0]:
+      return STATUS_LIST[1];
+    case STATUS_LIST[1]:
+      return STATUS_LIST[2];
+    default:
+      return str;
+  }
+};
+
 const AdminOrderComp = () => {
   // Sample data
-  const initialProducts = [
-    { id: "#2345", status: "Processing" },
-    { id: "#5667", status: "Processing" },
-    { id: "#1998", status: "Processing" },
-    { id: "#1245", status: "Processing" },
-    { id: "#1234", status: "Active" },
-    { id: "#1236", status: "Active" },
-    { id: "#1237", status: "Active" },
-    { id: "#1239", status: "Active" },
-    { id: "#2345", status: "Active" },
-    { id: "#5678", status: "Active" },
-    { id: "#7890", status: "Active" },
-  ];
-
   const { user, updateUser, scheduleTokenRenewal } = useAuthContext();
 
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({});
-  const [products, setProducts] = useState(initialProducts);
+  // const [products, setProducts] = useState(initialProducts);
   const [orderItems, setOrderItems] = useState([]);
   const [pickupPlace, setPickUpPlace] = useState("");
   const [status, setStatus] = useState("");
@@ -51,7 +52,10 @@ const AdminOrderComp = () => {
   const [page, setPage] = useState(1);
   const [queryStrArr, setqueryStrArr] = useState([]);
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedOrderItem, setSelectedOrderItem] = useState(null); // Selected product for action
+  const [showModal, setShowModal] = useState(false); // State to control modal visibility
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // State to control success modal visibility
+  const [successMessage, setSuccessMessage] = useState(""); // State to store success message
 
   //refresh token
   useEffect(() => {
@@ -65,6 +69,7 @@ const AdminOrderComp = () => {
     const abortcontroller = new AbortController();
     const fetchStats = async () => {
       try {
+        setLoading((l) => true);
         const response = await fetch(
           `${process.env.REACT_APP_API_URL}/admin/transactions/stats`,
           {
@@ -78,7 +83,7 @@ const AdminOrderComp = () => {
         );
         if (response.ok) {
           const statsData = await response.json();
-          setStats((s) => statsData.data);
+          setStats((s) => ({ ...s, ...statsData.data }));
         }
       } catch (error) {
         if (error.name !== "AbortError")
@@ -91,7 +96,7 @@ const AdminOrderComp = () => {
     return () => {
       abortcontroller.abort();
     };
-  }, [orderItems]);
+  }, [orderItems, selectedOrderItem]);
 
   // fetch orderItems
   useEffect(() => {
@@ -99,9 +104,9 @@ const AdminOrderComp = () => {
     setOrderItems((od) => []);
 
     const fetchOrderItems = async () => {
-      setLoading((l) => true);
       console.log(queryStrArr);
       try {
+        setLoading((l) => true);
         const response = await fetch(
           `${
             process.env.REACT_APP_API_URL
@@ -117,11 +122,13 @@ const AdminOrderComp = () => {
         );
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           console.log(findTotalPage(data.totalItems, data.limit));
           setOrderItems((ot) => data.data);
           setTotalPages((tp) => findTotalPage(data.totalItems, data.limit));
+          // setStats((s) => ({ ...s, ...data.totalItems }));
+          console.log("stats", stats);
         } else {
+          setTotalPages((tp) => 0);
           throw new Error("Cannot get data");
         }
       } catch (error) {
@@ -136,7 +143,7 @@ const AdminOrderComp = () => {
     return () => {
       abortcontroller.abort();
     };
-  }, [queryStrArr]);
+  }, [queryStrArr, selectedOrderItem, status]);
 
   //update querystring automatically
   useEffect(() => {
@@ -163,6 +170,7 @@ const AdminOrderComp = () => {
     setqueryStrArr((qta) => []);
     setStatus((s) => "");
     setPage((p) => 1);
+    setItemId((ii) => "");
   };
 
   const updateQueryStringArrayWithPage = (pageNumber) => {
@@ -210,7 +218,85 @@ const AdminOrderComp = () => {
     }
   };
 
+  // Handle opening the modal with the selected order item
+  const handleActionClick = (orderItem) => {
+    setSelectedOrderItem(orderItem);
+    setShowModal(true);
+  };
 
+  // Handle closing the modal
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedOrderItem(null);
+  };
+
+  // Handle closing the success modal
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    setSuccessMessage("");
+  };
+
+  //handle Button inside Modal
+  const handleStatusChange = async (item) => {
+    console.log("handle status change");
+    try {
+      const newSellingStatus = getNewSellingStatus(item.selling_status);
+      console.log(newSellingStatus);
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/admin/transactions/${item._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            selling_status: newSellingStatus,
+          }),
+          credentials: "include",
+          // signal: abortcontroller.signal,
+        }
+      );
+      if (response.ok) {
+        handleCloseModal();
+        setSuccessMessage("Order item changes status successfully");
+        setShowSuccessModal(true);
+      } else {
+        throw new Error("Fail to change order item's status");
+      }
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  const handleCancelStatus = async (item) => {
+    try {
+      // const newSellingStatus = getNewSellingStatus(str);
+      console.log("handle cancel status");
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/admin/transactions/${item._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            selling_status: STATUS_LIST[3],
+          }),
+
+          credentials: "include",
+        }
+      );
+      if (response.ok) {
+        handleCloseModal();
+        setSuccessMessage("Order item cancels successfully");
+        setShowSuccessModal(true);
+      } else {
+        throw new Error("Fail to cancel order item");
+      }
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
 
   return (
     <Container fluid className="p-4">
@@ -219,21 +305,12 @@ const AdminOrderComp = () => {
         stats={stats}
         statusList={STATUS_LIST}
         changeSellingStatus={changeSellingStatus}
+        // totalItems={data.totalItems}
+        displayAllOrderItem={displayAllOrderItem}
       />
 
-      {/* {orderId} */}
-      {/* Search Bar */}
       <Row className="mb-3 d-flex justify-content-between">
-        <Col className="col-2">
-          <button
-            type="button"
-            class="btn btn-light"
-            onClick={displayAllOrderItem}
-          >
-            All
-          </button>
-        </Col>
-        <Col className="col-9 ">
+        <Col>
           <InputGroup>
             <FormControl
               placeholder="Search order item id..."
@@ -249,46 +326,126 @@ const AdminOrderComp = () => {
       </Row>
 
       {/* Product Table */}
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Order Item Id</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orderItems.map((item) => (
-            <tr key={item._id}>
-              <td>{item._id}</td>
-              <td
-                style={{
-                  color: `${displaySellingStatusColor(item.selling_status)}`,
-                }}
-              >
-                {item.selling_status}
-              </td>
-              <td>
-                <Button variant="primary">Action</Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-      <Container className="d-flex justify-content-center">
-        <Pagination className="order-page">
-          {[...Array(totalPages)].map((_, index) => (
-            <Pagination.Item
-              key={index + 1}
-              active={index + 1 === page}
-              onClick={() => handlePageChange(index + 1)}
-              className="order-page-item"
-            >
-              {index + 1}
-            </Pagination.Item>
-          ))}
-        </Pagination>
-      </Container>
+      {loading ? (
+        <Loading />
+      ) : (
+        <>
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>Order Item Id</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orderItems.map((item) => (
+                <tr key={item._id}>
+                  <td>{item._id}</td>
+                  <td
+                    style={{
+                      color: `${displaySellingStatusColor(
+                        item.selling_status
+                      )}`,
+                    }}
+                  >
+                    {item.selling_status}
+                  </td>
+                  <td className="text-center align-middle">
+                    {item.selling_status !== STATUS_LIST[3] && (
+                      <Button
+                        className="action-button"
+                        onClick={() => handleActionClick(item)}
+                      >
+                        Action
+                      </Button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          <Container className="d-flex justify-content-center">
+            <Pagination className="order-page">
+              {[...Array(totalPages)].map((_, index) => (
+                <Pagination.Item
+                  key={index + 1}
+                  active={index + 1 === page}
+                  onClick={() => handlePageChange(index + 1)}
+                  className="order-page-item"
+                >
+                  {index + 1}
+                </Pagination.Item>
+              ))}
+            </Pagination>
+          </Container>
+
+          {/* Action Modal */}
+          <Modal show={showModal} onHide={handleCloseModal} centered>
+            <Modal.Header closeButton>
+              <Modal.Title>Product Action</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Order Item ID: {selectedOrderItem?._id}</p>
+              <p>Status: {selectedOrderItem?.selling_status}</p>
+              {selectedOrderItem?.selling_status === STATUS_LIST[0] ? (
+                <>
+                  <Button
+                    variant="success"
+                    className="me-2"
+                    onClick={() => handleStatusChange(selectedOrderItem)}
+                  >
+                    AWAIT PICKUP
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleCancelStatus(selectedOrderItem)}
+                  >
+                    CANCEL
+                  </Button>
+                </>
+              ) : selectedOrderItem?.selling_status === STATUS_LIST[1] ? (
+                <>
+                  <Button
+                    variant="success"
+                    className="me-2"
+                    onClick={() => handleStatusChange(selectedOrderItem)}
+                  >
+                    DELIVER
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleCancelStatus(selectedOrderItem)}
+                  >
+                    CANCEL
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="danger"
+                  onClick={() => handleCancelStatus(selectedOrderItem)}
+                >
+                  Cancel
+                </Button>
+              )}
+            </Modal.Body>
+          </Modal>
+
+          {/* Success Modal */}
+          <Modal
+            show={showSuccessModal}
+            onHide={handleCloseSuccessModal}
+            centered
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>Success</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>{successMessage}</p>
+            </Modal.Body>
+          </Modal>
+        </>
+      )}
     </Container>
   );
 };
