@@ -1,3 +1,7 @@
+.profileMenu {
+    font-size: 1rem;
+}
+
 .profileMenu .profileButton {
     display: flex;
     align-items: center;

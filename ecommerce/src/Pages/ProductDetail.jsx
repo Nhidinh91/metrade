@@ -159,7 +159,7 @@ const ProductDetail = () => {
                   <img src={clock} alt="clock" />
                   <div>{daysCreation(product.created_at)} days</div>
                 </div>
-                <div className="location">
+                <div className={`location ${product.pickup_point}`}>
                   <img src={locImg} alt="location" />
                   <div>{product.pickup_point}</div>
                 </div>

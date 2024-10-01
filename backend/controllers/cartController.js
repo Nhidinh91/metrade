@@ -4,6 +4,7 @@ import CartItem from "../models/cartItemModel.js";
 import Order from "../models/orderModel.js";
 import OrderItem from "../models/orderItemModel.js";
 import Product from "../models/productModel.js";
+import User from "../models/userModel.js";
 
 //ADD PRODUCT TO CART
 export const addCartItem = async (req, res) => {
@@ -213,7 +214,7 @@ export const updateItemQuantity = async (req, res) => {
   try {
     const cartItem = await CartItem.findById(itemId).populate({
       path: "product_id",
-      model: "Product"
+      model: "Product",
     });
     if (
       (updatedQuantity === -1 && cartItem.adding_quantity >= 2) ||
@@ -224,7 +225,9 @@ export const updateItemQuantity = async (req, res) => {
         {
           adding_quantity: cartItem.adding_quantity + updatedQuantity,
           limit_quantity: cartItem.limit_quantity - updatedQuantity,
-          sub_total: (cartItem.adding_quantity + updatedQuantity) * cartItem.product_id.price
+          sub_total:
+            (cartItem.adding_quantity + updatedQuantity) *
+            cartItem.product_id.price,
         },
         { new: true }
       );
@@ -294,6 +297,22 @@ export const checkout = async (req, res) => {
       });
     }
 
+    const user = await User.findById(userId).session(session);
+    // Check if user exists
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    // Check if user has enough balance
+    if (user.balance < checkout.total_price) {
+      return res.status(402).json({
+        success: false,
+        message: "Not enough balance",
+      });
+    }
+    // Check if cart exists
     const cart = await Cart.findOne({ user_id: userId })
       .populate({
         path: "cart_items",
@@ -303,9 +322,11 @@ export const checkout = async (req, res) => {
         },
       })
       .session(session);
-      
+
     const cartItems = cart.cart_items.filter((item) => {
-      return checkout.order_items.some(orderItem => orderItem._id === item._id.toString());
+      return checkout.order_items.some(
+        (orderItem) => orderItem._id === item._id.toString()
+      );
     });
 
     if (!cart || cartItems.length === 0) {
@@ -315,7 +336,7 @@ export const checkout = async (req, res) => {
       });
     }
 
-    // Create the Order document
+    // 1-Create the Order document
     const newOrder = new Order({
       user_id: userId,
       total_item_quantity: checkout.total_items,
@@ -323,7 +344,7 @@ export const checkout = async (req, res) => {
     });
     const savedOrder = await newOrder.save({ session });
 
-    // Create OrderItem documents for each selected cart item
+    // 2-Create OrderItem documents for each selected cart item
     const orderItems = cartItems.map((item) => ({
       order_id: savedOrder._id,
       product_id: item.product_id._id,
@@ -337,9 +358,11 @@ export const checkout = async (req, res) => {
 
     await OrderItem.insertMany(orderItems, { session });
 
-    // Step 5: Update stock quantity of each product
+    // 3-Update stock quantity of each product
     for (const item of cartItems) {
-      const product = await Product.findById(item.product_id._id).session(session);
+      const product = await Product.findById(item.product_id._id).session(
+        session
+      );
       if (product) {
         product.stock_quantity -= item.adding_quantity;
         if (product.stock_quantity === 0) {
@@ -358,11 +381,11 @@ export const checkout = async (req, res) => {
       }
     }
 
-    //Remove items that are checked out from the cartItem
+    //4-Remove items that are checked out from the cartItem
     const cartItemIds = cartItems.map((item) => item._id);
     await CartItem.deleteMany({ _id: { $in: cartItemIds } }, { session });
 
-    // Remove the checked-out cart items from the Cart
+    // 5-Remove the checked-out cart items from the Cart
     await Cart.findByIdAndUpdate(
       cart._id,
       {
@@ -370,6 +393,15 @@ export const checkout = async (req, res) => {
       },
       { session }
     );
+
+    //6-Deduct money from balance of the user
+    user.balance -= checkout.total_price;
+    const updatedUser = await user.save({ session });
+    if (!updatedUser) {
+      throw new Error("Failed to update user balance");
+    }
+    
+    console.log("User balance after deduction:", updatedUser.balance);
 
     // Commit the transaction
     await session.commitTransaction();
@@ -379,6 +411,7 @@ export const checkout = async (req, res) => {
       success: true,
       message: "Checkout successful and stock updated",
       order: savedOrder,
+      user: updatedUser,
     });
   } catch (error) {
     // If any error, abort the transaction
@@ -393,4 +426,3 @@ export const checkout = async (req, res) => {
     });
   }
 };
-

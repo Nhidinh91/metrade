@@ -18,7 +18,8 @@ const CartDetail = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [showCheckoutModal, setshowCheckoutModal] = useState(false);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
-  const { cartCount, setCartCount, setReloadCartCount, user } =
+  const [showInsufficientModal, setShowInsufficientModal] = useState(false);
+  const { cartCount, setCartCount, setReloadCartCount, user, updateUser } =
     useAuthContext();
 
   // Calculate total items in the cart
@@ -209,9 +210,12 @@ const CartDetail = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        setUpdatedCartItem(data.deleted_item);
+        setUpdatedCartItem(data.order);
         fetchCartDetail();
         setReloadCartCount(true);
+        updateUser(data.user);
+      } else if (response.status === 402) {
+        setShowInsufficientModal(true);
       }
     } catch (error) {
       console.log("Error deleting cart item", error);
@@ -309,7 +313,7 @@ const CartDetail = () => {
           </Col>
         </Row>
       )}
-
+      {/* {Checkout Modal} */}
       <Modal
         className="order-confirm-container"
         show={showCheckoutModal}
@@ -351,41 +355,69 @@ const CartDetail = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-      {user.is_verified === false && (
-        <Modal
-          className="email-verification-container"
-          show={showVerifyModal}
-          onHide={() => setShowVerifyModal(false)}
-        >
-          <Modal.Header>
-            <Modal.Title className="title">Verify Your Email</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <div className="notification-container">
-              <div className="ask-verify">
-                You must verify your email before proceeding to checkout.
-              </div>
-              <div></div>
+      {/* {Email Verification Modal} */}
+      <Modal
+        className="email-verification-container"
+        show={showVerifyModal}
+        onHide={() => setShowVerifyModal(false)}
+      >
+        <Modal.Header>
+          <Modal.Title className="title">Verify Your Email</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="notification-container">
+            <div className="ask-verify">
+              You must verify your email before proceeding to checkout.
             </div>
-          </Modal.Body>
-          <Modal.Footer className="button-container">
-              <Button
-                className="cancel-button"
-                variant="secondary"
-                onClick={() => setShowVerifyModal(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="navigate-button"
-                variant="primary"
-                onClick={() => navigate("/my-page")}
-              >
-                Go to My profile
-              </Button>
-          </Modal.Footer>
-        </Modal>
-      )}
+            <div></div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer className="button-container">
+          <Button
+            className="cancel-button"
+            variant="secondary"
+            onClick={() => setShowVerifyModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            className="navigate-button"
+            variant="primary"
+            onClick={() => navigate("/my-page")}
+          >
+            Go to My profile
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Insufficient Balance Modal */}
+      <Modal
+        className="insufficient-balance-container"
+        show={showInsufficientModal}
+        onHide={() => setShowInsufficientModal(false)}
+      >
+        <Modal.Header>
+          <Modal.Title className="title">Insufficient Coins</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="ask-add-coin">
+            You do not have enough balance to complete the checkout. Please add
+            more MetCoins
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            className="close-button"
+            variant="secondary"
+            onClick={() => setShowInsufficientModal(false)}
+          >
+            Close
+          </Button>
+          <Button className="add-funds-button" variant="primary">
+            Add MetCoins
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

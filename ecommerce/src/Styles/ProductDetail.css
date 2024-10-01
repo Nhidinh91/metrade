@@ -62,6 +62,19 @@
     justify-content: flex-start;
     gap: 0.25rem;
     font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.product-detail-container .Myyrmäki {
+  color: #009e54;
+}
+
+.product-detail-container .Karamalmi {
+  color: #e67300;
+}
+
+.product-detail-container .Myllypuro {
+  color: #ee0017;
 }
 
 .product-detail-container .location img {
