@@ -63,3 +63,16 @@
 td, tr {
     text-align: center;
 }
+
+/* User status */
+.text-user-status-success {
+    color: green !important;
+}
+
+.text-user-status-warning, .text-warning {
+    color: rgb(176 114 0) !important;
+}
+
+.text-user-status-danger {
+    color: red !important;
+}

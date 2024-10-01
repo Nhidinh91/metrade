@@ -46,8 +46,8 @@ const AdminUserComp = () => {
             setUserCount({
                 all: data.allUsersCount,
                 active: data.activeUserCount,
-                deactive: data.bannedUserCount,
-                banned: data.deletedUserCount
+                banned: data.bannedUserCount,
+                deleted: data.deletedUserCount
             });
             
         } catch (error) {
@@ -221,7 +221,7 @@ const AdminUserComp = () => {
             <Card.Body>
               <Card.Title className="status-card-title">Banned</Card.Title>
               <Card.Text className="text-warning fs-2 status-card-text">
-                {userCount.deactive}
+                {userCount.banned}
               </Card.Text>
             </Card.Body>
           </Card>
@@ -230,8 +230,8 @@ const AdminUserComp = () => {
           <Card className="text-center status-card" onClick={() => handleStatusClick("deleted")}>
             <Card.Body>
               <Card.Title className="status-card-title">Deleted</Card.Title>
-              <Card.Text className="text-danger fs-2 status-card-text">
-                {userCount.banned}
+              <Card.Text className="text-danger fs-2 status-card-text" >
+                {userCount.deleted}
               </Card.Text>
             </Card.Body>
           </Card>
@@ -270,7 +270,7 @@ const AdminUserComp = () => {
             <tr key={index}>
               <td>{user.email}</td>
               <td
-                className={`text-${getTextVariant(user.status)}`}
+                className={`text-user-status-${getTextVariant(user.status)}`}
               >
                 {user.status}
               </td>
