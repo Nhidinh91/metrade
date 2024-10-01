@@ -3,14 +3,14 @@ import { useLocalStorage } from "../hooks/useLocalStorage";
 
 export const AuthContext = createContext({
   user: null,
-  updateUser: () => { },
-  deleteUser: () => { },
-  setUser: () => { },
+  updateUser: () => {},
+  deleteUser: () => {},
+  setUser: () => {},
   isAuthenticated: () => false,
   isLoading: true,
-  renewAccessToken: () => { },
-  scheduleTokenRenewal: () => { },
-  logout: () => { },
+  renewAccessToken: () => {},
+  scheduleTokenRenewal: () => {},
+  logout: () => {},
   cartCount: 0,
   setCartCount: () => {},
   reloadCartCount: false,
@@ -44,6 +44,7 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         setItem(null);
         setIsLoading(false);
+        setCartCount(0);
       } else {
         console.error("Failed to log out on the server.");
       }
@@ -55,20 +56,23 @@ export const AuthProvider = ({ children }) => {
   //function to renew access token
   const renewAccessToken = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/token/get-access-token`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/token/get-access-token`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
       if (!response.ok) {
         await logout(); // Log the user out if token renewal fails
         return;
       }
       //if renew successfully
       const data = await response.json();
-      
+
       updateUser(data.user);
     } catch (error) {
       console.error("Error renewing access token:", error);
@@ -106,11 +110,49 @@ export const AuthProvider = ({ children }) => {
     setUser(user);
     setItem(user);
     scheduleTokenRenewal(user.token_expired_at); // Schedule token renewal when the user logs in or update user info
+    setReloadCartCount(true);
   };
 
   const isAuthenticated = () => {
     return user !== null;
   };
+
+  useEffect(() => {
+    const getCartDetail = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/cart/get-cart-detail`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          return;
+        }
+
+        if (response.ok) {
+          const cartDetail = data.cart_detail.cart_items || [];
+
+          const cartCount = cartDetail.reduce(
+            (acc, item) => acc + item.adding_quantity,
+            0
+          );
+          setCartCount(cartCount);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    getCartDetail();
+  }, [reloadCartCount]);
 
   return (
     <AuthContext.Provider
