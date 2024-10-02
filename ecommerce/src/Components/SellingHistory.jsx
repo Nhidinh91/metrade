@@ -1,7 +1,7 @@
-import ProductStatus from "../Components/ProductStatus.jsx";
+import ProductStatus from "./ProductStatus.jsx";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { useAuthContext } from "../hooks/useAuthContext";
+import { useAuthContext } from "../hooks/useAuthContext.jsx";
 import ProfileImage from '../assets/profile-default-image.png';
 import '../Styles/SellingHistory.css';
 import coin from "../assets/star.png";

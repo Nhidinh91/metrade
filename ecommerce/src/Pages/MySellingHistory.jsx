@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
-import SellingHistory from "./SellingHistory";
+import SellingHistory from "../Components/SellingHistory";
 
 const MySellingHistory = () => {
   const navigate = useNavigate();
