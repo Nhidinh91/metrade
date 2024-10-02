@@ -1,7 +1,7 @@
-import ProductStatus from "../Components/ProductStatus.jsx";
+import ProductStatus from "./ProductStatus.jsx";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { useAuthContext } from "../hooks/useAuthContext";
+import { useAuthContext } from "../hooks/useAuthContext.jsx";
 import ProfileImage from '../assets/profile-default-image.png';
 import '../Styles/SellingHistory.css';
 import coin from "../assets/star.png";
@@ -19,12 +19,13 @@ const SellingHistory = () => {
             const fetchProducts = async () => {
             try {
                 const response = await fetch(
-                `${process.env.REACT_APP_API_URL}/product/selling-page/inventory/${user._id}`,
+                `${process.env.REACT_APP_API_URL}/seller/selling-page/inventory/${user._id}`,
                 {
                     method: 'GET',
                     headers: {
                     'Content-Type': 'application/json',
                     },
+                    credentials: 'include',
                 }
                 );
                 const data = await response.json();

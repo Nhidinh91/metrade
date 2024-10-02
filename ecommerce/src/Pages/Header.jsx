@@ -47,18 +47,15 @@ const Header = () => {
 
   return (
     <>
-      <Navbar sticky="top" className={style.navBar}>
+      <Container fluid className="header-container">
         <Row className={`${style.navUpper} w-100`}>
           <Container className={`${style.navContainer}`}>
             <Navbar.Brand href="/">
-              <img src={logo2} alt="" height="100" />
+              <img src={logo2} alt="" className="nav-logo" />
             </Navbar.Brand>
             <SearchBar />
             <div className={`${style.rightContainer}`}>
-              <Button
-                className={`${style.btnSellNow}`}
-                onClick={handleSellNowClick}
-              >
+              <Button className={`${style.btnSellNow} d-none d-md-block`} onClick={handleSellNowClick} href="/new-product">
                 Sell Now
               </Button>
               {!user ? (
@@ -70,18 +67,24 @@ const Header = () => {
               ) : (
                 <ProfileMenu />
               )}
+              <NavDropdown className="d-none d-md-block"
+                title={
+                  <i
+                    className={`${style.basketIcon} fa-solid fa-cart-shopping`}
+                  />
+                }
+                id="basic-nav-dropdown"
+              ></NavDropdown>
               
               <CartMenu />
             </div>
           </Container>
         </Row>
-        <Row className="d-flex justify-content-center align-items-center vh=100">
-          <PageLinks
-            parentClass={`${style.navLinks}`}
-            itemClass={`${style.navLink}`}
-          />
+        {/* <Row className="d-flex justify-content-center align-items-center vh=100"> */}
+        <Row>
+          <PageLinks/>
         </Row>
-      </Navbar>
+      </Container>
 
       {/* Modal */}
       <Modal show={showModal} onHide={handleCloseModal} centered>
