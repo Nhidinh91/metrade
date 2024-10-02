@@ -318,60 +318,63 @@ const AdminProductComp = () => {
 
       {/* Product Table */}
       {products && products.length > 0 ? (
-        <Table striped bordered hover className="product-table">
-          <thead className="product-table-header">
-            <tr>
-              <th>Product Image</th>
-              <th>Product Info</th>
-              <th className="text-center">Status</th>
-              <th className="text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => (
-              <tr key={product._id}>
-                <td>
-                  <Link to={`/product/detail/${product._id}`}>
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="product-image"
-                      style={{ width: "100px", height: "100px" }}
-                    />
-                  </Link>
-                </td>
-                <td className="align-middle">
-                  <div>
-                    <b>Name:</b> {product.name}
-                  </div>
-                  <div>
-                    <b>ID:</b> {product._id}
-                  </div>
-                </td>
-                <td
-                  className={`product-status ${
-                    product.status === "processing"
-                      ? "text-success"
-                      : product.status === "active"
-                      ? "text-primary"
-                      : ""
-                  }`}
-                  style={product.status === "sold" ? { color: "#F57C00" } : {}}
-                >
-                  {product.status}
-                </td>
-                <td className="text-center align-middle">
-                  <Button
-                    className="action-button"
-                    onClick={() => handleActionClick(product)}
-                  >
-                    Action
-                  </Button>
-                </td>
+        <Container fluid className="table-responsive p-0">
+          <Table striped bordered hover className="product-table">
+            <thead className="product-table-header">
+              <tr>
+                <th>Product Image</th>
+                <th>Product Info</th>
+                <th className="text-center">Status</th>
+                <th className="text-center">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {products.map((product) => (
+                <tr key={product._id}>
+                  <td>
+                    <Link to={`/product/detail/${product._id}`}>
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="product-image"
+                      />
+                    </Link>
+                  </td>
+                  <td className="align-middle">
+                    <div>
+                      <b>Name:</b> {product.name}
+                    </div>
+                    <div>
+                      <b>ID:</b> {product._id}
+                    </div>
+                  </td>
+                  <td
+                    className={`product-status ${
+                      product.status === "processing"
+                        ? "text-success"
+                        : product.status === "active"
+                        ? "text-primary"
+                        : ""
+                    }`}
+                    style={
+                      product.status === "sold" ? { color: "#F57C00" } : {}
+                    }
+                  >
+                    {product.status}
+                  </td>
+                  <td className="text-center align-middle">
+                    <Button
+                      className="action-button"
+                      onClick={() => handleActionClick(product)}
+                    >
+                      Action
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Container>
       ) : (
         <h3 className="mt-3">No products found</h3>
       )}

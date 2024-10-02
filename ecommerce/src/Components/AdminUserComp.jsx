@@ -257,6 +257,7 @@ const AdminUserComp = () => {
       </Row>
 
       {/* Product Table */}
+      <Container fluid className="table-responsive p-0">
       <Table striped bordered hover className="user-table">
         <thead className="user-table-header">
           <tr>
@@ -288,6 +289,7 @@ const AdminUserComp = () => {
           ))}
         </tbody>
       </Table>
+      </Container>
           {/*Popup menu to perform actions to users */}
         <Modal
             show={showModal}

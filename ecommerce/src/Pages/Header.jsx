@@ -67,14 +67,6 @@ const Header = () => {
               ) : (
                 <ProfileMenu />
               )}
-              <NavDropdown className="d-none d-md-block"
-                title={
-                  <i
-                    className={`${style.basketIcon} fa-solid fa-cart-shopping`}
-                  />
-                }
-                id="basic-nav-dropdown"
-              ></NavDropdown>
               
               <CartMenu />
             </div>
