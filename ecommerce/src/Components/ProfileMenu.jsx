@@ -27,62 +27,66 @@ const ProfileMenu = () => {
     logout();
   };
 
-  return (
-    <Dropdown className={`${style.profileMenu}`}>
-      <Dropdown.Toggle
-        as={ButtonGroup}
-        className={`${style.profileButton}`}
-        id="dropdown-profile-button"
-      >
-        <i className="fa-solid fa-caret-down"></i>
-        <img
-          src={
-            user.photo_url
-              ? `${process.env.REACT_APP_API_PUBLIC_URL}/${user.photo_url}`
-              : ProfileImage
-          }
-          alt="Profile"
-        />
-        <span className={`${style.profileName}`}>{user.first_name}</span>
-      </Dropdown.Toggle>
+    return (
+      <Dropdown className={`${style.profileMenu}`}>
+        <Dropdown.Toggle
+          as={ButtonGroup}
+          className={`${style.profileButton}`}
+          id="dropdown-profile-button"
+        >
+          <i className="fa-solid fa-caret-down"></i>
+          <img
+            src={
+              user.photo_url
+                ? `${process.env.REACT_APP_API_PUBLIC_URL}/${user.photo_url}`
+                : ProfileImage
+            }
+            alt="Profile"
+          />
+          <span className={`${style.profileName}`}>{user.first_name}</span>
+        </Dropdown.Toggle>
 
-      <Dropdown.Menu className={`${style.profileMenuItems}`}>
-        <Dropdown.Item
-          onClick={handleMyPageClick}
-          className={`${style.profileMenuItem}`}
-        >
-          My Page
-        </Dropdown.Item>
-        <Dropdown.Item
-          className={`${style.profileMenuItem} ${style.balanceItem}`}
-        >
-          Balance{" "}
-          <span className={`${style.balance}`}>
-            {user.balance || 0}
-            <img src={Coin} alt="Coin" />
-          </span>
-        </Dropdown.Item>
-        <Dropdown.Item
-          className={`${style.profileMenuItem}`}
-          onClick={handleSellingHistoryClick}
-        >
-          Selling History
-        </Dropdown.Item>
-        <Dropdown.Item
-          className={`${style.profileMenuItem}`}
-          onClick={handlePurchaseHistoryClick}
-        >
-          Purchase History
-        </Dropdown.Item>
-        <Dropdown.Item
-          onClick={handleLogoutClick}
-          className={`${style.profileMenuItem}`}
-        >
-          Logout
-        </Dropdown.Item>
-      </Dropdown.Menu>
-    </Dropdown>
-  );
+        <Dropdown.Menu className={`${style.profileMenuItems}`}>
+          <Dropdown.Item
+            onClick={handleMyPageClick}
+            className={`${style.profileMenuItem}`}
+          >
+            My Page
+          </Dropdown.Item>
+          <Dropdown.Item
+            className={`${style.profileMenuItem} ${style.balanceItem}`}
+          >
+            Balance{" "}
+            <span className={`${style.balance}`}>
+              <img src={Coin} alt="Coin" />
+              {user.balance || 0}
+            </span>
+          </Dropdown.Item>
+          {user && user.role === "seller" && (
+            <>
+              <Dropdown.Item
+                className={`${style.profileMenuItem}`}
+                onClick={handleSellingHistoryClick}
+              >
+                Selling History
+              </Dropdown.Item>
+              <Dropdown.Item
+                className={`${style.profileMenuItem}`}
+                onClick={handlePurchaseHistoryClick}
+              >
+                Purchase History
+              </Dropdown.Item>
+            </>
+          )}
+          <Dropdown.Item
+            onClick={handleLogoutClick}
+            className={`${style.profileMenuItem}`}
+          >
+            Logout
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown>
+    );
 };
 
 export default ProfileMenu;

@@ -39,6 +39,7 @@ app.use(express.static("public"));
 app.use("/api/user", jwtAuthenticate);
 app.use("/api/cart", jwtAuthenticate);
 app.use("/api/seller", jwtAuthenticate);
+app.use("/api/admin", jwtAuthenticate);
 
 // Routes
 app.use("/api/token", tokenRoutes);

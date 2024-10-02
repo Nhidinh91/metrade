@@ -17,6 +17,7 @@ const AdminDropdown = () => {
         className={`${style.profileButton}`}
         id="dropdown-profile-button"
       >
+        <i className="fa-solid fa-caret-down"></i>
         <img
           src={
             user.photo_url
