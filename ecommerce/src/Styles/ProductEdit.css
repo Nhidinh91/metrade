@@ -1,6 +1,6 @@
-.uploadForm {
+.editForm {
     padding: 40px;
-    margin: 0 auto;
+    margin: 5rem 10rem;
     background-color: white;
     border-radius: 10px;
 }
@@ -9,7 +9,7 @@
     background-color: whitesmoke;
 }
 
-.uploadForm button {
+.editForm button {
     border-radius: 10px;
     background-color: whitesmoke;
     color: #173b45

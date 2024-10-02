@@ -22,6 +22,8 @@ import NewProduct from "./Pages/NewProduct.jsx";
 import AdminProduct from "./Pages/AdminProduct.jsx";
 import AdminUser from "./Pages/AdminUser.jsx";
 import AdminOrder from "./Pages/AdminOrder.jsx";
+import CartDetail from "./Pages/CartDetail.jsx";
+import ProductEdit from "./Pages/ProductEdit.jsx";
 
 function App() {
   return (
@@ -44,6 +46,8 @@ function App() {
             <Route path="/product/detail/:id" element={<ProductDetail />} />
             <Route path="/my-page" element={<MyPage />} />
             <Route path="/new-product" element={<NewProduct />} />
+            <Route path="/cart-detail" element={<CartDetail/>} />
+            <Route path="/product/edit/:id" element={<ProductEdit />} />
             <Route path="*" element={<NotFound />} />
 
             <Route path="/admin-product" element={<AdminProduct />} />

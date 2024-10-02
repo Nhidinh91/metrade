@@ -94,3 +94,43 @@ export const getProductsByUserId = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+//Update product details
+export const updateProduct = async (req, res) => {
+  try {
+    const {
+    name,
+    image,
+    photos,
+    description,
+    price,
+    pickup_point,
+    category_id,
+    keywords,
+    stock_quantity,
+    status,
+  } = req.body;
+
+  const { id } = req.params;
+
+  // Convert and category_id to strings if they are objects
+  const categoryId = typeof category_id === 'object' ? category_id.$oid : category_id;
+
+  if (!categoryId || !mongoose.Types.ObjectId.isValid(categoryId)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Category Id",
+    });
+  }
+
+  const updatedProduct = await Product.findByIdAndUpdate(id, { name, image, photos, description, price, pickup_point, category_id: categoryId, keywords, stock_quantity, status });
+
+  res.status(200).json({
+    success: true,
+    message: "Product updated successfully",
+    product: updatedProduct, 
+  });
+  } catch (error) {
+    console.error("Error updating product:", error.message);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
