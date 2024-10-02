@@ -20,7 +20,7 @@ const convertToDateTimeStr = (string) => {
 
 const convertToFullDateTimeStr = (expStr) => {
   const time_str = convertToDateTimeStr(expStr[expStr.length - 1]);
-  const num_str = expStr.slice(0, 2);
+  const num_str = expStr.slice(0, expStr.length - 1);
   const num = Number(num_str);
   return num > 1 ? `${num_str} ${time_str}s` : `${num_str} ${time_str}`;
 };

@@ -246,10 +246,8 @@ const AdminOrderComp = () => {
 
   //handle Button inside Modal
   const handleStatusChange = async (item) => {
-    // console.log("handle status change");
     try {
       const newSellingStatus = getNewSellingStatus(item.selling_status);
-      // console.log(newSellingStatus);
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/admin/orders/${item._id}`,
         {
@@ -278,7 +276,6 @@ const AdminOrderComp = () => {
 
   const handleCancelStatus = async (item) => {
     try {
-      // const newSellingStatus = getNewSellingStatus(str);
       console.log("handle cancel status");
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/admin/orders/${item._id}`,
@@ -313,27 +310,28 @@ const AdminOrderComp = () => {
         stats={stats}
         statusList={STATUS_LIST}
         changeSellingStatus={changeSellingStatus}
-        // totalItems={data.totalItems}
         displayAllOrderItem={displayAllOrderItem}
       />
 
-      <Row className="mb-3 d-flex justify-content-between">
+      {/* Search bar */}
+      <Row>
         <Col>
-          <InputGroup>
+          <Container fluid className="search-bar-container d-flex">
             <FormControl
+              className="search-input"
               placeholder="Search order item id..."
               value={itemId}
               onChange={handleItemId}
               onKeyUp={handleKeyPress}
             />
-            <Button onClick={handleSubmit}>
+            <Button className="search-button" onClick={handleSubmit}>
               <i className="fa-solid fa-magnifying-glass" />
             </Button>
-          </InputGroup>
+          </Container>
         </Col>
       </Row>
 
-      {/* Product Table */}
+      {/* Order Table */}
       {loading ? (
         <Loading />
       ) : orderItems.length === 0 ? (
