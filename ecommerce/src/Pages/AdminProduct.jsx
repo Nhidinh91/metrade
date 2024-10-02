@@ -1,7 +1,6 @@
 import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import "../Styles/MyPage.css";
 import AdminProductComp from "../Components/AdminProductComp";
 import { useAuthContext } from "../hooks/useAuthContext";
 import AdminSideBar from "../Components/AdminSideBar";

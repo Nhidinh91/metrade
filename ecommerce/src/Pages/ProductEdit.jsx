@@ -1,19 +1,32 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useCategoryContext } from "../contexts/CategoryContext";
-import {SuccessModal, FailureModal, LoadingModal} from "./ProductUploadStatus";
-import { Form, Button, InputGroup, Dropdown, DropdownButton, Alert, } from "react-bootstrap";
-import "../Styles/ProductUpload.css";
+import {
+  SuccessModal,
+  FailureModal,
+  LoadingModal,
+} from "../Components/ProductEditStatus";
+import {
+  Form,
+  Button,
+  InputGroup,
+  Dropdown,
+  DropdownButton,
+  Alert,
+} from "react-bootstrap";
+import "../Styles/ProductEdit.css";
 import Pica from "pica";
-import coin from "../assets/star.png";
+import coin from "../assets/star.png"
 
-const ProductUpload = () => {
+const ProductEdit = () => {
   const { user } = useAuthContext();
   const { categories } = useCategoryContext();
-  const pica = Pica(); //use pica for image resizing cause cloudinary has a 10MB limit for free plan
-  const alertRef = useRef(null); //reference to alert component for scrolling
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const pica = Pica();
+  const alertRef = useRef(null);
 
-  //Form state to track product details
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -23,50 +36,132 @@ const ProductUpload = () => {
     keywords: "",
   });
 
-  //States to track selected categories
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
   const [selectedSubSubCategory, setSelectedSubSubCategory] = useState(null);
 
-  //States to track and alert validation errors
-  const [errors, setErrors] = useState([]); //State for validation errors
-  const [showAlert, setShowAlert] = useState(false); //State for showing alert
+  const [errors, setErrors] = useState([]);
+  const [showAlert, setShowAlert] = useState(false);
 
-  //States to track photos and preview
-  const [selectedFiles, setSelectedFiles] = useState([]); //state to store photos
-  const [previewUrls, setPreviewUrls] = useState([]); //state to store preview before uploading
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previewUrls, setPreviewUrls] = useState([]);
 
-  //States for uploading status modals
   const [showSuccess, setShowSuccess] = useState(false);
   const [showFailure, setShowFailure] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
 
-  //Handle changes in product's name, description, price, keywords
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/product/detail/${id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (!response.ok) throw new Error("Failed to fetch product data");
+        const data = await response.json();
+        const { product } = data;
+        setForm({
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          quantity: product.stock_quantity,
+          pickUpPoint: product.pickup_point,
+          keywords: Array.isArray(product.keywords)
+            ? product.keywords.join(", ")
+            : "",
+        });
+
+        setSelectedFiles(product.photos);
+        setPreviewUrls(product.photos);
+
+        // Set category based on product's category_id
+        const categoryId = product.category_id._id;
+
+        // Find the corresponding sub-category or sub-sub-category from the categories context
+        let category = null;
+        let subCategory = null;
+        let subSubCategory = null;
+
+        console.log("Looking for categoryId:", categoryId);
+
+        for (let cat of categories) {
+          console.log("Checking top-level category:", cat.children);
+
+          // Check if category_id is a sub-category
+          const subCat = cat.children.find(
+            (child) => child._id === categoryId
+          );
+          if (subCat) {
+            console.log("Found as sub-category:", subCat);
+            category = cat;
+            subCategory = subCat;
+            break;
+          }
+
+          // Check if category_id is a sub-sub-category
+          for (let child of cat.children) {
+            const subSubCat = child.children?.find(
+              (subChild) => subChild._id === categoryId
+            );
+            if (subSubCat) {
+              console.log("Found as sub-sub-category:", subSubCat);
+              category = cat;
+              subCategory = child;
+              subSubCategory = subSubCat;
+              break;
+            }
+          }
+          if (subSubCategory) break;
+        }
+
+        // Update selected category states
+        setSelectedCategory(category);
+        setSelectedSubCategory(subCategory);
+        setSelectedSubSubCategory(subSubCategory);
+
+        console.log(
+          "Selected category:",
+          category,
+          subCategory,
+          subSubCategory
+        );
+      } catch (error) {
+        console.error("Error fetching product data:", error);
+      }
+    };
+
+    fetchProduct();
+  }, [id, categories]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  //Functions to handle chosen category dropdown
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
     setSelectedSubCategory(null);
     setSelectedSubSubCategory(null);
   };
+
   const handleSubCategoryChange = (subCategory) => {
     setSelectedSubCategory(subCategory);
     setSelectedSubSubCategory(null);
   };
+
   const handleSubSubCategoryChange = (subSubCategory) => {
     setSelectedSubSubCategory(subSubCategory);
   };
 
-  //Handle pick-up point
   const handlePickupChange = (point) => () => {
     setForm((prev) => ({ ...prev, pickUpPoint: point }));
   };
 
-  //Handle quantity
   const handleQuantityChange = (type) => {
     setForm((prev) => ({
       ...prev,
@@ -77,29 +172,23 @@ const ProductUpload = () => {
     }));
   };
 
-  //Handle uploading images
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
     if (selectedFiles.length + files.length > 4) {
-      alert("You can only upload up to 4 images"); //alert if more than 4 images
-
+      alert("You can only upload up to 4 images");
       return;
     }
     const resizedFiles = await Promise.all(
       files.map((file) => resizeImage(file))
-    ); //resize images if larger than 10MB
-
-    setSelectedFiles((prevFiles) => [...prevFiles, ...resizedFiles]); //add new photo to array
-
+    );
+    setSelectedFiles((prevFiles) => [...prevFiles, ...resizedFiles]);
     const urls = files.map((file) => URL.createObjectURL(file));
-    setPreviewUrls((prevUrls) => [...prevUrls, ...urls]); //add preview
+    setPreviewUrls((prevUrls) => [...prevUrls, ...urls]);
   };
 
-  //Handle resizing images
   const resizeImage = (file) => {
     return new Promise((resolve, reject) => {
       if (file.size <= 10 * 1024 * 1024) {
-        // If the file size is already under 10MB, resolve immediately
         resolve(file);
         return;
       }
@@ -122,14 +211,11 @@ const ProductUpload = () => {
             .then((result) => pica.toBlob(result, "image/jpeg", quality))
             .then((blob) => {
               if (blob.size <= 10 * 1024 * 1024) {
-                // Check if the size is less than or equal to 10MB
-                console.log(`Resized image size: ${blob.size} bytes`); // Log the size of the resized image
                 const resizedFile = new File([blob], file.name, {
                   type: "image/jpeg",
                 });
                 resolve(resizedFile);
               } else if (quality > 0.1) {
-                // Reduce quality and try again if the size exceeds 10MB
                 resizeAndCompress(quality - 0.1);
               } else {
                 reject(new Error("Unable to resize image to be under 10MB"));
@@ -138,26 +224,23 @@ const ProductUpload = () => {
             .catch((error) => reject(error));
         };
 
-        resizeAndCompress(0.8); // Start with 80% quality
+        resizeAndCompress(0.8);
       };
     });
   };
 
-  //Handle removing images
   const handleRemoveImage = (index) => {
     setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
     setPreviewUrls((prevUrls) => prevUrls.filter((_, i) => i !== index));
   };
 
-  // Validate form fields before uploading
   const validateForm = () => {
     const newErrors = [];
 
     if (selectedFiles.length === 0)
-          newErrors.push("At least one image is required"); //validate image
-    if (!form.name) newErrors.push("Product name is required"); //validate name
-    if (!form.description) newErrors.push("Description is required"); //validate description
-    //Validate the smallest category ID is selected
+      newErrors.push("At least one image is required");
+    if (!form.name) newErrors.push("Product name is required");
+    if (!form.description) newErrors.push("Description is required");
     if (
       !selectedSubSubCategory &&
       selectedCategory &&
@@ -171,74 +254,78 @@ const ProductUpload = () => {
       newErrors.push("You must select a category");
     }
     if (!form.price || form.price <= 0)
-      newErrors.push("Price must be greater than 0"); //validate price
+      newErrors.push("Price must be greater than 0");
     if (!form.pickUpPoint || form.pickUpPoint === "Choose a pick-up point")
-      newErrors.push("Pick-up point is required"); //validate pick-up point
+      newErrors.push("Pick-up point is required");
 
     setErrors(newErrors);
-    setShowAlert(newErrors.length > 0); //alert if there are errors
+    setShowAlert(newErrors.length > 0);
     return newErrors.length === 0;
   };
 
-  //Scroll to alert if there are errors
   useEffect(() => {
     if (errors.length > 0 && alertRef.current) {
       alertRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
     }
   }, [errors]);
 
-  //Function to upload product to database
-  const uploadProduct = async () => {
-    if (!validateForm()) {return;}// Stop if any missing details and scroll up to Alert component
-    setShowLoading(true); //Show loading modal
+  const updateProduct = async () => {
+    if (!validateForm()) return;
+    setShowLoading(true);
 
-    //get smallest category id
     const categoryId =
       selectedSubSubCategory?._id ||
       selectedSubCategory?._id ||
       selectedCategory?._id;
 
     try {
-      const formData = new FormData(); //form data to send photos to backend for upload to cloudinary
+      const formData = new FormData();
       for (const file of selectedFiles) {
+        if (typeof file === "string") {
+          // Existing URLs, skip adding to form data
+          continue;
+        }
         formData.append("files", file);
       }
-      //Upload images to cloudinary
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/seller/imageUpload`,
-        {
-          method: "POST",
-          credentials: "include",
-          body: formData,
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Can not upload images");
-      }
-      const data = await response.json();
-      const { urls } = data; //retrieve image urls after successful upload
-      const image = urls[0]; //set main image as first image
-      const photos = urls; //save photos' urls to send to database
 
-      //Create product object
+      let newUrls = [];
+      if (formData.has("files")) {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/seller/imageUpload`,
+          {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          }
+        );
+        if (!response.ok) throw new Error("Cannot upload images");
+        const data = await response.json();
+        newUrls = data.urls;
+      }
+
+      // Combine existing URLs with new ones
+      const updatedPhotos = [
+        ...selectedFiles.filter((file) => typeof file === "string"), // Existing URLs
+        ...newUrls, // Newly uploaded URLs
+      ];
+
       const product = {
-        user_id: user._id,
         name: form.name,
-        image: image,
-        photos: photos,
+        image: updatedPhotos[0],
+        photos: updatedPhotos,
         description: form.description,
         price: form.price,
         pickup_point: form.pickUpPoint,
         category_id: categoryId,
         stock_quantity: form.quantity,
         keywords: form.keywords.split(","),
+        status: "processing",
       };
 
-      //Upload product to database
       const productResponse = await fetch(
-        `${process.env.REACT_APP_API_URL}/seller/upload`,
+        `${process.env.REACT_APP_API_URL}/seller/update/${id}`,
         {
-          method: "POST",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
@@ -246,22 +333,22 @@ const ProductUpload = () => {
           body: JSON.stringify(product),
         }
       );
-      if (!productResponse.ok) throw new Error("Can not upload product");
+      if (!productResponse.ok) throw new Error("Can not update product");
       const productData = await productResponse.json();
-      console.log("Product uploaded successfully:", productData);
+      console.log("Product updated successfully:", productData);
       setShowLoading(false);
       setShowSuccess(true);
     } catch (error) {
-      console.log("Error uploading product:", error);
+      console.log("Error updating product:", error);
       setShowLoading(false);
       setShowFailure(true);
     }
   };
-  return (
-    <Form className="uploadForm">
-      <h3>Sell your product</h3>
 
-      {/* Show missing fields */}
+  return (
+    <Form className="editForm">
+      <h3>Edit your product</h3>
+
       {errors.length > 0 && showAlert && (
         <Alert
           ref={alertRef}
@@ -279,14 +366,12 @@ const ProductUpload = () => {
         </Alert>
       )}
 
-      {/* Image Upload */}
       <Form.Group className="mb-3 text-center" controlId="formFileMultiple">
         <Form.Label
           className="d-block border border-secondary p-3 rounded"
           style={{ cursor: "pointer", borderStyle: "dashed" }}
         >
           Add photos (up to 4)
-          {/* Image Previews */}
           <div>
             {previewUrls.map((url, index) => (
               <div
@@ -300,7 +385,11 @@ const ProductUpload = () => {
                 <img
                   src={url}
                   alt={`Preview ${index}`}
-                  style={{ width: "100px", height: "100px", objectFit: "cover", }}
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    objectFit: "cover",
+                  }}
                 />
                 <button
                   type="button"
@@ -325,7 +414,6 @@ const ProductUpload = () => {
         <Form.Control type="file" multiple hidden onChange={handleFileChange} />
       </Form.Group>
 
-      {/* Product Name */}
       <Form.Group className="mb-3" controlId="name">
         <Form.Label>Product name</Form.Label>
         <Form.Control
@@ -338,7 +426,6 @@ const ProductUpload = () => {
         />
       </Form.Group>
 
-      {/* Description */}
       <Form.Group className="mb-3" controlId="description">
         <Form.Label>Description</Form.Label>
         <Form.Control
@@ -352,7 +439,6 @@ const ProductUpload = () => {
         />
       </Form.Group>
 
-      {/* Category Dropdowns */}
       <Form.Group className="mb-3" controlId="category">
         <Form.Label>Category</Form.Label>
         <DropdownButton
@@ -416,7 +502,6 @@ const ProductUpload = () => {
         </Form.Group>
       )}
 
-      {/* Keywords */}
       <Form.Group className="mb-3" controlId="keywords">
         <Form.Label>Keywords</Form.Label>
         <InputGroup>
@@ -431,7 +516,6 @@ const ProductUpload = () => {
         </InputGroup>
       </Form.Group>
 
-      {/* Price */}
       <Form.Group className="mb-3" controlId="price">
         <Form.Label>Price</Form.Label>
         <InputGroup>
@@ -451,7 +535,6 @@ const ProductUpload = () => {
         </InputGroup>
       </Form.Group>
 
-      {/* Pick-up Point */}
       <Form.Group className="mb-3" controlId="pickUpPoint">
         <Form.Label>Pick-up point</Form.Label>
         <DropdownButton id="dropdown-pickup-point" title={form.pickUpPoint}>
@@ -463,7 +546,6 @@ const ProductUpload = () => {
         </DropdownButton>
       </Form.Group>
 
-      {/* Quantity */}
       <Form.Group className="mb-3" controlId="quantity">
         <Form.Label>Quantity</Form.Label>
         <InputGroup className="quantityInput">
@@ -483,17 +565,15 @@ const ProductUpload = () => {
         </InputGroup>
       </Form.Group>
 
-      {/* Actions */}
       <div className="d-flex justify-content-end">
-        <Button href="/new-product" className="cancelBtn">
+        <Button href="/selling-history" className="cancelBtn">
           Cancel
         </Button>
-        <Button onClick={uploadProduct} className="sellBtn">
-          Sell now
+        <Button onClick={updateProduct} className="sellBtn">
+          Save Changes
         </Button>
       </div>
 
-      {/* Status Modal */}
       <LoadingModal show={showLoading} />
       <SuccessModal show={showSuccess} />
       <FailureModal show={showFailure} />
@@ -501,4 +581,4 @@ const ProductUpload = () => {
   );
 };
 
-export default ProductUpload;
+export default ProductEdit;

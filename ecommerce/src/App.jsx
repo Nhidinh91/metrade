@@ -23,6 +23,7 @@ import AdminProduct from "./Pages/AdminProduct.jsx";
 import AdminUser from "./Pages/AdminUser.jsx";
 import AdminOrder from "./Pages/AdminOrder.jsx";
 import CartDetail from "./Pages/CartDetail.jsx";
+import ProductEdit from "./Pages/ProductEdit.jsx";
 
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
             <Route path="/my-page" element={<MyPage />} />
             <Route path="/new-product" element={<NewProduct />} />
             <Route path="/cart-detail" element={<CartDetail/>} />
+            <Route path="/product/edit/:id" element={<ProductEdit />} />
             <Route path="*" element={<NotFound />} />
 
             <Route path="/admin-product" element={<AdminProduct />} />
