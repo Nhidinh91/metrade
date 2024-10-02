@@ -75,3 +75,22 @@ export const uploadProductImages = async (req, res) => {
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
+
+//Get products by user_id
+export const getProductsByUserId = async (req, res) => {
+  const seller = req.params.userId;
+
+  try {
+    const products = await Product.find({ user_id: seller }).sort({status: 1});
+    if (products.length > 0) {
+      res.status(200).json(products);
+    } else {
+      console.log("No products found");
+      res.status(404).json({ message: "No products found" });
+    }
+  } catch (error) {
+    console.log(error);
+    // Handle any server errors
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

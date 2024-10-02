@@ -19,12 +19,13 @@ const SellingHistory = () => {
             const fetchProducts = async () => {
             try {
                 const response = await fetch(
-                `${process.env.REACT_APP_API_URL}/product/selling-page/inventory/${user._id}`,
+                `${process.env.REACT_APP_API_URL}/seller/selling-page/inventory/${user._id}`,
                 {
                     method: 'GET',
                     headers: {
                     'Content-Type': 'application/json',
                     },
+                    credentials: 'include',
                 }
                 );
                 const data = await response.json();

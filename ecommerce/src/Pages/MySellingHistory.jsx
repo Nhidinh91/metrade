@@ -18,9 +18,11 @@ const MySellingHistory = () => {
     
   }, [isAuthenticated(), isLoading, user, navigate]);
   
+
   return (
     <SellingHistory />
   );
+
 };
 
 export default MySellingHistory;
