@@ -1,18 +1,21 @@
-import { useEffect, useState } from "react";
+
 import MainCategory from "./MainCategory.jsx";
-import style from "../Styles/Navbar.module.css"
 import { useCategoryContext } from "../contexts/CategoryContext";
+import { Navbar, Container } from "react-bootstrap";
 
 // Updated PageLinks component to work with new data structure
-const PageLinks = ({ parentClass, itemClass }) => {
-  const { categories, loading } = useCategoryContext();
+const PageLinks = ({ }) => {
+  const { categories } = useCategoryContext();
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <MainCategory categories={categories} />
-        </div>
-    </nav>
+    <Navbar expand="lg" >
+      <Container style={{ padding: "0px" }}>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ marginBottom: '10px' }} />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <MainCategory categories={categories}/>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 };
 

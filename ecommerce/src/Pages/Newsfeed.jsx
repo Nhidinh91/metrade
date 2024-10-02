@@ -29,6 +29,10 @@ const Newsfeed = () => {
           }
         );
 
+        if (response.status === 404) {
+          throw new Error("Products not found (404)");
+        }
+
         const data = await response.json();
 
         if (isMounted) {

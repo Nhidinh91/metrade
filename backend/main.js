@@ -42,6 +42,7 @@ app.use("/api/seller", jwtAuthenticate);
 app.use("/api/admin", jwtAuthenticate);
 app.use("/api/orders",jwtAuthenticate)
 
+
 // Routes
 app.use("/api/token", tokenRoutes);
 app.use("/api/auth", authRoutes);

@@ -3,7 +3,7 @@ import {Container, Row, Col, Button} from "react-bootstrap";
 
 const Footer = () => {
   return (
-    <footer className='footer' sticky="bottom">
+    <footer className='footer'>
         <Container fluid className=''>
             <Row className='footer-upper'>
                 <Col md={{span: 6, offset: 1}} >
