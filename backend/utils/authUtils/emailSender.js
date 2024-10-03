@@ -23,7 +23,6 @@ const convertToFullDateTimeStr = (expStr) => {
   return num > 1 ? `${num_str} ${time_str}s` : `${num_str} ${time_str}`;
 };
 
-
 export const sendConfirmationEmailService = async (firstName, email, token) => {
   console.log("Start sending email");
   const exp_time_str = process.env.VERIFICATION_EXPIRES_IN;
@@ -48,13 +47,15 @@ export const sendConfirmationEmailService = async (firstName, email, token) => {
     to: `${email}`,
     subject: "Email Verification",
 
-    text: `Hi! ${firstName}, You have recently visited 
-           our website and entered your email.
-           Please follow the given link to verify your email
-           ${FEURL}?token=${token}&email=${email}\n.
+    text: `Hi! ${firstName},
+    
+You have recently visited our website and entered your email.
+Please follow the given link to verify your email
+${FEURL}?token=${token}&email=${email}.\n
 
-           The link will expire after ${timeStr}
-           Thanks`,
+The link will expire after ${timeStr}
+Thanks,
+Metrade`,
   });
   transport.sendMail(mailConfigurations, (err, info) => {
     if (err) {
