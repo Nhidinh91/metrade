@@ -4,21 +4,15 @@ import {
   adminGetProductCounts,
   activateProduct,
   deleteProduct,
-} from "../controllers/adminController.js";
-import jwtAuthenticate from "../middlewares/jwtAuthenticate.js";
-
-import {
   getOrderItemStats,
   getAllOrderItems,
   updateOrderItemStatus,
-} from "../controllers/adminController.js";
-
-const router = express.Router();
-import {
   getAllUsers,
   getAllUserCount,
   updateUserStatus,
 } from "../controllers/adminController.js";
+
+const router = express.Router();
 
 //User Management Routes
 router.get("/users", getAllUsers);
