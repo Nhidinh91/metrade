@@ -19,6 +19,9 @@ const CartDetail = () => {
   const [showCheckoutModal, setshowCheckoutModal] = useState(false);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [showInsufficientModal, setShowInsufficientModal] = useState(false);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [checkoutResult, setCheckoutResult] = useState(false);
+  const [error, setError] = useState(null);
   const { cartCount, setCartCount, setReloadCartCount, user, updateUser } =
     useAuthContext();
 
@@ -214,11 +217,17 @@ const CartDetail = () => {
         fetchCartDetail();
         setReloadCartCount(true);
         updateUser(data.user);
+        setCheckoutResult(true);
+        setShowResultModal(true);
       } else if (response.status === 402) {
         setShowInsufficientModal(true);
+      } else {
+        const data = await response.json();
+        setError(data.message);
+        setShowResultModal(true);
       }
     } catch (error) {
-      console.log("Error deleting cart item", error);
+      console.log("Error checkout", error);
     }
   };
 
@@ -315,7 +324,7 @@ const CartDetail = () => {
       )}
       {/* {Checkout Modal} */}
       <Modal
-        className="order-confirm-container"
+        className="cart-modal-container"
         show={showCheckoutModal}
         onHide={() => setshowCheckoutModal(false)}
       >
@@ -357,7 +366,7 @@ const CartDetail = () => {
       </Modal>
       {/* {Email Verification Modal} */}
       <Modal
-        className="email-verification-container"
+        className="cart-modal-container"
         show={showVerifyModal}
         onHide={() => setShowVerifyModal(false)}
       >
@@ -366,7 +375,7 @@ const CartDetail = () => {
         </Modal.Header>
         <Modal.Body>
           <div className="notification-container">
-            <div className="ask-verify">
+            <div className="notification">
               You must verify your email before proceeding to checkout.
             </div>
             <div></div>
@@ -392,7 +401,7 @@ const CartDetail = () => {
 
       {/* Insufficient Balance Modal */}
       <Modal
-        className="insufficient-balance-container"
+        className="cart-modal-container"
         show={showInsufficientModal}
         onHide={() => setShowInsufficientModal(false)}
       >
@@ -400,21 +409,49 @@ const CartDetail = () => {
           <Modal.Title className="title">Insufficient Coins</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className="ask-add-coin">
+          <div className="notification">
             You do not have enough balance to complete the checkout. Please add
             more MetCoins
           </div>
         </Modal.Body>
         <Modal.Footer>
           <Button
-            className="close-button"
+            className="cancel-button"
             variant="secondary"
             onClick={() => setShowInsufficientModal(false)}
           >
             Close
           </Button>
-          <Button className="add-funds-button" variant="primary">
+          <Button className="navigate-button" variant="primary">
             Add MetCoins
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {/* Checkout result Modal */}
+      <Modal
+        className="cart-modal-container"
+        show={showResultModal}
+        onHide={() => setShowResultModal(false)}
+      >
+        <Modal.Header>
+          <Modal.Title className="title">
+            {checkoutResult ? `Successful Checkout` : `Checkout failed`}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="notification">
+            {checkoutResult
+              ? `Your order has been successfully placed. You can check your order in My Purchase History.`
+              : `${error}. Your order could not be placed. Please try again.`}
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            className="cancel-button"
+            variant="secondary"
+            onClick={() => setShowResultModal(false)}
+          >
+            Close
           </Button>
         </Modal.Footer>
       </Modal>

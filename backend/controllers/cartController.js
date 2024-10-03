@@ -364,6 +364,15 @@ export const checkout = async (req, res) => {
         session
       );
       if (product) {
+        // if product is in processing, rollback the transaction
+        if (product.status === "processing") {
+          await session.abortTransaction();
+          session.endSession();
+          return res.status(400).json({
+            success: false,
+            message: `Product:" ${product.name}" is in processing`,
+          });
+        }
         product.stock_quantity -= item.adding_quantity;
         if (product.stock_quantity === 0) {
           product.status = "sold";
@@ -374,7 +383,7 @@ export const checkout = async (req, res) => {
           session.endSession();
           return res.status(400).json({
             success: false,
-            message: `Not enough stock for product ${product.name}`,
+            message: `Not enough stock for product: "${product.name}"`,
           });
         }
         await product.save({ session });
@@ -394,14 +403,27 @@ export const checkout = async (req, res) => {
       { session }
     );
 
-    //6-Deduct money from balance of the user
+    //6-Deduct money from balance of the buyer
     user.balance -= checkout.total_price;
     const updatedUser = await user.save({ session });
     if (!updatedUser) {
       throw new Error("Failed to update user balance");
     }
-    
+
     console.log("User balance after deduction:", updatedUser.balance);
+
+    //7-Increase money of the seller of each product
+    for (const item of cartItems) {
+      const seller = await User.findById(item.product_id.user_id).session(
+        session
+      );
+      if (seller) {
+        seller.balance += item.sub_total;
+        await seller.save({ session });
+      } else {
+        throw new Error("Seller not found");
+      }
+    }
 
     // Commit the transaction
     await session.commitTransaction();
@@ -421,7 +443,7 @@ export const checkout = async (req, res) => {
     console.error("Error during checkout:", error);
     res.status(500).json({
       success: false,
-      message: "Checkout failed",
+      message: "Error during checkout",
       error: error.message,
     });
   }

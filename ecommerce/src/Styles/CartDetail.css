@@ -98,67 +98,71 @@
   color: black;
 }
 
-.order-confirm-container .title {
+.cart-modal-container .title {
   font-weight: 700;
   font-size: 1.8rem;
 }
 
-.order-confirm-container .ask-confirm {
+.cart-modal-container .ask-confirm {
   font-size: 1.2rem;
   padding-bottom: 1rem;
   color: #c65200;
 }
 
-.order-confirm-container .tag {
+.cart-modal-container .tag {
   font-size: 1.2rem;
   padding-top: 0.5rem;
 }
 
-.order-confirm-container .number {
+.cart-modal-container .number {
   font-weight: 600;
   font-size: 1.2rem;
   padding-top: 0.5rem;
 }
 
-.order-confirm-container .order-items {
+.cart-modal-container .order-items {
   display: flex;
   gap: 0.5rem;
   align-items: center;
 }
 
-.order-confirm-container .total-order-price {
+.cart-modal-container .total-order-price {
   display: flex;
   gap: 0.5rem;
   align-items: center;
 }
 
-.order-confirm-container .cancel-button {
-  border: none;
-  background-color: gray;
-  color: black;
+.cart-modal-container .cancel-button {
   padding-top: 0.8rem;
   padding-bottom: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-weight: 600;
+  background-color: gray;
+  color: black;
+  border: none;
 }
 
-.order-confirm-container .cancel-button:hover {
+.cart-modal-container .cancel-button:hover {
   color: rgb(255, 255, 255);
 }
 
-.order-confirm-container .confirm-button {
+.cart-modal-container .confirm-button {
   padding-top: 0.8rem;
   padding-bottom: 0.5rem;
+  border: none;
 }
 
 .order-confirm-container .confirm-button:hover {
   border-color: #3f9c36;
 }
 
-.email-verification-container .button-container {
+.cart-modal-container .button-container {
   display: flex;
   gap: 1rem;
 }
 
-.email-verification-container .navigate-button {
+.cart-modal-container .navigate-button {
   padding-top: 0.8rem;
   padding-bottom: 0.5rem;
   padding-left: 1rem;
@@ -166,58 +170,4 @@
   font-weight: 600;
   border: none;
   align-self: center;
-}
-
-.email-verification-container .cancel-button {
-  padding-top: 0.8rem;
-  padding-bottom: 0.5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  font-weight: 600;
-  background-color: gray;
-  color: black;
-  border: none;
-}
-
-.email-verification-container .title {
-  font-weight: 700;
-  font-size: 1.8rem;
-}
-
-.email-verification-container .cancel-button:hover {
-  color: rgb(255, 255, 255);
-}
-
-.insufficient-balance-container .title {
-  font-weight: 700;
-  font-size: 1.8rem;
-}
-
-.insufficient-balance-container .ask-add-coin {
-  color: #c65200;
-}
-
-.insufficient-balance-container .add-funds-button {
-  padding-top: 0.8rem;
-  padding-bottom: 0.5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  font-weight: 600;
-  border: none;
-  align-self: center;
-}
-
-.insufficient-balance-container .close-button {
-  padding-top: 0.8rem;
-  padding-bottom: 0.5rem;
-  padding-left: 1.2rem;
-  padding-right: 1.2rem;
-  font-weight: 600;
-  background-color: gray;
-  color: black;
-  border: none;
-}
-
-.insufficient-balance-container .close-button:hover {
-  color: rgb(255, 255, 255);
 }
