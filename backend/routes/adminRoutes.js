@@ -1,10 +1,11 @@
 import express from "express";
-import { adminGetAllProducts, adminGetProductCounts, activateProduct, deleteProduct } from "../controllers/adminController.js";// import orderRouter from "./orderRoutes.js";
+import {
+  adminGetAllProducts,
+  adminGetProductCounts,
+  activateProduct,
+  deleteProduct,
+} from "../controllers/adminController.js";
 import jwtAuthenticate from "../middlewares/jwtAuthenticate.js";
-import // getOrderItemStats,
-// getAllOrderItems,
-// updateOrderItemStatus,
-"../controllers/orderController.js";
 
 import {
   getOrderItemStats,
@@ -31,12 +32,6 @@ router.put("/product/activate/:id", activateProduct);
 router.delete("/product/delete/:id", deleteProduct);
 
 //Order Management Routes
-router.use("/orders", jwtAuthenticate);
-
-// router.route("/orders/stats").get(getOrderItemStats);
-// router.route("/orders/").get(getAllOrderItems);
-// router.route("/orders/:orderItemId").put(updateOrderItemStatus);
-
 router.get("/orders/", getAllOrderItems);
 router.put("/orders/:orderItemId", updateOrderItemStatus);
 router.get("/orders/stats", getOrderItemStats);

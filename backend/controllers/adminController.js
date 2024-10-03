@@ -5,17 +5,26 @@ import Order from "../models/orderModel.js";
 import OrderItem from "../models/orderItemModel.js";
 
 import { isValidId } from "../utils/dbUtils.js";
+
+const LIMIT = 8;
+const SELLING_STATUS_LIST = [
+  "processing",
+  "await-pickup",
+  "delivered",
+  "cancelled",
+];
+
 ///User management
 // Define user management's initial query conditions
 const queryConditions = {
-  role: { $ne: "admin" }
+  role: { $ne: "admin" },
 };
 
 // Get users based on the query parameters
 export const getAllUsers = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1; // Get the page number from the query parameter
-    const limit = 8; // Set the limit for each page
+    const limit = LIMIT; // Set the limit for each page
 
     // Validate page and limit
     if (page < 1) {
@@ -29,9 +38,9 @@ export const getAllUsers = async (req, res) => {
 
     // Define the query conditions if given
     const updateQueryConditions = {
-        ...queryConditions,
+      ...queryConditions,
       ...(status ? { status } : {}),
-      ...(search ? { email: { $regex: new RegExp(search, "i") } } : {})
+      ...(search ? { email: { $regex: new RegExp(search, "i") } } : {}),
     };
 
     let users = await User.find(updateQueryConditions)
@@ -44,7 +53,7 @@ export const getAllUsers = async (req, res) => {
 
     res.json({
       users,
-      totalUsersDisplay
+      totalUsersDisplay,
     });
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -52,58 +61,60 @@ export const getAllUsers = async (req, res) => {
 };
 
 export const getAllUserCount = async (req, res) => {
-    try {
-        const allUsersCount = await User.countDocuments(queryConditions);
-    
-        const activeUserCount = await User.countDocuments({
-        ...queryConditions,
-        status: "active",
-        });
-        const bannedUserCount = await User.countDocuments({
-        ...queryConditions,
-        status: "banned",
-        });
-        const deletedUserCount = await User.countDocuments({
-        ...queryConditions,
-        status: "deleted",
-        });
-        res.json({
-          allUsersCount,
-          activeUserCount,
-          bannedUserCount,
-          deletedUserCount,
-        });
-    } catch (error) {
-        res.status(404).json({ message: error.message });
-    }
+  try {
+    const allUsersCount = await User.countDocuments(queryConditions);
+
+    const activeUserCount = await User.countDocuments({
+      ...queryConditions,
+      status: "active",
+    });
+    const bannedUserCount = await User.countDocuments({
+      ...queryConditions,
+      status: "banned",
+    });
+    const deletedUserCount = await User.countDocuments({
+      ...queryConditions,
+      status: "deleted",
+    });
+    res.json({
+      allUsersCount,
+      activeUserCount,
+      bannedUserCount,
+      deletedUserCount,
+    });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
 };
 
 export const updateUserStatus = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { status } = req.body;
-    
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({ message: "User not found" });
-        }
-    
-        const user = await User.findById(id);
-    
-        if (!user) {
-        return res.status(404).json({ message: "User not found" });
-        }
-        // Admin cannot change the status of banned user
-        if (user.status !== "deleted") {
-            user.status = status;
-            await user.save();
-        } else {
-            return res.status(400).json({ message: "Cannot change status of deleted user" });
-        }
-    
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({ message: "User not found" });
     }
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    // Admin cannot change the status of banned user
+    if (user.status !== "deleted") {
+      user.status = status;
+      await user.save();
+    } else {
+      return res
+        .status(400)
+        .json({ message: "Cannot change status of deleted user" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 ///Product management
@@ -149,7 +160,7 @@ const createAggregationPipeline = (status, search, skip, limit) => {
 export const adminGetAllProducts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1; // Get the page number from the query parameter
-    const limit = 8; // Get the limit from the query parameter
+    const limit = LIMIT; // Get the limit from the query parameter
     const status = req.query.status || null; // Get the status filter from the query parameter
     const search = req.query.search || null; // Get the search filter from the query parameter
 
@@ -231,11 +242,9 @@ export const activateProduct = async (req, res) => {
     }
 
     if (product.status !== "processing") {
-      return res
-        .status(400)
-        .json({
-          message: "Only products with 'processing' status can be activated",
-        });
+      return res.status(400).json({
+        message: "Only products with 'processing' status can be activated",
+      });
     }
 
     product.status = "active";
@@ -245,7 +254,9 @@ export const activateProduct = async (req, res) => {
       .status(200)
       .json({ message: "Product activated successfully", product });
   } catch (error) {
-    res.status(500).json({ message: "Failed to activate product", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to activate product", error: error.message });
   }
 };
 
@@ -271,33 +282,28 @@ export const deleteProduct = async (req, res) => {
 
     res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Failed to delete product", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to delete product", error: error.message });
   }
 };
 
 ///Order management
-const LIMIT = 8;
-const selling_status_list = [
-  "processing",
-  "await-pickup",
-  "delivered",
-  "cancelled",
-];
 
 export const getOrderItemStats = async (req, res) => {
   try {
     const allOrderNum = await OrderItem.countDocuments();
     const processNum = await OrderItem.countDocuments({
-      selling_status: selling_status_list[0],
+      selling_status: SELLING_STATUS_LIST[0],
     });
     const awaitNum = await OrderItem.countDocuments({
-      selling_status: selling_status_list[1],
+      selling_status: SELLING_STATUS_LIST[1],
     });
     const deliveredNum = await OrderItem.countDocuments({
-      selling_status: selling_status_list[2],
+      selling_status: SELLING_STATUS_LIST[2],
     });
     const cancelledNum = await OrderItem.countDocuments({
-      selling_status: selling_status_list[3],
+      selling_status: SELLING_STATUS_LIST[3],
     });
 
     const stats = {
@@ -323,13 +329,12 @@ export const getAllOrderItems = async (req, res) => {
   try {
     let orderItems;
     const queryObj = { ...req.query };
-    console.log("query", queryObj);
 
     // if query have page, exclude it so can use find
     const excludingFields = ["page"];
     excludingFields.forEach((el) => delete queryObj[el]);
 
-    const currentPage = req.query.page * 1 || 1;
+    const currentPage = req.query.page * 1 || 1; // convert the page from query from string to num
     const limit = LIMIT;
     const skip = (currentPage - 1) * limit;
     console.log(`${currentPage} - ${limit} - ${skip}`);
@@ -373,12 +378,11 @@ export const updateOrderItemStatus = async (req, res) => {
       });
     }
 
-    if (!selling_status) {
-      console.log("order status", selling_status);
+    if (!selling_status || !SELLING_STATUS_LIST.includes(selling_status)) {
       return res.status(400).json({
         status: "fail",
         message: "Cannot change status",
-      });
+      }); 
     }
 
     const updatedOrderItem = await OrderItem.findOneAndUpdate(

@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Dropdown,
-  Pagination,
-} from "react-bootstrap";
+import { Container, Pagination } from "react-bootstrap";
 import "../Styles/OrderHistory.css";
 import Coin from "../assets/star.png";
 import {
@@ -22,13 +15,6 @@ import { useNavigate } from "react-router-dom";
 
 const STATUS_LIST = ["processing", "await-pickup", "delivered", "cancelled"];
 const PICKUP_LIST = ["Myllypuro", "Karamalmi", "Myyrmäki"];
-
-// const capitalizeStatusStr = (str) => {
-//   let result = str.trim().split("-");
-//   result = result.map((e) => e.charAt(0).toUpperCase() + e.slice(1));
-//   result = result.join(" ");
-//   return result;
-// };
 
 const OrderHistory = () => {
   const { user, updateUser, scheduleTokenRenewal } = useAuthContext();
@@ -51,14 +37,12 @@ const OrderHistory = () => {
 
     let isMounted = true;
     const fetchOrderItems = async () => {
-      console.log(user);
       if (user.role !== SELLER) {
         navigate("/");
       }
-      // console.log("fetch detail", queryStrArr);
+
       try {
         setLoading((l) => true);
-        console.log("Start fetching order details");
         const response = await fetch(
           `${
             process.env.REACT_APP_API_URL
@@ -74,17 +58,15 @@ const OrderHistory = () => {
         if (response.ok) {
           const orderData = await response.json();
           const { totalOrder, limit, orderItemList } = orderData.data;
-          // console.log(orderItemList);
+
           if (orderData && isMounted) {
             setOrderItems((od) => [...od, ...orderItemList]);
-            // setTotalPages((tp) => Math.ceil(totalOrder / limit));
+
             setTotalPages((tp) => findTotalPage(totalOrder, limit));
           }
         } else {
           setTotalPages((tp) => 0);
-          // setPage(tp)
         }
-        console.log("Finish Fetching order history");
       } catch (err) {
         console.error("Error fetching orders", err);
       } finally {
@@ -147,13 +129,14 @@ const OrderHistory = () => {
   const updateQueryStringArrayWithId = () => {
     setqueryStrArr((qtr) => {
       let updatedQueryStrArr = qtr.filter(
+      //set new query with new page, exclude old id and page fields
         (param) => !param.includes("id") && !param.includes("page")
       );
       if (id) {
         updatedQueryStrArr.push(`id=${id}`);
         setPage((p) => 1);
       }
-      // console.log(updateQueryStringArrayWithId);
+
       return updatedQueryStrArr;
     });
   };
@@ -166,8 +149,6 @@ const OrderHistory = () => {
       if (page) {
         updatedQueryStrArr.push(`page=${pageNumber}`);
       }
-      // console.log(updatedQueryStrArr);
-      // console.log(updateQueryStringArrayWithId);
       return updatedQueryStrArr;
     });
   };
@@ -190,13 +171,13 @@ const OrderHistory = () => {
   return (
     <div className="order-history-container">
       <h2>Filter</h2>
-      <div className="filter-container">
-        <div className="filter-item">
+      <div className="order-filter-container">
+        <div className="order-filter-item">
           <button type="click" onClick={displayAll} id="all-order-detail">
             All
           </button>
         </div>
-        <div className="filter-item">
+        <div className="order-filter-item">
           <div className="search-container">
             <input
               type="text"
@@ -214,8 +195,9 @@ const OrderHistory = () => {
             ></i>
           </div>
         </div>
-        <div className="filter-item">
+        <div className="order-filter-item">
           <select
+            className="order-filter-dropdown"
             name="pickup"
             id="pickup"
             value={pickUpPlace}
@@ -231,12 +213,11 @@ const OrderHistory = () => {
             ))}
           </select>
         </div>
-        <div className="filter-item">
+        <div className="order-filter-item">
           <select
             name="status"
-            className="filter-dropdown"
+            className="order-filter-dropdown"
             value={status}
-            // placeholder="Order Status"
             onChange={(e) => handleStatus(e)}
           >
             <option value="" disabled>
@@ -268,7 +249,6 @@ const OrderHistory = () => {
               </div>
               <div className="order-item-info">
                 <h4>{detail.product_name}</h4>
-                {/* <>{detail.</p> */}
                 <p id="order-item-date">{diplayDate(detail.created_at)}</p>
                 <p id="order-item-orderno">
                   Order no:

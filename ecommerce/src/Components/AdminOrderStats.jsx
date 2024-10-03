@@ -1,14 +1,4 @@
-import { useEffect } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Table,
-  Button,
-  FormControl,
-  InputGroup,
-} from "react-bootstrap";
+import { Row, Col, Card } from "react-bootstrap";
 
 import { displaySellingStatusColor } from "../utils/transactionUtils";
 
@@ -16,7 +6,6 @@ const AdminOrderStats = ({
   stats,
   statusList,
   changeSellingStatus,
-  totalItmes,
   displayAllOrderItem,
 }) => {
   return (
@@ -26,8 +15,8 @@ const AdminOrderStats = ({
           <Card.Body>
             <Card.Title className="status-card-title">All</Card.Title>
             <Card.Text
-              className="fs-2 status-card-text text-primary"
-              style={{ color: `${displaySellingStatusColor(statusList[2])}` }}
+              className="status-card-text fs-2"
+              style={{ color: "var(--clr-navy)" }}
             >
               {stats.allOrderNum}
             </Card.Text>

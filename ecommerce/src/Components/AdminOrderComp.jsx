@@ -3,11 +3,9 @@ import {
   Container,
   Row,
   Col,
-  Card,
   Table,
   Button,
   FormControl,
-  InputGroup,
   Pagination,
   Modal,
 } from "react-bootstrap";
@@ -15,7 +13,6 @@ import AdminOrderStats from "./AdminOrderStats";
 import { useAuthContext } from "../hooks/useAuthContext";
 import {
   displaySellingStatusColor,
-  capitalizeStatusStr,
   convertToQueryString,
   findTotalPage,
 } from "../utils/transactionUtils";
@@ -36,39 +33,28 @@ const getNewSellingStatus = (str) => {
 };
 
 const AdminOrderComp = () => {
-  // Sample data
   const { user, updateUser, scheduleTokenRenewal } = useAuthContext();
 
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({});
-  // const [products, setProducts] = useState(initialProducts);
   const [orderItems, setOrderItems] = useState([]);
-  const [pickupPlace, setPickUpPlace] = useState("");
   const [status, setStatus] = useState("");
   const [itemId, setItemId] = useState("");
-  const [orderId, setOrderId] = useState("");
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(1);
   const [queryStrArr, setqueryStrArr] = useState([]);
+  const [error, setError] = useState(null);
 
   const [selectedOrderItem, setSelectedOrderItem] = useState(null); // Selected product for action
   const [showModal, setShowModal] = useState(false); // State to control modal visibility
   const [showSuccessModal, setShowSuccessModal] = useState(false); // State to control success modal visibility
   const [successMessage, setSuccessMessage] = useState(""); // State to store success message
 
-  //refresh token
-  // useEffect(() => {
-  //   if (user && user.token_expired_at) {
-  //     scheduleTokenRenewal(user.token_expired_at);
-  //   }
-  // }, [user, scheduleTokenRenewal]);
-
   //fetch stat stats
   useEffect(() => {
     const abortcontroller = new AbortController();
     const fetchStats = async () => {
       try {
-        setLoading((l) => true);
         const response = await fetch(
           `${process.env.REACT_APP_API_URL}/admin/orders/stats`,
           {
@@ -87,8 +73,7 @@ const AdminOrderComp = () => {
       } catch (error) {
         if (error.name !== "AbortError")
           console.log("Error fetching stats", error.message);
-      } finally {
-        setLoading((l) => false);
+        setError((e) => error);
       }
     };
     fetchStats();
@@ -103,9 +88,7 @@ const AdminOrderComp = () => {
     setOrderItems((od) => []);
 
     const fetchOrderItems = async () => {
-      // console.log(queryStrArr);
       try {
-        // setLoading((l) => true);
         const response = await fetch(
           `${process.env.REACT_APP_API_URL}/admin/orders${convertToQueryString(
             queryStrArr
@@ -121,12 +104,8 @@ const AdminOrderComp = () => {
         );
         if (response.ok) {
           const data = await response.json();
-          // console.log(findTotalPage(data.totalItems, data.limit));
-          // console.log(data.data);
           setOrderItems((ot) => data.data);
           setTotalPages((tp) => findTotalPage(data.totalItems, data.limit));
-          // setStats((s) => ({ ...s, ...data.totalItems }));
-          // console.log("stats", stats);
         } else {
           setTotalPages((tp) => 0);
           throw new Error("Cannot get data");
@@ -134,32 +113,31 @@ const AdminOrderComp = () => {
       } catch (error) {
         if (error.name !== "AbortError") {
           console.log(error.message);
+          setError((e) => error);
         }
       } finally {
-        // setLoading((l) => false);
+        setLoading((l) => false);
       }
     };
     fetchOrderItems();
     return () => {
       abortcontroller.abort();
     };
-    // }, [queryStrArr, selectedOrderItem, status]);
   }, [queryStrArr, selectedOrderItem]);
 
   //update querystring automatically
   useEffect(() => {
     const updateQueryStringArray = () => {
-      // console.log("qryStrArr", queryStrArr);
       setqueryStrArr((qta) => {
         let newQueryStrArr = qta.filter(
           (param) =>
+            //everytime get a new querry string, exclude these field and add a new one
             !param.includes("selling_status") && !param.includes("page")
         );
         if (status) {
           newQueryStrArr.push(`selling_status=${status}`);
           setPage((p) => 1);
         }
-
         return newQueryStrArr;
       });
     };
@@ -181,6 +159,7 @@ const AdminOrderComp = () => {
   const updateQueryStringArrayWithPage = (pageNumber) => {
     setPage((p) => pageNumber);
     setqueryStrArr((qta) => {
+      //replace the old /page=x with new /page=y
       let updatedQueryStrArr = qta.filter((param) => !param.includes("page"));
       if (page) {
         updatedQueryStrArr.push(`page=${pageNumber}`);
@@ -197,6 +176,7 @@ const AdminOrderComp = () => {
     setItemId((ii) => e.target.value);
   };
 
+  //when search by id, remove other querystr
   const updateQueryStringArrayWithId = () => {
     setqueryStrArr((qta) => {
       let updatedQueryStrArr = qta.filter(
@@ -259,7 +239,6 @@ const AdminOrderComp = () => {
             selling_status: newSellingStatus,
           }),
           credentials: "include",
-          // signal: abortcontroller.signal,
         }
       );
       if (response.ok) {
@@ -271,6 +250,7 @@ const AdminOrderComp = () => {
       }
     } catch (error) {
       console.error(error.message);
+      setError((e) => error);
     }
   };
 
@@ -300,6 +280,7 @@ const AdminOrderComp = () => {
       }
     } catch (error) {
       console.error(error.message);
+      setError((e) => error);
     }
   };
 
@@ -334,6 +315,11 @@ const AdminOrderComp = () => {
       {/* Order Table */}
       {loading ? (
         <Loading />
+      ) : error ? (
+        <>
+          <h1>Error: {error}</h1>
+          <Container style={{ height: "200px" }}></Container>
+        </>
       ) : orderItems.length === 0 ? (
         <div>
           <p>Cannot find any order.</p>

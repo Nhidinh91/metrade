@@ -1,10 +1,20 @@
 import React from "react";
 import logo2 from "../assets/logo-2-removebg.png";
 import PageLinks from "../Components/PageLinks";
-import { Navbar, Nav, NavDropdown, Container, Row, Col, Form, Button, Modal } from "react-bootstrap";
-import style from '../Styles/Navbar.module.css';
+import {
+  Navbar,
+  Nav,
+  NavDropdown,
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  Modal,
+} from "react-bootstrap";
+import style from "../Styles/Navbar.module.css";
 import SearchBar from "../Components/SearchBar";
-import { useAuthContext } from '../hooks/useAuthContext';
+import { useAuthContext } from "../hooks/useAuthContext";
 import ProfileMenu from "../Components/ProfileMenu";
 import CartMenu from "../Components/CartMenu";
 import AdminDropdown from "../Components/AdminDropdown";
@@ -21,29 +31,29 @@ const Header = () => {
   });
   const navigate = useNavigate();
 
-    const handleSellNowClick = () => {
-      if (!user) {
-        setModalContent({
-          message: "Please signup to access this feature.",
-          buttonText: "Signup Now",
-          buttonLink: "/signup",
-        });
-        setShowModal(true);
-      } else if (user.role !== "seller" && user.role !== "admin") {
-        setModalContent({
-          message: "Please verify your email to access this feature.",
-          buttonText: "To My Page",
-          buttonLink: "/my-page",
-        });
-        setShowModal(true);
-      } else {
-        navigate("/new-product");
-      }
-    };
+  const handleSellNowClick = () => {
+    if (!user) {
+      setModalContent({
+        message: "Please signup to access this feature.",
+        buttonText: "Signup Now",
+        buttonLink: "/signup",
+      });
+      setShowModal(true);
+    } else if (user.role !== "seller" && user.role !== "admin") {
+      setModalContent({
+        message: "Please verify your email to access this feature.",
+        buttonText: "To My Page",
+        buttonLink: "/my-page",
+      });
+      setShowModal(true);
+    } else {
+      navigate("/new-product");
+    }
+  };
 
-    const handleCloseModal = () => {
-      setShowModal(false);
-    };
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
 
   return (
     <>
@@ -55,7 +65,11 @@ const Header = () => {
             </Navbar.Brand>
             <SearchBar />
             <div className={`${style.rightContainer}`}>
-              <Button className={`${style.btnSellNow} d-none d-md-block`} onClick={handleSellNowClick} href="/new-product">
+              {/* <Button className={`${style.btnSellNow} d-none d-md-block`} onClick={handleSellNowClick} href="/new-product"> */}
+              <Button
+                className={`${style.btnSellNow} d-none d-md-block`}
+                onClick={handleSellNowClick}
+              >
                 Sell Now
               </Button>
               {!user ? (
@@ -67,14 +81,14 @@ const Header = () => {
               ) : (
                 <ProfileMenu />
               )}
-              
+
               <CartMenu />
             </div>
           </Container>
         </Row>
         {/* <Row className="d-flex justify-content-center align-items-center vh=100"> */}
         <Row>
-          <PageLinks/>
+          <PageLinks />
         </Row>
       </Container>
 
@@ -85,7 +99,9 @@ const Header = () => {
         </Modal.Header>
         <Modal.Body>
           <p>{modalContent.message}</p>
-            <Button href={modalContent.buttonLink}>{modalContent.buttonText}</Button>
+          <Button href={modalContent.buttonLink}>
+            {modalContent.buttonText}
+          </Button>
         </Modal.Body>
       </Modal>
     </>
@@ -93,4 +109,3 @@ const Header = () => {
 };
 
 export default Header;
-
