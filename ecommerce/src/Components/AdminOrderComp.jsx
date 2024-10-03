@@ -3,9 +3,11 @@ import {
   Container,
   Row,
   Col,
+  Card,
   Table,
   Button,
   FormControl,
+  InputGroup,
   Pagination,
   Modal,
 } from "react-bootstrap";
@@ -13,6 +15,7 @@ import AdminOrderStats from "./AdminOrderStats";
 import { useAuthContext } from "../hooks/useAuthContext";
 import {
   displaySellingStatusColor,
+  capitalizeStatusStr,
   convertToQueryString,
   findTotalPage,
 } from "../utils/transactionUtils";
@@ -33,13 +36,17 @@ const getNewSellingStatus = (str) => {
 };
 
 const AdminOrderComp = () => {
+  // Sample data
   const { user, updateUser, scheduleTokenRenewal } = useAuthContext();
 
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({});
+  // const [products, setProducts] = useState(initialProducts);
   const [orderItems, setOrderItems] = useState([]);
+  const [pickupPlace, setPickUpPlace] = useState("");
   const [status, setStatus] = useState("");
   const [itemId, setItemId] = useState("");
+  const [orderId, setOrderId] = useState("");
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(1);
   const [queryStrArr, setqueryStrArr] = useState([]);
@@ -55,6 +62,7 @@ const AdminOrderComp = () => {
     const abortcontroller = new AbortController();
     const fetchStats = async () => {
       try {
+        setLoading((l) => true);
         const response = await fetch(
           `${process.env.REACT_APP_API_URL}/admin/orders/stats`,
           {
@@ -71,9 +79,12 @@ const AdminOrderComp = () => {
           setStats((s) => ({ ...s, ...statsData.data }));
         }
       } catch (error) {
-        if (error.name !== "AbortError")
+        if (error.name !== "AbortError") {
+          setError((e) => error.message);
           console.log("Error fetching stats", error.message);
-        setError((e) => error);
+        }
+      } finally {
+        setLoading((l) => false);
       }
     };
     fetchStats();
@@ -104,6 +115,7 @@ const AdminOrderComp = () => {
         );
         if (response.ok) {
           const data = await response.json();
+
           setOrderItems((ot) => data.data);
           setTotalPages((tp) => findTotalPage(data.totalItems, data.limit));
         } else {
@@ -113,10 +125,8 @@ const AdminOrderComp = () => {
       } catch (error) {
         if (error.name !== "AbortError") {
           console.log(error.message);
-          setError((e) => error);
+          setError((e) => error.message);
         }
-      } finally {
-        setLoading((l) => false);
       }
     };
     fetchOrderItems();
@@ -131,13 +141,13 @@ const AdminOrderComp = () => {
       setqueryStrArr((qta) => {
         let newQueryStrArr = qta.filter(
           (param) =>
-            //everytime get a new querry string, exclude these field and add a new one
             !param.includes("selling_status") && !param.includes("page")
         );
         if (status) {
           newQueryStrArr.push(`selling_status=${status}`);
           setPage((p) => 1);
         }
+
         return newQueryStrArr;
       });
     };
@@ -159,7 +169,6 @@ const AdminOrderComp = () => {
   const updateQueryStringArrayWithPage = (pageNumber) => {
     setPage((p) => pageNumber);
     setqueryStrArr((qta) => {
-      //replace the old /page=x with new /page=y
       let updatedQueryStrArr = qta.filter((param) => !param.includes("page"));
       if (page) {
         updatedQueryStrArr.push(`page=${pageNumber}`);
@@ -176,7 +185,6 @@ const AdminOrderComp = () => {
     setItemId((ii) => e.target.value);
   };
 
-  //when search by id, remove other querystr
   const updateQueryStringArrayWithId = () => {
     setqueryStrArr((qta) => {
       let updatedQueryStrArr = qta.filter(
@@ -239,6 +247,7 @@ const AdminOrderComp = () => {
             selling_status: newSellingStatus,
           }),
           credentials: "include",
+          // signal: abortcontroller.signal,
         }
       );
       if (response.ok) {
@@ -250,7 +259,7 @@ const AdminOrderComp = () => {
       }
     } catch (error) {
       console.error(error.message);
-      setError((e) => error);
+      setError((e) => error.message);
     }
   };
 
@@ -280,12 +289,12 @@ const AdminOrderComp = () => {
       }
     } catch (error) {
       console.error(error.message);
-      setError((e) => error);
+      setError((e) => error.message);
     }
   };
 
   return (
-    <Container fluid className="p-4">
+    <Container fluid className=" production-dashbard p-4">
       {/* Statistics Cards */}
       <AdminOrderStats
         stats={stats}
@@ -325,14 +334,14 @@ const AdminOrderComp = () => {
           <p>Cannot find any order.</p>
         </div>
       ) : (
-        <>
-          <Table striped bordered hover>
-            <thead>
+        <Container fluid className="table-responsive p-0">
+          <Table striped bordered hover className="product-table">
+            <thead className="product-table-header">
               <tr>
                 <th>Order Item Picture</th>
                 <th>Order Item Id</th>
-                <th>Status</th>
-                <th>Action</th>
+                <th className="align-middle">Status</th>
+                <th className="align-middle">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -342,7 +351,7 @@ const AdminOrderComp = () => {
                     <img
                       src={item.image}
                       alt={item.product_name}
-                      className="order-image"
+                      className="product-image"
                       style={{
                         width: "100px",
                         height: "auto",
@@ -350,8 +359,9 @@ const AdminOrderComp = () => {
                       }}
                     />
                   </td>
-                  <td>{item._id}</td>
+                  <td className="align-middle">{item._id}</td>
                   <td
+                    className="align-middle"
                     style={{
                       color: `${displaySellingStatusColor(
                         item.selling_status
@@ -461,7 +471,7 @@ const AdminOrderComp = () => {
               <p>{successMessage}</p>
             </Modal.Body>
           </Modal>
-        </>
+        </Container>
       )}
     </Container>
   );

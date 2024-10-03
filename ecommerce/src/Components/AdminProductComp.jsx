@@ -222,7 +222,6 @@ const AdminProductComp = () => {
     return (
       <>
         <h1>Error: {error}</h1>
-        <Container style={{ height: "200px" }}></Container>
       </>
     );
   }
