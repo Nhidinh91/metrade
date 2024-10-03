@@ -1,70 +1,25 @@
-import moment from "moment";
-
 import { useState, useEffect } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Dropdown,
-  Pagination,
-} from "react-bootstrap";
+import { Container, Pagination } from "react-bootstrap";
 import "../Styles/OrderHistory.css";
 import Coin from "../assets/star.png";
+import {
+  displaySellingStatusColor,
+  displayPickupColor,
+  diplayDate,
+  convertToQueryString,
+  findTotalPage,
+  capitalizeStatusStr,
+} from "../utils/transactionUtils";
+import { useNavigate } from "react-router-dom";
 
 const STATUS_LIST = ["processing", "await-pickup", "delivered", "cancelled"];
 const PICKUP_LIST = ["Myllypuro", "Karamalmi", "Myyrmäki"];
 
-const displayStatus = (str) => {
-  let result = str.trim().split("-");
-  result = result.map((e) => e.charAt(0).toUpperCase() + e.slice(1));
-  result = result.join(" ");
-  return result;
-};
-
-const displayButtonColor = (str) => {
-  switch (str) {
-    case "processing":
-      return "#ffc41f";
-    case "await-pickup":
-      return "#f37c25";
-    case "delivered":
-      return "#3f9c36";
-    case "cancelled":
-      return "#b43f3f";
-  }
-};
-
-const displayColor = (str) => {
-  // console.log(str);
-  switch (str) {
-    case "Myllypuro":
-      return "#3f9c36";
-    case "Karamalmi":
-      return "#b43f3f";
-    case "Myyrmäki":
-      return "#f37c25";
-  }
-};
-
-const diplayDate = (dateStr) => {
-  const date = moment(dateStr).format("DD-MM-YYYY");
-  // console.log(date);
-  return `${date}`;
-};
-
-const convertToQueryString = (qrArr) => {
-  let result = "";
-  if (qrArr.length > 0) {
-    result = "?" + qrArr.join("&");
-  }
-  return result;
-};
-
 const OrderHistory = () => {
   const { user, updateUser, scheduleTokenRenewal } = useAuthContext();
 
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState("");
   const [queryStrArr, setqueryStrArr] = useState([]);
@@ -75,14 +30,19 @@ const OrderHistory = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(1);
 
+  const SELLER = "seller";
+
   useEffect(() => {
     setOrderItems((od) => []);
 
     let isMounted = true;
     const fetchOrderItems = async () => {
-      setLoading((l) => true);
-      console.log("fetch detail", queryStrArr);
+      if (user.role !== SELLER) {
+        navigate("/");
+      }
+
       try {
+        setLoading((l) => true);
         const response = await fetch(
           `${
             process.env.REACT_APP_API_URL
@@ -98,13 +58,14 @@ const OrderHistory = () => {
         if (response.ok) {
           const orderData = await response.json();
           const { totalOrder, limit, orderItemList } = orderData.data;
+
           if (orderData && isMounted) {
             setOrderItems((od) => [...od, ...orderItemList]);
-            setTotalPages((tp) => Math.ceil(totalOrder / limit));
+
+            setTotalPages((tp) => findTotalPage(totalOrder, limit));
           }
         } else {
           setTotalPages((tp) => 0);
-          // setPage(tp)
         }
       } catch (err) {
         console.error("Error fetching orders", err);
@@ -126,7 +87,6 @@ const OrderHistory = () => {
   }, [user, scheduleTokenRenewal]);
 
   useEffect(() => {
-    console.log("updating picking ");
     const updateQueryStringArray = () => {
       setqueryStrArr((qtr) => {
         let newQueryStrArr = qtr.filter(
@@ -143,9 +103,6 @@ const OrderHistory = () => {
           newQueryStrArr.push(`status=${status}`);
           setPage((p) => 1);
         }
-        // if (page) {
-        //   newQueryStrArr.push(`page=${page}`);
-        // }
         return newQueryStrArr;
       });
     };
@@ -172,13 +129,14 @@ const OrderHistory = () => {
   const updateQueryStringArrayWithId = () => {
     setqueryStrArr((qtr) => {
       let updatedQueryStrArr = qtr.filter(
+      //set new query with new page, exclude old id and page fields
         (param) => !param.includes("id") && !param.includes("page")
       );
       if (id) {
         updatedQueryStrArr.push(`id=${id}`);
         setPage((p) => 1);
       }
-      // console.log(updateQueryStringArrayWithId);
+
       return updatedQueryStrArr;
     });
   };
@@ -191,8 +149,6 @@ const OrderHistory = () => {
       if (page) {
         updatedQueryStrArr.push(`page=${pageNumber}`);
       }
-      console.log(updatedQueryStrArr);
-      // console.log(updateQueryStringArrayWithId);
       return updatedQueryStrArr;
     });
   };
@@ -209,23 +165,19 @@ const OrderHistory = () => {
   };
 
   const handlePageChange = (pageNumber) => {
-    // console.log(pageNumber);
-    // setPage((p) => pageNumber);
-    // setPage(pageNumber);
-    // e.preventDefault();
     updateQueryStringArrayWithPage(pageNumber);
   };
 
   return (
     <div className="order-history-container">
       <h2>Filter</h2>
-      <div className="filter-container">
-        <div className="filter-item">
+      <div className="order-filter-container">
+        <div className="order-filter-item">
           <button type="click" onClick={displayAll} id="all-order-detail">
             All
           </button>
         </div>
-        <div className="filter-item">
+        <div className="order-filter-item">
           <div className="search-container">
             <input
               type="text"
@@ -243,8 +195,9 @@ const OrderHistory = () => {
             ></i>
           </div>
         </div>
-        <div className="filter-item">
+        <div className="order-filter-item">
           <select
+            className="order-filter-dropdown"
             name="pickup"
             id="pickup"
             value={pickUpPlace}
@@ -260,12 +213,11 @@ const OrderHistory = () => {
             ))}
           </select>
         </div>
-        <div className="filter-item">
+        <div className="order-filter-item">
           <select
             name="status"
-            className="filter-dropdown"
+            className="order-filter-dropdown"
             value={status}
-            // placeholder="Order Status"
             onChange={(e) => handleStatus(e)}
           >
             <option value="" disabled>
@@ -273,7 +225,7 @@ const OrderHistory = () => {
             </option>
             {STATUS_LIST.map((status, index) => (
               <option key={index} value={status}>
-                {displayStatus(status)}
+                {capitalizeStatusStr(status)}
               </option>
             ))}
           </select>
@@ -297,7 +249,6 @@ const OrderHistory = () => {
               </div>
               <div className="order-item-info">
                 <h4>{detail.product_name}</h4>
-                {/* <>{detail.</p> */}
                 <p id="order-item-date">{diplayDate(detail.created_at)}</p>
                 <p id="order-item-orderno">
                   Order no:
@@ -307,7 +258,11 @@ const OrderHistory = () => {
               </div>
               <div className="order-item-pickup">
                 <h4>Pickup</h4>
-                <p style={{ color: `${displayColor(detail.pickup_point)}` }}>
+                <p
+                  style={{
+                    color: `${displayPickupColor(detail.pickup_point)}`,
+                  }}
+                >
                   {detail.pickup_point}{" "}
                 </p>
               </div>
@@ -321,10 +276,12 @@ const OrderHistory = () => {
                   id="order-item-status"
                   disabled
                   style={{
-                    background: `${displayButtonColor(detail.selling_status)}`,
+                    background: `${displaySellingStatusColor(
+                      detail.selling_status
+                    )}`,
                   }}
                 >
-                  {displayStatus(detail.selling_status)}
+                  {capitalizeStatusStr(detail.selling_status)}
                 </button>
 
                 <span id="coin">

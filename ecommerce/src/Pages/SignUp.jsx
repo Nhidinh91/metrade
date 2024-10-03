@@ -101,7 +101,7 @@ const SignUp = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    // let ignore = false
+
     const isValid = isvalidForm();
 
     if (isValid) {
@@ -213,7 +213,6 @@ const SignUp = () => {
                     placeholder="Enter your password"
                     onChange={handlePassword}
                     value={password}
-                    // onChange={(e) => setPassword(e.target.value)}
                     className="signin-input"
                   />
                   {passwordType === "password" ? (

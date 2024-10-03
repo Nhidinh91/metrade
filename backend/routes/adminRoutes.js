@@ -1,12 +1,18 @@
 import express from "express";
-import { adminGetAllProducts, adminGetProductCounts, activateProduct, deleteProduct } from "../controllers/adminController.js";
-
-const router = express.Router();
 import {
+  adminGetAllProducts,
+  adminGetProductCounts,
+  activateProduct,
+  deleteProduct,
+  getOrderItemStats,
+  getAllOrderItems,
+  updateOrderItemStatus,
   getAllUsers,
   getAllUserCount,
   updateUserStatus,
 } from "../controllers/adminController.js";
+
+const router = express.Router();
 
 //User Management Routes
 router.get("/users", getAllUsers);
@@ -20,6 +26,8 @@ router.put("/product/activate/:id", activateProduct);
 router.delete("/product/delete/:id", deleteProduct);
 
 //Order Management Routes
-
+router.get("/orders/", getAllOrderItems);
+router.put("/orders/:orderItemId", updateOrderItemStatus);
+router.get("/orders/stats", getOrderItemStats);
 
 export default router;

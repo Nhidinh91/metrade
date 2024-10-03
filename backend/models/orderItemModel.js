@@ -1,5 +1,13 @@
 import mongoose from "mongoose";
 
+const LIMIT = 8;
+const selling_status_list = [
+  "processing",
+  "await-pickup",
+  "delivered",
+  "cancelled",
+];
+
 const orderItemSchema = new mongoose.Schema(
   {
     order_id: {

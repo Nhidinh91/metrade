@@ -8,14 +8,13 @@ import SideBar from "../Components/SideBar";
 
 const PurchaseHistory = () => {
   const navigate = useNavigate();
-  const {  isAuthenticated, isLoading } = useAuthContext();
+  const { isAuthenticated, isLoading } = useAuthContext();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated()) {
       navigate("/login");
     }
   }, [isAuthenticated, isLoading, navigate]);
-
 
   return (
     <Container>

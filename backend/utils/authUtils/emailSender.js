@@ -1,7 +1,5 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import User from "../../models/userModel.js";
-import { hashInput } from "./inputHashing.js";
 
 dotenv.config();
 
@@ -20,14 +18,11 @@ const convertToDateTimeStr = (string) => {
 
 const convertToFullDateTimeStr = (expStr) => {
   const time_str = convertToDateTimeStr(expStr[expStr.length - 1]);
-  const num_str = expStr.slice(0, 2);
+  const num_str = expStr.slice(0, expStr.length - 1);
   const num = Number(num_str);
   return num > 1 ? `${num_str} ${time_str}s` : `${num_str} ${time_str}`;
 };
 
-// const capitalizeString = (str) => {
-//   return string.charAt().toUpperCase() = string.slice(1);
-// }
 
 export const sendConfirmationEmailService = async (firstName, email, token) => {
   console.log("Start sending email");

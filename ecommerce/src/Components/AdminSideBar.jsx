@@ -5,7 +5,7 @@ import "../Styles/SideBar.css";
 const AdminSideBar = ({ pageName, children }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   return (
     <Container className="side-bar">
       <h3>{pageName}</h3>
