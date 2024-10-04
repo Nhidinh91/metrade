@@ -282,6 +282,7 @@ const AdminUserComp = () => {
       </Row>
 
       {/* Product Table */}
+      { users && users.length > 0  ? (
       <Container fluid className="table-responsive p-0">
         <Table striped bordered hover className="user-table">
           <thead className="user-table-header">
@@ -318,6 +319,9 @@ const AdminUserComp = () => {
           </tbody>
         </Table>
       </Container>
+      ) : (
+        <h3 className="mt-3" >No users found</h3>
+      )}
       {/*Popup menu to perform actions to users */}
       <Modal show={showModal} onHide={handleClose} centered>
         <Modal.Header closeButton>

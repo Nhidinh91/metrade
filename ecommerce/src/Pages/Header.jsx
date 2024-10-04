@@ -60,26 +60,38 @@ const Header = () => {
       <Container fluid className="header-container">
         <Row className={`${style.navUpper} w-100`}>
           <Container className={`${style.navContainer}`}>
-            <Navbar.Brand href="/">
+            <Navbar.Brand
+              as={Link}
+              to={user && user.role === "admin" ? "/admin-user" : "/"}
+            >
               <img src={logo2} alt="" className="nav-logo" />
             </Navbar.Brand>
             <SearchBar />
             <div className={`${style.rightContainer}`}>
-              {/* <Button className={`${style.btnSellNow} d-none d-md-block`} onClick={handleSellNowClick} href="/new-product"> */}
-              <Button
-                className={`${style.btnSellNow} d-none d-md-block`}
-                onClick={handleSellNowClick}
-              >
-                Sell Now
-              </Button>
               {!user ? (
-                <Nav.Link className={`${style.btnLogin}`} href="/login">
-                  Login
-                </Nav.Link>
+                <>
+                  <Button
+                    className={`${style.btnSellNow} d-none d-md-block`}
+                    onClick={handleSellNowClick}
+                  >
+                    Sell Now
+                  </Button>
+                  <Nav.Link className={`${style.btnLogin}`} href="/login">
+                    Login
+                  </Nav.Link>
+                </>
               ) : user.role === "admin" ? (
                 <AdminDropdown />
               ) : (
-                <ProfileMenu />
+                <>
+                  <Button
+                    className={`${style.btnSellNow} d-none d-md-block`}
+                    onClick={handleSellNowClick}
+                  >
+                    Sell Now
+                  </Button>
+                  <ProfileMenu />
+                </>
               )}
 
               <CartMenu />
