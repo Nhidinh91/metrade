@@ -323,7 +323,7 @@ export const checkout = async (req, res) => {
       })
       .session(session);
 
-    const cartItems = cart.cart_items.filter((item) => {
+    let cartItems = cart.cart_items.filter((item) => {
       return checkout.order_items.some(
         (orderItem) => orderItem._id === item._id.toString()
       );
@@ -366,11 +366,20 @@ export const checkout = async (req, res) => {
       if (product) {
         // if product is in processing, rollback the transaction
         if (product.status === "processing") {
+          const updatedcart = await Cart.findByIdAndUpdate(
+            cart._id,
+            {
+              $pull: { cart_items: item._id },
+            },
+            { new: true }
+          );
+          await CartItem.findByIdAndDelete(item._id);
           await session.abortTransaction();
           session.endSession();
-          return res.status(400).json({
+          return res.status(422).json({
             success: false,
             message: `Product:" ${product.name}" is in processing`,
+            updatedCart: updatedcart,
           });
         }
         product.stock_quantity -= item.adding_quantity;
@@ -398,7 +407,7 @@ export const checkout = async (req, res) => {
     await Cart.findByIdAndUpdate(
       cart._id,
       {
-        $pull: { cart_items: { $in: cartItemIds } },
+        $pull: { cart_items: { $in: cartItemIds }, new: true },
       },
       { session }
     );

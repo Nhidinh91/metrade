@@ -14,6 +14,7 @@ import userRoutes from "./routes/userRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import sellerRoutes from "./routes/sellerRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import cartDocs from "./api-document/cart.js";
 
 dotenv.config();
 
@@ -54,7 +55,15 @@ app.use("/api/orders",  orderRoutes);
 app.use("/api/seller", sellerRoutes);
 app.use("/api/admin", adminRoutes);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+const PORT1 = process.env.PORT || 3000;
+const PORT2 = process.env.PORT2 || 4000;
+
+cartDocs(app, PORT2);
+
+app.listen(PORT1, () => {
+  console.log(`Server is running on port ${PORT1}`);
+});
+
+app.listen(PORT2, () => {
+  console.log(`Cart Swagger docs available at http://localhost:${PORT2}/api-docs/cart`);
 });
