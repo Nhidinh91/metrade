@@ -12,6 +12,7 @@ import {
   generateAccessToken,
   generateRefreshToken,
 } from "../utils/token/jwtToken.js";
+import bcrypt from "bcryptjs";
 
 export const register = async (req, res) => {
   try {
@@ -212,7 +213,7 @@ export const login = async (req, res) => {
     const user = await User.findOne({ email: email });
 
     // If invalid email or password
-    if (!user || !(await user.comparePassword(password))) {
+    if (!user || !(bcrypt.compareSync(password, user.password))) {
       return res
         .status(401)
         .json({ success: false, message: "Invalid email or password" });
