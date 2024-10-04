@@ -4,7 +4,7 @@ import VerifySuccess from "./VerifySuccess";
 import VerifyFail from "./VerifyFail";
 import Logo from "./../assets/logo.png";
 
-const BEURL = "http://localhost:3000/api/auth/register/verify";
+const BEURL = `${process.env.REACT_APP_API_URL}/auth/register/verify`;
 
 const Verify = () => {
   const location = useLocation();

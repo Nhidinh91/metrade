@@ -113,7 +113,7 @@ const SignUp = () => {
       };
       try {
         const response = await fetch(
-          "http://127.0.0.1:3000/api/auth/register",
+          `${process.env.REACT_APP_API_URL}/auth/register`,
           {
             method: "POST",
             headers: {

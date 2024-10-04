@@ -40,7 +40,7 @@ export const sendConfirmationEmailService = async (firstName, email, token) => {
   });
 
   const timeStr = convertToFullDateTimeStr(exp_time_str);
-  const BEURL = "http://localhost:3000/api/auth/register/verify";
+
   const FEURL = "http://localhost:5173/verify";
 
   let mailConfigurations = await transport.sendMail({
@@ -51,7 +51,7 @@ export const sendConfirmationEmailService = async (firstName, email, token) => {
     text: `Hi! ${firstName}, You have recently visited 
            our website and entered your email.
            Please follow the given link to verify your email
-           ${FEURL}?token=${token}&email=${email}\n.
+           ${process.env.FE_URL}?token=${token}&email=${email}\n.
 
            The link will expire after ${timeStr}
            Thanks`,
