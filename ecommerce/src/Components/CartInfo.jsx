@@ -221,7 +221,14 @@ const CartDetail = () => {
         setShowResultModal(true);
       } else if (response.status === 402) {
         setShowInsufficientModal(true);
-      } else {
+      } else if (response.status === 422) {
+        const data = await response.json();
+        setUpdatedCartItem(data.updatedCart);
+        fetchCartDetail();
+        setError(data.message);
+        setShowResultModal(true);
+      }
+      else {
         const data = await response.json();
         setError(data.message);
         setShowResultModal(true);
