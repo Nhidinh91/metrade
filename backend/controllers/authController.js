@@ -267,7 +267,7 @@ export const login = async (req, res) => {
         is_verified: user.is_verified,
         phone: user.phone,
         balance: user.balance,
-        card_id: card._id,
+        card_id: card?._id,
         token_expired_at: Date.now() + accessTokenMaxAge,
       },
     });
