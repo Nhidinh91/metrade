@@ -1,8 +1,10 @@
-import { initializeServer, closeServer } from './setupTestServer';
+// import { initializeServer, closeServer } from './setupTestServer';
 import request from 'supertest';
 import bcrypt from 'bcryptjs';
 import User from '../models/userModel';
 import dotenv from 'dotenv';
+import app from '../app';
+import mongoose from 'mongoose';
 
 dotenv.config();
 
@@ -28,7 +30,7 @@ let appServer;
 
 beforeAll(async () => {
     // Start the server and return the appServer
-    appServer = await initializeServer();
+    appServer = app.listen(0);
 
     // Insert the mock user into the database
     await User.create(mockUser);
@@ -47,7 +49,8 @@ beforeAll(async () => {
 afterAll(async () => {
     // Clean up the database by removing the mock user
     await User.deleteMany({ email: mockUser.email });
-    await closeServer();
+    mongoose.connection.close();
+    appServer.close();
 });
 
 describe('User API Tests', () => {
