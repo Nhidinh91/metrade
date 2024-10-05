@@ -1,7 +1,6 @@
+import { initializeServer, closeServer } from './setupTestServer';
 import request from 'supertest';
-import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import app from '../app';
 import User from '../models/userModel';
 import dotenv from 'dotenv';
 
@@ -14,7 +13,7 @@ jest.setTimeout(30000);
 const mockUser = {
     first_name: 'Test',
     last_name: 'User',
-    email: 'test.user@metropolia.fi',
+    email: 'test.user1@metropolia.fi',
     phone: '123456789',
     balance: 1000,
     password: bcrypt.hashSync('12345678', parseInt(process.env.SALT_ROUNDS)),
@@ -24,11 +23,12 @@ const mockUser = {
     status: 'active',
 };
 
-let appServer;
 let accessToken;
+let appServer;
 
 beforeAll(async () => {
-    appServer = app.listen(process.env.APP_TEST_PORT);
+    // Start the server and return the appServer
+    appServer = await initializeServer();
 
     // Insert the mock user into the database
     await User.create(mockUser);
@@ -47,12 +47,7 @@ beforeAll(async () => {
 afterAll(async () => {
     // Clean up the database by removing the mock user
     await User.deleteMany({ email: mockUser.email });
-
-    // Close the mongoose connection
-    await mongoose.connection.close();
-
-    // Close the server
-    appServer.close();
+    await closeServer();
 });
 
 describe('User API Tests', () => {
