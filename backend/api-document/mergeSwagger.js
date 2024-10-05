@@ -11,7 +11,7 @@ const basePath = path.join(__dirname, 'base.json');
 const baseContent = JSON.parse(fs.readFileSync(basePath, 'utf-8'));
 
 // Define paths to merge
-const pathsToMerge = ['auth.json'];
+const pathsToMerge = ['auth.json','order.json','admin-order.json'];
 
 // Function to merge paths into base
 pathsToMerge.forEach((file) => {
