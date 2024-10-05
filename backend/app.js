@@ -14,10 +14,16 @@ import userRoutes from "./routes/userRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import sellerRoutes from "./routes/sellerRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import fs from 'fs';
+import path from 'path';
+import swaggerUI from "swagger-ui-express";
 
 dotenv.config();
 
 const app = express();
+
+// Load the Swagger JSON file using fs
+const swaggerSpec = JSON.parse(fs.readFileSync(path.resolve('./api-document/swagger.json'), 'utf-8'));
 
 // Connect to MongoDB
 connectDB();
@@ -35,11 +41,13 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
+
 app.use("/api/user", jwtAuthenticate);
 app.use("/api/cart", jwtAuthenticate);
 app.use("/api/seller", jwtAuthenticate);
 app.use("/api/admin", jwtAuthenticate);
-app.use("/api/orders",jwtAuthenticate)
+app.use("/api/orders",jwtAuthenticate);
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 
 // Routes
