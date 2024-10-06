@@ -213,7 +213,7 @@ export const login = async (req, res) => {
     const user = await User.findOne({ email: email });
 
     // If invalid email or password
-    if (!user || !(bcrypt.compareSync(password, user.password))) {
+    if (!user || !bcrypt.compareSync(password, user.password)) {
       return res
         .status(401)
         .json({ success: false, message: "Invalid email or password" });
@@ -235,9 +235,10 @@ export const login = async (req, res) => {
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      // secure: true,
       path: "/api/token/get-access-token",
       maxAge: convertTimeToMilliseconds(process.env.JWT_REFRESH_EXPIRES_IN),
-      sameSite: "none"
+      sameSite: "Strict",
     });
 
     //generate accessToken and store in cookies
@@ -249,9 +250,10 @@ export const login = async (req, res) => {
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      // secure: true,
       path: "/api",
       maxAge: accessTokenMaxAge,
-      sameSite: "none"
+      sameSite: "Strict",
     });
 
     const card = await Cart.findOne({ user_id: user._id });
@@ -292,16 +294,18 @@ export const logout = async (req, res) => {
 
     if (deletedToken) {
       // Clear the tokens from the cookie
-      res.clearCookie('refreshToken', {
+      res.clearCookie("refreshToken", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === "production",
         path: "/api/token/get-access-token",
+        sameSite: "Strict",
       });
-      
-      res.clearCookie("accessToken", {      
+
+      res.clearCookie("accessToken", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === "production",
         path: "/api",
+        sameSite: "Strict",
       });
 
       return res
