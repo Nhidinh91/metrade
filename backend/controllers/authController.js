@@ -237,7 +237,6 @@ export const login = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       path: "/api/token/get-access-token",
       maxAge: convertTimeToMilliseconds(process.env.JWT_REFRESH_EXPIRES_IN),
-
     });
 
     //generate accessToken and store in cookies
@@ -295,14 +294,12 @@ export const logout = async (req, res) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         path: "/api/token/get-access-token",
-        sameSite: "Strict",
       });
 
       res.clearCookie("accessToken", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         path: "/api",
-        sameSite: "Strict",
       });
 
       return res
