@@ -13,9 +13,13 @@ const baseContent = JSON.parse(fs.readFileSync(basePath, "utf-8"));
 // Define paths to merge
 const pathsToMerge = [
   "auth.json",
-  "carts.json",
   "order.json",
   "admin-order.json",
+  ,
+  "carts.json",
+  "users.json",
+  "token.json",
+  "carts.json",
 ];
 
 // Function to merge paths into base

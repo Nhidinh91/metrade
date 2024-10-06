@@ -237,6 +237,7 @@ export const login = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       path: "/api/token/get-access-token",
       maxAge: convertTimeToMilliseconds(process.env.JWT_REFRESH_EXPIRES_IN),
+      sameSite: "none"
     });
 
     //generate accessToken and store in cookies
@@ -250,6 +251,7 @@ export const login = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       path: "/api",
       maxAge: accessTokenMaxAge,
+      sameSite: "none"
     });
 
     const card = await Cart.findOne({ user_id: user._id });

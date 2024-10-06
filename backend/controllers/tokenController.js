@@ -30,8 +30,8 @@ export const getAccessToken = async (req, res) => {
 
     res.cookie("accessToken", newAcessToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "Strict",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: "none",
       path: "/api",
       maxAge: tokenMaxAge,
     });
