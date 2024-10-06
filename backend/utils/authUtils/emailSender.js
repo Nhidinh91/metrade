@@ -41,8 +41,6 @@ export const sendConfirmationEmailService = async (firstName, email, token) => {
 
   const timeStr = convertToFullDateTimeStr(exp_time_str);
 
-  const FEURL = "http://localhost:5173/verify";
-
   let mailConfigurations = await transport.sendMail({
     from: `Metrade <${process.env.EMAIL_USERNAME}>`,
     to: `${email}`,

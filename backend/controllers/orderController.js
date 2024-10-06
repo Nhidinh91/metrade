@@ -30,7 +30,7 @@ export const getOrderHistory = async (req, res) => {
           as: "order_detail_list",
         },
       },
-      
+
       { $sort: { updated_at: -1 } },
       { $unwind: "$order_detail_list" },
       { $replaceRoot: { newRoot: "$order_detail_list" } },
@@ -56,18 +56,23 @@ export const getOrderHistory = async (req, res) => {
 
     pipeline.push({
       $facet: {
-        totalCount: [{ $count: "totalCount" }],
+        totalCountArr: [{ $count: "totalCount" }],
         data: [{ $skip: skip }, { $limit: limit }],
       },
     });
 
     const orderItemList = await Order.aggregate(pipeline);
-    const { totalCount, data } = orderItemList[0];
-    // console.log(orderItemList);
+
+    const { totalCountArr, data } = orderItemList[0];
+    let totalNum = 0;
+    if (totalCountArr.length > 0) {
+      totalNum = totalCountArr[0].totalCount;
+    }
+
     res.status(200).json({
       status: 200,
       data: {
-        totalOrder: totalCount[0].totalCount,
+        totalOrder: totalNum,
         limit: limit,
         orderItemList: data,
       },
@@ -79,4 +84,3 @@ export const getOrderHistory = async (req, res) => {
     });
   }
 };
-

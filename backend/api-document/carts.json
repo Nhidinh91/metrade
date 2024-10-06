@@ -5,7 +5,7 @@
       "summary": "Add a product to the cart",
       "security": [
         {
-          "cookieAuth": []
+          "accessTokenCookie": []
         }
       ],
       "requestBody": {
@@ -100,7 +100,7 @@
       "summary": "Get specific cart item info",
       "security": [
         {
-          "cookieAuth": []
+          "accessTokenCookie": []
         }
       ],
       "requestBody": {
@@ -173,7 +173,7 @@
       "summary": "Get cart details including all items",
       "security": [
         {
-          "cookieAuth": []
+          "accessTokenCookie": []
         }
       ],
       "responses": {
@@ -229,7 +229,7 @@
       "summary": "Update quantity of a cart item",
       "security": [
         {
-          "cookieAuth": []
+          "accessTokenCookie": []
         }
       ],
       "requestBody": {
@@ -332,7 +332,7 @@
       "summary": "Delete an item from the cart",
       "security": [
         {
-          "cookieAuth": []
+          "accessTokenCookie": []
         }
       ],
       "parameters": [
@@ -396,7 +396,7 @@
       "summary": "Checkout the cart",
       "security": [
         {
-          "cookieAuth": []
+          "accessTokenCookie": []
         }
       ],
       "requestBody": {

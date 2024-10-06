@@ -21,7 +21,7 @@ export const getAccessToken = async (req, res) => {
     const { id: userId } = decoded;
 
     const user = await User.findById(userId);
-    const card = await Cart.findOne({ user_id: user._id })
+    const card = await Cart.findOne({ user_id: user._id });
 
     const newAcessToken = generateAccessToken(userId);
     const tokenMaxAge = convertTimeToMilliseconds(
@@ -30,8 +30,7 @@ export const getAccessToken = async (req, res) => {
 
     res.cookie("accessToken", newAcessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
       path: "/api",
       maxAge: tokenMaxAge,
     });
