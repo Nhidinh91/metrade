@@ -1,5 +1,5 @@
 {
-  "/api/admin/orders/": {
+  "/admin/orders/": {
     "get": {
       "tags": [
         "Admin Orders"
@@ -7,7 +7,7 @@
       "summary": "Get all order items",
       "security": [
         {
-          "cookieAuth": []
+          "accessTokenCookie": []
         }
       ],
       "parameters": [
@@ -84,7 +84,7 @@
       }
     }
   },
-  "/api/admin/orders/{orderItemId}": {
+  "/admin/orders/{orderItemId}": {
     "put": {
       "tags": [
         "Admin Orders"
@@ -92,7 +92,7 @@
       "summary": "Update order item status",
       "security": [
         {
-          "cookieAuth": []
+          "accessTokenCookie": []
         }
       ],
       "parameters": [
@@ -182,7 +182,7 @@
       }
     }
   },
-  "/api/admin/orders/stats": {
+  "/admin/orders/stats": {
     "get": {
       "tags": [
         "Admin Orders"
@@ -190,7 +190,7 @@
       "summary": "Get order item statistics",
       "security": [
         {
-          "cookieAuth": []
+          "accessTokenCookie": []
         }
       ],
       "responses": {

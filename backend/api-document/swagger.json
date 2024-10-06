@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000",
+      "url": "http://localhost:3000/api",
       "description": "Local development server"
     }
   ],
@@ -366,10 +366,28 @@
           }
         }
       }
+    },
+    "securitySchemes": {
+      "accessTokenCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "accessToken"
+      },
+      "refreshTokenCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "refreshToken"
+      }
     }
   },
+  "security": [
+    {
+      "accessTokenCookie": [],
+      "refreshTokenCookie": []
+    }
+  ],
   "paths": {
-    "/api/auth/register": {
+    "/auth/register": {
       "post": {
         "tags": [
           "Authentication"
@@ -474,7 +492,7 @@
         }
       }
     },
-    "/api/auth/verify": {
+    "/auth/verify": {
       "post": {
         "tags": [
           "Authentication"
@@ -570,7 +588,7 @@
         }
       }
     },
-    "/api/auth/resend-verification-email": {
+    "/auth/resend-verification-email": {
       "post": {
         "tags": [
           "Authentication"
@@ -672,7 +690,7 @@
         }
       }
     },
-    "/api/auth/login": {
+    "/auth/login": {
       "post": {
         "tags": [
           "Authentication"
@@ -706,12 +724,6 @@
         "responses": {
           "200": {
             "description": "Login successful",
-            "headers": {
-              "schema": {
-                "type": "string",
-                "example": "accessToken=abcde1234565; Path=/api; httpOnly"
-              }
-            },
             "content": {
               "application/json": {
                 "schema": {
@@ -823,7 +835,7 @@
         }
       }
     },
-    "/api/auth/logout": {
+    "/auth/logout": {
       "post": {
         "tags": [
           "Authentication"
@@ -889,7 +901,7 @@
         }
       }
     },
-    "/api/orders/order-history": {
+    "/orders/order-history": {
       "get": {
         "tags": [
           "Orders"
@@ -897,7 +909,7 @@
         "summary": "Get order history",
         "security": [
           {
-            "cookieAuth": []
+            "accessTokenCookie": []
           }
         ],
         "parameters": [
@@ -1024,7 +1036,7 @@
         }
       }
     },
-    "/api/admin/orders/": {
+    "/admin/orders/": {
       "get": {
         "tags": [
           "Admin Orders"
@@ -1032,7 +1044,7 @@
         "summary": "Get all order items",
         "security": [
           {
-            "cookieAuth": []
+            "accessTokenCookie": []
           }
         ],
         "parameters": [
@@ -1109,7 +1121,7 @@
         }
       }
     },
-    "/api/admin/orders/{orderItemId}": {
+    "/admin/orders/{orderItemId}": {
       "put": {
         "tags": [
           "Admin Orders"
@@ -1117,7 +1129,7 @@
         "summary": "Update order item status",
         "security": [
           {
-            "cookieAuth": []
+            "accessTokenCookie": []
           }
         ],
         "parameters": [
@@ -1207,7 +1219,7 @@
         }
       }
     },
-    "/api/admin/orders/stats": {
+    "/admin/orders/stats": {
       "get": {
         "tags": [
           "Admin Orders"
@@ -1215,7 +1227,7 @@
         "summary": "Get order item statistics",
         "security": [
           {
-            "cookieAuth": []
+            "accessTokenCookie": []
           }
         ],
         "responses": {

@@ -1,5 +1,5 @@
 {
-  "/api/orders/order-history": {
+  "/orders/order-history": {
     "get": {
       "tags": [
         "Orders"
@@ -7,7 +7,7 @@
       "summary": "Get order history",
       "security": [
         {
-          "cookieAuth": []
+          "accessTokenCookie": []
         }
       ],
       "parameters": [

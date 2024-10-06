@@ -366,25 +366,7 @@
           }
         }
       }
-    },
-    "securitySchemes": {
-      "accessTokenCookie": {
-        "type": "apiKey",
-        "in": "cookie",
-        "name": "accessToken"
-      },
-      "refreshTokenCookie": {
-        "type": "apiKey",
-        "in": "cookie",
-        "name": "refreshToken"
-      }
     }
   },
-  "security": [
-    {
-      "accessTokenCookie": [],
-      "refreshTokenCookie": []
-    }
-  ],
   "paths": {}
 }
