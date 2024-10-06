@@ -51,7 +51,7 @@ export const sendConfirmationEmailService = async (firstName, email, token) => {
     text: `Hi! ${firstName}, You have recently visited 
            our website and entered your email.
            Please follow the given link to verify your email
-           ${process.env.FE_URL}?token=${token}&email=${email}\n.
+           ${process.env.CLIENT_URL}/verify?token=${token}&email=${email}\n.
 
            The link will expire after ${timeStr}
            Thanks`,
