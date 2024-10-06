@@ -294,12 +294,14 @@ export const logout = async (req, res) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         path: "/api/token/get-access-token",
+        sameSite: "none"
       });
       
       res.clearCookie("accessToken", {      
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         path: "/api",
+        sameSite: "none"
       });
 
       return res

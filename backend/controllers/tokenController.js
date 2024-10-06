@@ -31,7 +31,7 @@ export const getAccessToken = async (req, res) => {
     res.cookie("accessToken", newAcessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "Strict",
+      sameSite: "none",
       path: "/api",
       maxAge: tokenMaxAge,
     });
