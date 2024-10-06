@@ -235,10 +235,9 @@ export const login = async (req, res) => {
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      // secure: true,
       path: "/api/token/get-access-token",
       maxAge: convertTimeToMilliseconds(process.env.JWT_REFRESH_EXPIRES_IN),
-      sameSite: "Strict",
+
     });
 
     //generate accessToken and store in cookies
@@ -250,10 +249,8 @@ export const login = async (req, res) => {
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      // secure: true,
       path: "/api",
       maxAge: accessTokenMaxAge,
-      sameSite: "Strict",
     });
 
     const card = await Cart.findOne({ user_id: user._id });

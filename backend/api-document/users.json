@@ -1,11 +1,13 @@
 {
   "/user/profile/detail": {
     "get": {
-      "tags": ["Users"],
+      "tags": [
+        "Users"
+      ],
       "summary": "Get user profile details",
       "security": [
         {
-          "cookieAuth": []
+          "accessTokenCookie": []
         }
       ],
       "responses": {
@@ -77,11 +79,13 @@
   },
   "/user/profile/update": {
     "patch": {
-      "tags": ["Users"],
+      "tags": [
+        "Users"
+      ],
       "summary": "Update user profile",
       "security": [
         {
-          "cookieAuth": []
+          "accessTokenCookie": []
         }
       ],
       "requestBody": {
