@@ -15,7 +15,7 @@ jest.setTimeout(30000);
 const mockUser = {
   first_name: "Test",
   last_name: "User",
-  email: "test.user1@metropolia.fi",
+  email: "testuser@metropolia.fi",
   phone: "123456789",
   balance: 1000,
   password: bcrypt.hashSync("12345678", parseInt(process.env.SALT_ROUNDS)),
@@ -63,7 +63,8 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  // Clean up the database by removing the mock products
+  // Clean up the database by removing the mock products and user
+  await User.deleteMany({ email: mockUser.email });
   await Product.deleteMany({ name: mockProduct.name });
   mongoose.connection.close();
   appServer.close();

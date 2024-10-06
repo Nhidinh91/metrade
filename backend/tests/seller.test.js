@@ -15,7 +15,7 @@ jest.setTimeout(30000);
 const mockUser = {
   first_name: "Test",
   last_name: "User",
-  email: "test.user2@metropolia.fi",
+  email: "testseller@metropolia.fi",
   phone: "123456789",
   balance: 1000,
   password: bcrypt.hashSync("12345678", parseInt(process.env.SALT_ROUNDS)),
