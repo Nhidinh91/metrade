@@ -44,11 +44,11 @@ export const register = async (req, res) => {
         const validation_token = await createToken(email);
 
         // send confirmation email
-        await sendConfirmationEmailService(
-          first_name,
-          email,
-          validation_token.value
-        );
+        // await sendConfirmationEmailService(
+        //   first_name,
+        //   email,
+        //   validation_token.value
+        // );
         const newUser = await User.create({
           first_name,
           last_name,
@@ -177,11 +177,11 @@ export const resendEmail = async (req, res) => {
           { returnDocument: "after" }
         );
 
-        sendConfirmationEmailService(
-          user.first_name,
-          email,
-          validation_token.value
-        );
+        // sendConfirmationEmailService(
+        //   user.first_name,
+        //   email,
+        //   validation_token.value
+        // );
 
         return res.status(201).json({
           status: "success",

@@ -7,7 +7,8 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node main.js",
     "dev": "cross-env NODE_ENV=development nodemon main.js",
-    "test": "jest --watchAll --verbose"
+    "test": "jest --watchAll --verbose",
+    "test:detect": "jest --detectOpenHandles"
   },
   "author": "",
   "license": "ISC",
