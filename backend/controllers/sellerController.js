@@ -122,7 +122,7 @@ export const updateProduct = async (req, res) => {
     });
   }
 
-  const updatedProduct = await Product.findByIdAndUpdate(id, { name, image, photos, description, price, pickup_point, category_id: categoryId, keywords, stock_quantity, status });
+  const updatedProduct = await Product.findByIdAndUpdate(id, { name, image, photos, description, price, pickup_point, category_id: categoryId, keywords, stock_quantity, status }, { new: true });
 
   res.status(200).json({
     success: true,

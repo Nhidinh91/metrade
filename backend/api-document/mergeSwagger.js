@@ -15,11 +15,12 @@ const pathsToMerge = [
   "auth.json",
   "order.json",
   "admin-order.json",
-  ,
   "carts.json",
   "users.json",
   "token.json",
   "carts.json",
+  "products.json",
+  "sellers.json",
 ];
 
 // Function to merge paths into base
