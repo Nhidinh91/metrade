@@ -118,14 +118,6 @@ afterAll(async () => {
   const user = await User.findOne({ email: mockUser.email });
 
   if (user) {
-    // Clean up Cart and CartItems related to the mock user
-    // await Cart.deleteMany({ user_id: user._id });
-    // await CartItem.deleteMany({
-    //   cart_id: {
-    //     $in: (await Cart.find({ user_id: user._id })).map((cart) => cart._id),
-    //   },
-    // });
-
     // Clean up Orders and OrderItems related to the mock user
     const orderIds = (await Order.find({ user_id: user._id })).map(
       (order) => order._id
