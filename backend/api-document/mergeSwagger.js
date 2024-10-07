@@ -21,6 +21,8 @@ const pathsToMerge = [
   "carts.json",
   "products.json",
   "sellers.json",
+  "categories.json",
+  "admin.json"
 ];
 
 // Function to merge paths into base
