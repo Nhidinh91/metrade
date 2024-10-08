@@ -1,11 +1,9 @@
-import request from "supertest";
+
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import app from "../app";
 import mongoose from "mongoose";
 import User from "../models/userModel";
-import Cart from "../models/cartModel";
-import CartItem from "../models/cartItemModel";
 import Category from "../models/categoryModel";
 import Product from "../models/productModel";
 import Order from "../models/orderModel.js";
@@ -17,9 +15,6 @@ const api = supertest(app);
 
 // Increase the timeout for the test to 30 seconds
 let accessToken;
-let appServer;
-let verifyToken;
-let email;
 jest.setTimeout(30000);
 
 const mockUser = {
@@ -79,9 +74,9 @@ const mockOrderItem = {
   selling_status: "processing", // Default status
 };
 
-// let accessToken;
 
 beforeAll(async () => {
+  //setting up database for testing
   const user = await User.create(mockUser);
   mockProduct.user_id = user._id;
   mockOrder.user_id = user._id;
@@ -90,8 +85,6 @@ beforeAll(async () => {
   mockProduct.category_id = category._id;
 
   const product = await Product.create(mockProduct);
-  // mockProduct._id = product._id;
-
   mockOrderItem.product_id = product._id;
   mockOrderItem.product_name = product.name;
   mockOrderItem.image = product.image;
@@ -101,9 +94,10 @@ beforeAll(async () => {
 
   mockOrder.total_item_quantity = mockOrderItem.sold_quantity;
   mockOrder.total_price = mockOrderItem.sub_total;
-  const order = await Order.create(mockOrder);
 
+  const order = await Order.create(mockOrder);
   mockOrderItem.order_id = order._id;
+
   const orderItem = await OrderItem.create(mockOrderItem);
   mockOrderItemId = orderItem._id;
 
@@ -116,6 +110,7 @@ beforeAll(async () => {
   accessToken = res.headers["set-cookie"][1];
 });
 
+//clean up database with testing data
 afterAll(async () => {
   const user = await User.findOne({ email: mockUser.email });
 
@@ -137,7 +132,6 @@ afterAll(async () => {
     await Product.deleteMany({ user_id: user._id });
   }
 
-  // mongoose.connection.close();
   await mongoose.connection.close();
 });
 
@@ -148,7 +142,6 @@ describe("Admin Order API", () => {
         .get("/api/admin/orders/")
         .set("Cookie", [accessToken]); // Assuming you use a token for authentication
 
-      // console.log(response.body);
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty("data");
       expect(response.body.status).toContain("success");
@@ -156,9 +149,8 @@ describe("Admin Order API", () => {
     it("should return Unauthenticated Error with status 401", async () => {
       const response = await api.get("/api/admin/orders/");
 
-      // console.log(response.body);
+
       expect(response.status).toBe(401);
-      // expect(response.body.status).toContain("success");
     });
   });
   describe("GET /api/admin/orders/stats", () => {
@@ -167,7 +159,6 @@ describe("Admin Order API", () => {
         .get("/api/admin/orders/stats")
         .set("Cookie", [accessToken]); // Assuming you use a token for authentication
 
-      // console.log(response.body);
       expect(response.status).toBe(200);
       expect(response.body.status).toContain("success");
       expect(response.body).toHaveProperty("data");
@@ -179,7 +170,6 @@ describe("Admin Order API", () => {
     });
     it("should return Unauthenticated Error with status 401", async () => {
       const response = await api.get("/api/admin/orders/stats");
-
       expect(response.status).toBe(401);
     });
   });
@@ -187,7 +177,6 @@ describe("Admin Order API", () => {
     it("should update order item status when provide orderItemId that exists in database and is authenticated", async () => {
       const selling_status = "await-pickup";
       const orderItem = await OrderItem.findOne({ _id: mockOrderItemId });
-      // console.log(orderItem);
       const response = await api
         .put(`/api/admin/orders/${mockOrderItemId}`)
         .send({ selling_status: selling_status })
@@ -195,13 +184,6 @@ describe("Admin Order API", () => {
       expect(response.status).toBe(200);
       expect(response.body.status).toContain("success");
       expect(response.body).toHaveProperty("data");
-      console.log(response.body);
-      // expect(response.body.data).toHaveProperty("selling_status");
-      // console.log(response.body);
-      // expect(response.body.data).toHaveProperty(
-      //   "selling_status",
-      //   selling_status
-      // );
     });
     it("should return status 400 when not provide orderItemId, provide invalid Id", async () => {
       const invalidId = "123";

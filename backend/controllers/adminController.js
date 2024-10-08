@@ -337,7 +337,6 @@ export const getAllOrderItems = async (req, res) => {
     const currentPage = req.query.page * 1 || 1; // convert the page from query from string to num
     const limit = LIMIT;
     const skip = (currentPage - 1) * limit;
-    console.log(`${currentPage} - ${limit} - ${skip}`);
 
     orderItems = await OrderItem.find(queryObj)
       .sort({ updated_at: -1 })

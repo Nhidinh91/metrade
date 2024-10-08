@@ -57,21 +57,10 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-// afterEach(async () => {
-//   // Clean up the database between tests
-//   await User.deleteMany({});
-// });
-
 describe("Auth Routes", () => {
   describe("POST /api/auth/register", () => {
     it("should signup a new user with valid credentials", async () => {
       // Arrange
-      // const mockUserRegister = {
-      //   first_name: "test",
-      //   last_name: "test",
-      //   email: "test@metropolia.fi",
-      //   password: "password",
-      // };
 
       // Act
       const response = await api
@@ -121,10 +110,7 @@ describe("Auth Routes", () => {
       await User.create(mockExistingUser);
 
       const existingUser = {
-        first_name: "user",
-        last_name: "user",
-        email: "user@metropolia.fi",
-        password: "password",
+        ...mockExistingUser,
       };
 
       //Act
@@ -165,15 +151,7 @@ describe("Auth Routes", () => {
   });
   describe("POST /api/auth/resend-verification-email", () => {
     it("should return status 200 and send new email if unverified user request a new email", async () => {
-      // const mockUserResend = {
-      //   first_name: "test1",
-      //   last_name: "test1",
-      //   email: "test1@metropolia.fi",
-      //   password: "password",
-      // };
-      const response1 = await api
-        .post("/api/auth/register/")
-        .send(mockUserResend);
+      await api.post("/api/auth/register/").send(mockUserResend);
 
       const response = await api
         .post("/api/auth/resend-verification-email")
@@ -203,8 +181,8 @@ describe("Auth Routes", () => {
   describe("POST /api/auth/login", () => {
     it("should return 200 if provide correct credentials", async () => {
       const userInfo = {
-        email: "test@metropolia.fi",
-        password: "password",
+        email: mockUserRegister.email,
+        password: mockUserRegister.password,
       };
       const response = await api.post("/api/auth/login").send(userInfo);
       expect(response.status).toBe(200);
@@ -213,8 +191,8 @@ describe("Auth Routes", () => {
     });
     it("should return 200 with accessToken and refreshToken with correct credentials", async () => {
       const userInfo = {
-        email: "test@metropolia.fi",
-        password: "password",
+        email: mockUserRegister.email,
+        password: mockUserRegister.password,
       };
       const response = await api.post("/api/auth/login").send(userInfo);
       expect(response.status).toBe(200);
@@ -277,9 +255,8 @@ describe("Auth Routes", () => {
     });
     it("should return 200 when provided valid userId and clear cookies if log out is successfully", async () => {
       const user = await User.findOne({ email });
-      // console.log(user);
+
       const userId = { userId: user._id };
-      // console.log(userId);
 
       const response = await api.post("/api/auth/logout").send(userId);
       expect(response.status).toBe(200);

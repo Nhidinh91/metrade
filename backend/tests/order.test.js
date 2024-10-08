@@ -89,8 +89,6 @@ beforeAll(async () => {
   mockProduct.category_id = category._id;
 
   const product = await Product.create(mockProduct);
-  // mockProduct._id = product._id;
-
   mockOrderItem.product_id = product._id;
   mockOrderItem.product_name = product.name;
   mockOrderItem.image = product.image;
@@ -100,9 +98,10 @@ beforeAll(async () => {
 
   mockOrder.total_item_quantity = mockOrderItem.sold_quantity;
   mockOrder.total_price = mockOrderItem.sub_total;
-  const order = await Order.create(mockOrder);
 
+  const order = await Order.create(mockOrder);
   mockOrderItem.order_id = order._id;
+
   const orderItem = await OrderItem.create(mockOrderItem);
 
   const res = await api.post("/api/auth/login").send({
@@ -134,8 +133,7 @@ afterAll(async () => {
     await Category.deleteMany({ name: mockCategory.name });
     await Product.deleteMany({ user_id: user._id });
   }
-
-  // mongoose.connection.close();
+  //close db connection after each test
   await mongoose.connection.close();
 });
 
@@ -149,7 +147,6 @@ describe("Order API Test", () => {
     });
     it("should not get order history if user is not Authenticated", async () => {
       const response = await api.get("/api/orders/order-history");
-
       expect(response.status).toBe(401);
     });
   });
