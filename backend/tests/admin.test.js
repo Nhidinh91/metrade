@@ -27,9 +27,24 @@ const mockUser = {
   role: "admin",
   photo_url: "",
   is_verified: true,
-  status: "active",
+  status: "banned",
+  _id: new mongoose.Types.ObjectId(),
 };
 
+// Mock product data
+const mockProduct = {
+  user_id: new mongoose.Types.ObjectId(), // Mock user ID
+  name: "Test Product",
+  image: "http://example.com/image.jpg",
+  photos: ["http://example.com/photo1.jpg", "http://example.com/photo2.jpg"],
+  description: "A test product description.",
+  price: 100,
+  pickup_point: "Myllypuro",
+  category_id: new mongoose.Types.ObjectId(), // Mock category ID
+  stock_quantity: 10,
+  status: "processing",
+  keywords: ["test", "product"],
+};
 
 beforeAll(async () => {
   // Start the server and return the appServer
@@ -81,15 +96,15 @@ describe("Admin API", () => {
 
   // Test updating a user's status
   test("should update user status", async () => {
-    const user = await User.findOne({ status: "banned" });
+    const user = await User.findById(mockUser._id);
     const response = await api
       .post(`/api/admin/users/${user._id}`)
       .set("Cookie", [accessToken])
-      .send({ status: "active" })
+      .send({ status: "banned" })
       .expect(200)
       .expect("Content-Type", /json/);
 
-    expect(response.body.status).toBe("active");
+    expect(response.body.status).toBe("banned");
   });
 
   // Test fetching products
@@ -106,12 +121,7 @@ describe("Admin API", () => {
 
   // Test activating a product
   test("should activate a product", async () => {
-    const newProduct = await Product.findOne({
-      status: "processing",
-    });
-
-    console.log("newProduct", newProduct);
-
+    const newProduct = await Product.create({...mockProduct});
     const response = await api
       .put(`/api/admin/product/activate/${newProduct._id}`)
       .set("Cookie", [accessToken])
