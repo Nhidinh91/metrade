@@ -7,7 +7,12 @@ import {
   createToken,
   isValidVerifyToken,
 } from "../utils/authUtils/tokenValidation.js";
-import jwt from "jsonwebtoken";
+import { convertTimeToMilliseconds } from "../utils/time/time.js";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../utils/token/jwtToken.js";
+import bcrypt from "bcryptjs";
 
 export const register = async (req, res) => {
   try {
@@ -38,6 +43,14 @@ export const register = async (req, res) => {
         const hashedPassword = await hashInput(password);
         const validation_token = await createToken(email);
 
+        // send confirmation email
+        // need to turn this off while testing auth.test.js but working with normal email
+        await sendConfirmationEmailService(
+          first_name,
+          email,
+          validation_token.value
+        );
+
         const newUser = await User.create({
           first_name,
           last_name,
@@ -46,13 +59,7 @@ export const register = async (req, res) => {
           validation_token,
         });
         const newCart = await Cart.create({ user_id: newUser.id });
-        
-        // send confirmation email
-        await sendConfirmationEmailService(
-          first_name,
-          email,
-          validation_token.value
-        );
+
         // return response to FE
         return res.status(201).json({
           status: "success",
@@ -97,6 +104,7 @@ export const checkVerify = async (req, res) => {
         {
           $set: {
             is_verified: true,
+            role: "seller",
             validation_token: {
               value: "",
               expired_at: user.validation_token.expired_at,
@@ -171,6 +179,7 @@ export const resendEmail = async (req, res) => {
           { returnDocument: "after" }
         );
 
+        // need to turn this off while testing auth.test.js but working with normal email
         sendConfirmationEmailService(
           user.first_name,
           email,
@@ -192,6 +201,7 @@ export const resendEmail = async (req, res) => {
   }
 };
 
+//Login controller
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -206,15 +216,46 @@ export const login = async (req, res) => {
     const user = await User.findOne({ email: email });
 
     // If invalid email or password
-    if (!user || !(await user.comparePassword(password))) {
+    if (!user || !bcrypt.compareSync(password, user.password)) {
       return res
         .status(401)
         .json({ success: false, message: "Invalid email or password" });
     }
     // If email and password are correct, send res with token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
+
+    //generate refreshToken and store in cookies and database
+    const newRefreshToken = generateRefreshToken(user._id);
+    const savedToken = await User.findByIdAndUpdate(user._id, {
+      refresh_token: newRefreshToken,
     });
+
+    if (!savedToken) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User not found" });
+    }
+
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/api/token/get-access-token",
+      maxAge: convertTimeToMilliseconds(process.env.JWT_REFRESH_EXPIRES_IN),
+    });
+
+    //generate accessToken and store in cookies
+    const newAccessToken = generateAccessToken(user._id);
+    const accessTokenMaxAge = convertTimeToMilliseconds(
+      process.env.JWT_ACCESS_EXPIRES_IN
+    );
+
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/api",
+      maxAge: accessTokenMaxAge,
+    });
+
+    const card = await Cart.findOne({ user_id: user._id });
 
     res.status(200).json({
       success: true,
@@ -229,12 +270,50 @@ export const login = async (req, res) => {
         is_verified: user.is_verified,
         phone: user.phone,
         balance: user.balance,
-        token: token,
+        card_id: card?._id,
+        token_expired_at: Date.now() + accessTokenMaxAge,
       },
     });
   } catch (error) {
     console.log(error);
     // Handle any server errors
     res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+//Logout action
+export const logout = async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+    // Clear the refresh token in the database
+    const deletedToken = await User.findByIdAndUpdate(userId, {
+      refresh_token: "",
+    });
+
+    if (deletedToken) {
+      // Clear the tokens from the cookie
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        path: "/api/token/get-access-token",
+      });
+
+      res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        path: "/api",
+      });
+
+      return res
+        .status(200)
+        .json({ success: true, message: "Logout successfully" });
+    } else {
+      return res
+        .status(500)
+        .json({ success: false, message: "Error during logout" });
+    }
+  } catch (err) {
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };

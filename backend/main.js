@@ -1,44 +1,9 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import morgan from "morgan";
-import connectDB from "./configs/database.js";
-import jwtAuthenticate from "./middlewares/jwtAuthenticate.js";
-import authRoutes from "./routes/authRoutes.js";
+import app from "./app.js";
 
-import categoryRoutes from "./routes/categoryRoutes.js";
+const APP_PORT = process.env.APP_PORT || 3000;
 
-import productRoutes from "./routes/productRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
-
-dotenv.config();
-
-const app = express();
-app.use(cors());
-
-// Middleware
-// A middleware function in Express.js that is used to parse incoming JSON payloads in HTTP requests
-app.use(express.json());
-
-// Connect to MongoDB
-connectDB();
-
-app.use(morgan("dev"));
-
-// Middlewares
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
-app.use("/api/user", jwtAuthenticate);
-
-// Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/user", userRoutes);
-app.use("/api/product", productRoutes);
-app.use("/api/categories", categoryRoutes);
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(APP_PORT, () => {
+  if (process.env.NODE_ENV === "development") {
+    console.log(`Server is running on http://localhost:${APP_PORT}`);
+  }
 });

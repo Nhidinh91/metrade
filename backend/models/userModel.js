@@ -1,7 +1,4 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
-
-import { createToken } from "./../utils/authUtils/tokenValidation.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -51,7 +48,7 @@ const userSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["active", "deactive", "banned"],
+      enum: ["active", "banned", "deleted"],
       default: "active",
     },
 
@@ -63,6 +60,11 @@ const userSchema = new mongoose.Schema(
         type: Date,
       },
     },
+
+    refresh_token: {
+      type: String,
+    },
+
     deleted_at: {
       type: Date,
       default: null,
@@ -72,24 +74,6 @@ const userSchema = new mongoose.Schema(
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" }, // Automatically add created_at and updated_at
   }
 );
-
-//statics
-
-//methods
-
-userSchema.methods.createAndUpdateToken = async function () {
-  const tokenObject = await createToken(this.email);
-  const updatedUser = await this.findOneAndUpdate(
-    { email },
-    { $set: { validation_token: tokenObject } },
-    { returnDocument: "after" }
-  );
-  return updatedUser;
-};
-
-userSchema.methods.comparePassword = async function (inputPassword) {
-  return await bcrypt.compare(inputPassword, this.password);
-};
 
 const User = mongoose.model("User", userSchema);
 export default User;

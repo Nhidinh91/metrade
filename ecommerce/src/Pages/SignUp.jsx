@@ -101,7 +101,7 @@ const SignUp = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    // let ignore = false
+
     const isValid = isvalidForm();
 
     if (isValid) {
@@ -113,7 +113,7 @@ const SignUp = () => {
       };
       try {
         const response = await fetch(
-          "http://127.0.0.1:3000/api/auth/register",
+          `${process.env.REACT_APP_API_URL}/auth/register`,
           {
             method: "POST",
             headers: {
@@ -213,7 +213,6 @@ const SignUp = () => {
                     placeholder="Enter your password"
                     onChange={handlePassword}
                     value={password}
-                    // onChange={(e) => setPassword(e.target.value)}
                     className="signin-input"
                   />
                   {passwordType === "password" ? (

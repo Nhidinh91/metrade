@@ -52,6 +52,7 @@ const Login = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ email, password }), // Send email and password to backend
       });
 
@@ -60,7 +61,13 @@ const Login = () => {
       if (response.ok) {
         updateUser(data.user);
 
-        navigate("/");
+        // Check if user is admin
+        if (data.user.role === "admin") {
+          navigate("/admin-user");
+        } else {
+          navigate("/");
+        }
+        
       } else {
         setError(data.message || "Login failed. Please try again.");
       }
