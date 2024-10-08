@@ -33,18 +33,18 @@ export const sendConfirmationEmailService = async (firstName, email, token) => {
     port: 25, //25, 465
     secure: false, // true for 465, false for other ports
     auth: {
-      // user: process.env.EMAIL_USERNAME,
-      // pass: process.env.EMAIL_PASSWORD,
-      user: process.env.BACKUP_EMAIL_USERNAME,
-      pass: process.env.BACKUP_EMAIL_PASSWORD,
+      user: process.env.EMAIL_USERNAME,
+      pass: process.env.EMAIL_PASSWORD,
+      // user: process.env.BACKUP_EMAIL_USERNAME,
+      // pass: process.env.BACKUP_EMAIL_PASSWORD,
     },
   });
 
   const timeStr = convertToFullDateTimeStr(exp_time_str);
 
   let mailConfigurations = await transport.sendMail({
-    // from: `Metrade <${process.env.EMAIL_USERNAME}>`,
-    from: `Metrade <${process.env.BACKUP_EMAIL_USERNAME}>`,
+    from: `Metrade <${process.env.EMAIL_USERNAME}>`,
+    // from: `Metrade <${process.env.BACKUP_EMAIL_USERNAME}>`,
     to: `${email}`,
     subject: "Email Verification",
 
