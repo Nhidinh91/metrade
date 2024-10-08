@@ -44,11 +44,13 @@ export const register = async (req, res) => {
         const validation_token = await createToken(email);
 
         // send confirmation email
+        // need to turn this off while testing auth.test.js but working with normal email
         await sendConfirmationEmailService(
           first_name,
           email,
           validation_token.value
         );
+
         const newUser = await User.create({
           first_name,
           last_name,
@@ -177,6 +179,7 @@ export const resendEmail = async (req, res) => {
           { returnDocument: "after" }
         );
 
+        // need to turn this off while testing auth.test.js but working with normal email
         sendConfirmationEmailService(
           user.first_name,
           email,

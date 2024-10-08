@@ -26,8 +26,9 @@ router.put("/product/activate/:id", activateProduct);
 router.delete("/product/delete/:id", deleteProduct);
 
 //Order Management Routes
-router.get("/orders/", getAllOrderItems);
 router.put("/orders/:orderItemId", updateOrderItemStatus);
+router.get("/orders", getAllOrderItems);
+
 router.get("/orders/stats", getOrderItemStats);
 
 export default router;

@@ -70,7 +70,7 @@ export const getOrderHistory = async (req, res) => {
     }
 
     res.status(200).json({
-      status: 200,
+      status: "success",
       data: {
         totalOrder: totalNum,
         limit: limit,
