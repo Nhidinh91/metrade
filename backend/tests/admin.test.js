@@ -27,7 +27,8 @@ const mockUser = {
   role: "admin",
   photo_url: "",
   is_verified: true,
-  status: "active",
+  status: "banned",
+  _id: new mongoose.Types.ObjectId(),
 };
 
 // Mock product data
@@ -95,7 +96,7 @@ describe("Admin API", () => {
 
   // Test updating a user's status
   test("should update user status", async () => {
-    const user = await User.findOne({ status: "active" });
+    const user = await User.findById(mockUser._id);
     const response = await api
       .post(`/api/admin/users/${user._id}`)
       .set("Cookie", [accessToken])
